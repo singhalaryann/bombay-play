@@ -1,0 +1,39 @@
+.filterContainer {
+    display: flex;
+    gap: 8px;
+    padding: 4px;
+    background: #161616;
+    border-radius: 8px;
+  }
+  
+  .filterButton {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #A3A3A3;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .filterButton:hover {
+    color: #FFFFFF;
+  }
+  
+  .filterButton.active {
+    background: #15803D;
+    color: #FFFFFF;
+  }
+  
+  @media (max-width: 768px) {
+    .filterContainer {
+      overflow-x: auto;
+      width: 100%;
+      padding: 4px;
+    }
+  
+    .filterButton {
+      white-space: nowrap;
+    }
+  }

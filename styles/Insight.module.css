@@ -1,0 +1,72 @@
+/* styles/Insight.module.css */
+.container {
+    min-height: 100vh;
+    background: #050505;
+    color: white;
+  }
+  
+  .mainLayout {
+    display: flex;
+    height: calc(100vh - 64px);
+  }
+  
+  .mainContent {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    background: #050505;
+  }
+  
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: #E5E5E5;
+    font-size: 1.1rem;
+    background: #1E1E1E;
+  }
+  
+  .filterSection {
+    margin-bottom: 1.5rem;
+  }
+  
+  .descriptionBox {
+    background: rgba(52, 58, 64, 0.3);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    color: #E5E5E5;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  
+  .actionSection {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1.5rem;
+    padding: 0 0.5rem;
+  }
+  
+  .analyseButton {
+    background: #98FB98;
+    color: #000000;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  
+  .analyseButton:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+  
+  .analyseButton:active {
+    transform: translateY(0);
+  }

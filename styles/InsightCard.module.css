@@ -1,0 +1,83 @@
+/* styles/InsightCard.module.css */
+.wrapper {
+    margin-top: 32px;
+  }
+  
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  
+  .icon {
+    color: #16A34A;
+  }
+  
+  .title {
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  .card {
+    background: #161616;
+    border: 1px solid #262626;
+    border-radius: 12px;
+    padding: 16px;
+  }
+  
+  .content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .message {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+  }
+  
+  .bullet {
+    color: #16A34A;
+    font-size: 20px;
+  }
+  
+  .message p {
+    color: #E5E7EB;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  .investigateButton {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #16A34A;
+    border: none;
+    border-radius: 6px;
+    color: #FFFFFF;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .investigateButton:hover {
+    background: #15803D;
+  }
+  
+  @media (max-width: 768px) {
+    .content {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .investigateButton {
+      width: 100%;
+      justify-content: center;
+    }
+  }
