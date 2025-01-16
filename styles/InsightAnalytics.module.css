@@ -3,17 +3,19 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
-  padding: 0 0.5rem;
+  width: 100%;
+  margin-top: 1rem;
 }
 
 .section {
   position: relative;
+  min-height: 400px;
 }
 
 .glassEffect {
-  background: rgba(18, 18, 18, 0.4);
+  background: rgba(28, 28, 28, 0.6);
   border-radius: 12px;
-  padding: 20px;
+  padding: 1.5rem;
   height: 100%;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -44,34 +46,75 @@
   pointer-events: none;
 }
 
-.section h3 {
-  color: #ffffff;
+.chartTitle {
+  color: rgba(255, 255, 255, 0.9);
   font-size: 1.1rem;
-  margin-bottom: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  margin-bottom: 1.5rem;
   font-weight: 500;
 }
 
-/* Chart container styles */
-.chartContainer {
-  min-height: 300px;
-  width: 100%;
+.customTooltip {
+  background-color: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  color: white;
+  font-size: 0.875rem;
 }
 
-/* Responsive design */
-@media (max-width: 1024px) {
-  .analyticsContainer {
-    grid-template-columns: 1fr;
+/* Responsive Styles */
+@media (max-width: 1280px) {
+  .section {
+    min-height: 350px;
+  }
+
+  .glassEffect {
+    padding: 1.25rem;
+  }
+
+  .chartTitle {
+    font-size: 1rem;
+    margin-bottom: 1.25rem;
   }
 }
 
-/* Typography and spacing */
-.glassEffect h3 {
-  margin-bottom: 1.5rem;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 1rem;
-  font-weight: 500;
+@media (max-width: 1024px) {
+  .analyticsContainer {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .section {
+    min-height: 400px;
+  }
 }
 
+@media (max-width: 768px) {
+  .analyticsContainer {
+    gap: 1rem;
+  }
+
+  .section {
+    min-height: 350px;
+  }
+
+  .glassEffect {
+    padding: 1rem;
+  }
+
+  .chartTitle {
+    font-size: 0.9375rem;
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .section {
+    min-height: 300px;
+  }
+
+  .customTooltip {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+}

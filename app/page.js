@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import styles from '../styles/page.module.css';
 import { useRouter } from 'next/navigation';
 import { useAuth } from './context/AuthContext';
-import Image from 'next/image';
 
 export default function Home() {
   const router = useRouter();
@@ -19,7 +18,6 @@ export default function Home() {
     setLoading(true);
 
     try {
-      // Call the check_user API
       const response = await fetch('https://check-user-q54hzgyghq-uc.a.run.app', {
         method: 'POST',
         headers: {
@@ -51,11 +49,10 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      
       <div className={styles.content}>
-        <h1 className={styles.title}>Welcome to XG </h1>
+        <h1 className={styles.title}>Welcome to XG</h1>
         <p className={styles.subtitle}>Enter your user ID to continue</p>
-
+        
         <form onSubmit={handleSubmit} className={styles.form}>
           <input
             type="text"
@@ -64,16 +61,18 @@ export default function Home() {
             placeholder="Enter your ID"
             className={styles.input}
             disabled={loading}
+            autoFocus
           />
-          <button 
-            type="submit" 
+          
+          <button
+            type="submit"
             className={styles.button}
-            disabled={loading}
+            disabled={loading || !userId.trim()}
           >
             {loading ? 'Validating...' : 'Enter'}
           </button>
         </form>
-
+        
         {error && <p className={styles.error}>{error}</p>}
       </div>
     </div>
