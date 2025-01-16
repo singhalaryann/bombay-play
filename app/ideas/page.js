@@ -1,59 +1,56 @@
 // app/ideas/page.js
 'use client';
 import React, { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useAuth } from '../context/AuthContext';
 import Header from '../components/layout/Header';
 import Sidebar from '../components/layout/Sidebar';
-import TabFilter from '../components/dashboard/TabFilter';
 import IdeaCard from '../components/ideas/IdeaCard';
 import styles from '../../styles/Ideas.module.css';
+import { HelpCircle } from 'lucide-react';
 
 export default function IdeasPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { userId } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [description, setDescription] = useState("");
-  const [ideas, setIdeas] = useState([]);
-  const [selectedTime, setSelectedTime] = useState('30D');
+  const [ideasData, setIdeasData] = useState(null);
 
   useEffect(() => {
     const fetchIdeas = async () => {
-      console.log('Fetching ideas data');
-      
       try {
-        // TODO: Replace with actual API call
-        // const response = await fetch(`/idea/${userId}/${insightId}`);
-        // const data = await response.json();
-        
-        setDescription("Revenue has decreased by 5% in the last 24 hours.");
-        setIdeas([
-          {
-            id: 1,
-            description: "Raid participation could increase by 20% and session length by 15% in 2 weeks",
-            idea: "introduce limited-time raid events"
+        const insightId = searchParams.get('id');
+        console.log('Fetching ideas data for:', { userId, insightId });
+
+        if (!userId || !insightId) {
+          console.log('Missing parameters, redirecting to dashboard');
+          router.push('/dashboard');
+          return;
+        }
+
+        const response = await fetch('https://get-ideas-q54hzgyghq-uc.a.run.app', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
           },
-          {
-            id: 2,
-            description: "If I launch a community build competition, creative mode playtime will increase by 30% and returning users by 10% in 30 days."
-          },
-          {
-            id: 3,
-            description: "If I offer starter packs for new users, retention will improve by 15% and Bundle 1 conversions by 10% in 14 days.."
-          }
-        ]);
-        
-        console.log('Ideas data fetched successfully');
-        setLoading(false);
+          body: JSON.stringify({
+            user_id: userId,
+            insight_id: insightId
+          })
+        });
+
+        const data = await response.json();
+        console.log('Ideas data received:', data);
+        setIdeasData(data);
       } catch (error) {
         console.error('Error fetching ideas:', error);
+      } finally {
         setLoading(false);
       }
     };
 
     fetchIdeas();
-  }, [selectedTime]);
-
-  const handleTimeChange = (newTime) => {
-    console.log('Time filter changed:', newTime);
-    setSelectedTime(newTime);
-  };
+  }, [userId, searchParams, router]);
 
   if (loading) return <div className={styles.loading}>Loading...</div>;
 
@@ -63,33 +60,32 @@ export default function IdeasPage() {
       <div className={styles.mainLayout}>
         <Sidebar />
         <main className={styles.mainContent}>
-          <div className={styles.filterSection}>
-            <TabFilter
-              selected={selectedTime}
-              onChange={handleTimeChange}
-            />
-          </div>
+          <div className={styles.glassEffect}>
+            <section className={styles.problemSection}>
+              <h2 className={styles.sectionTitle}>Problem statement</h2>
+              <div className={styles.problemStatement}>
+                {ideasData?.description || 'No problem statement available'}
+              </div>
+            </section>
 
-          <h2 className={styles.title}>Problem statement</h2>
-          <div className={styles.problemStatement}>
-            {description}
-          </div>
-
-          <div className={styles.hypothesisSection}>
-            <h2 className={styles.title}>
-              Hypothesis
-              <span className={styles.questionMark}>?</span>
-            </h2>
-            
-            <div className={styles.ideasContainer}>
-              {ideas.map((idea, index) => (
-                <IdeaCard 
-                  key={idea.id}
-                  number={index + 1}
-                  {...idea}
-                />
-              ))}
-            </div>
+            <section className={styles.hypothesisSection}>
+              <div className={styles.hypothesisHeader}>
+                <h2 className={styles.sectionTitle}>Hypothesis</h2>
+                <HelpCircle className={styles.questionIcon} size={20} />
+              </div>
+              
+              <div className={styles.ideasContainer}>
+                {ideasData?.ideas?.map((idea, index) => (
+                  <IdeaCard
+                    key={idea.idea_id}
+                    number={index + 1}
+                    description={idea.description}
+                    ideaId={idea.idea_id}
+                    insightId={idea.insight_id}
+                  />
+                ))}
+              </div>
+            </section>
           </div>
         </main>
       </div>

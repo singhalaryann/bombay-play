@@ -1,21 +1,41 @@
 // components/layout/Sidebar.js
 'use client';
 import React from 'react';
+import Image from 'next/image';
 import styles from '../../../styles/Sidebar.module.css';
-import { LayoutGrid } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const Sidebar = () => {
+  const router = useRouter();
+
+  const handleNavigation = () => {
+    console.log('Navigating to dashboard');
+    router.push('/dashboard');
+  };
+
   return (
     <aside className={styles.sidebar}>
-        <div className={styles.glassEffect}>  
-      <div className={styles.menuItem}>
-        <div className={styles.menuLink}>
-          <div className={styles.menuIcon}>
-            <LayoutGrid size={20} className={styles.icon} />
+      <div className={styles.glassEffect}>
+        <div className={styles.menuItem}>
+          <div
+            className={styles.menuLink}
+            onClick={handleNavigation}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && handleNavigation()}
+          >
+            <div className={styles.menuIcon}>
+              <Image
+                src="/dashboard.svg"
+                alt="Dashboard"
+                width={20}
+                height={20}
+                className={styles.icon}
+              />
+            </div>
+            <span className={styles.menuText}>Dashboard</span>
           </div>
-          <span className={styles.menuText}>Dashboard</span>
         </div>
-      </div>
       </div>
     </aside>
   );

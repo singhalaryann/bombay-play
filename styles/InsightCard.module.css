@@ -11,7 +11,7 @@
   }
   
   .icon {
-    color: #16A34A;
+    color: #82FF83;
   }
   
   .title {
@@ -42,7 +42,7 @@
   }
   
   .bullet {
-    color: #16A34A;
+    color: #82FF83;
     font-size: 20px;
   }
   
@@ -57,7 +57,7 @@
     align-items: center;
     gap: 8px;
     padding: 8px 16px;
-    background: #16A34A;
+    background: #82FF83;
     border: none;
     border-radius: 6px;
     color: #FFFFFF;

@@ -9,8 +9,7 @@ const InsightCard = ({ description, insight_id }) => {
 
   const handleInvestigate = () => {
     console.log('Investigating insight:', insight_id);
-    router.push(`/insight`);
-    // When API ready: router.push(`/insight?id=${insight_id}`);
+    router.push(`/insight?id=${insight_id}`);
   };
 
   // Log when new insight data is received

@@ -1,39 +1,62 @@
+/* styles/TabFilter.module.css */
 .filterContainer {
-    display: flex;
-    gap: 8px;
-    padding: 4px;
-    background: #161616;
-    border-radius: 8px;
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  background: rgba(28, 28, 28, 0.6);
+  border-radius: 12px;
+  width: fit-content;
+  margin-bottom: 1.5rem;
+}
+
+.filterButton {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filterButton:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.filterButton.active {
+  color: #82FF83;
+  font-weight: 600;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .filterContainer {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
-  
+
+  .filterContainer::-webkit-scrollbar {
+    display: none;
+  }
+
   .filterButton {
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-size: 14px;
-    color: #A3A3A3;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    white-space: nowrap;
+    padding: 8px 14px;
   }
-  
-  .filterButton:hover {
-    color: #FFFFFF;
+}
+
+@media (max-width: 480px) {
+  .filterButton {
+    padding: 6px 12px;
+    font-size: 13px;
   }
-  
-  .filterButton.active {
-    background: #15803D;
-    color: #FFFFFF;
+
+  .filterContainer {
+    padding: 3px;
   }
-  
-  @media (max-width: 768px) {
-    .filterContainer {
-      overflow-x: auto;
-      width: 100%;
-      padding: 4px;
-    }
-  
-    .filterButton {
-      white-space: nowrap;
-    }
-  }
+}

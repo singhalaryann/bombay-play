@@ -1,56 +1,62 @@
 // app/insight/page.js
 'use client';
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useAuth } from '../context/AuthContext';
 import Header from '../components/layout/Header';
 import Sidebar from '../components/layout/Sidebar';
-import TabFilter from '../components/dashboard/TabFilter';
 import InsightAnalytics from '../components/insights/InsightAnalytics';
 import styles from '../../styles/Insight.module.css';
 
 export default function InsightPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { userId } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [description, setDescription] = useState("");
-  const [graphData, setGraphData] = useState(null);
-  const [selectedTime, setSelectedTime] = useState('30D');
+  const [insightData, setInsightData] = useState(null);
 
   useEffect(() => {
     const fetchInsightData = async () => {
-      console.log('Fetching insight data');
-      
       try {
-        // TODO: Replace with actual API call
-        // const response = await fetch(`/insight/${userId}/${insightId}`);
-        // const data = await response.json();
-        
-        setDescription("Revenue has decreased by 5% in the last 24 hours. Review user segments and experiment performance.");
-        setGraphData({
-          revenueStream: [],
-          userBase: [],
-          age: [],
-          geography: []
+        // Get insight_id from URL params
+        const insightId = searchParams.get('id');
+        console.log('Fetching insight data for:', { userId, insightId });
+
+        if (!userId || !insightId) {
+          console.log('Missing required parameters, redirecting to dashboard');
+          router.push('/dashboard');
+          return;
+        }
+
+        // Changed to POST request with proper body
+        const response = await fetch('https://get-insight-q54hzgyghq-uc.a.run.app', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            user_id: userId,
+            insight_id: insightId
+          })
         });
-        
-        console.log('Insight data fetched successfully');
-        setLoading(false);
+
+        const data = await response.json();
+        console.log('Insight data received:', data);
+        setInsightData(data);
       } catch (error) {
         console.error('Error fetching insight data:', error);
+      } finally {
         setLoading(false);
       }
     };
 
     fetchInsightData();
-  }, [selectedTime]);
-
-  const handleTimeChange = (newTime) => {
-    console.log('Time filter changed:', newTime);
-    setSelectedTime(newTime);
-  };
+  }, [userId, searchParams, router]);
 
   const handleAnalyseClick = () => {
-    console.log('Navigating to ideas page');
-    router.push('/ideas');
+    const insightId = searchParams.get('id');
+    console.log('Navigating to ideas with insight:', insightId);
+    router.push(`/ideas?id=${insightId}`);
   };
 
   if (loading) return <div className={styles.loading}>Loading...</div>;
@@ -61,27 +67,20 @@ export default function InsightPage() {
       <div className={styles.mainLayout}>
         <Sidebar />
         <main className={styles.mainContent}>
-          <div className={styles.filterSection}>
-            <TabFilter
-              selected={selectedTime}
-              onChange={handleTimeChange}
-            />
+          <div className={styles.glassEffect}>
+            <div className={styles.descriptionBox}>
+              {insightData?.description || 'No description available'}
+            </div>
+            <div className={styles.actionSection}>
+              <button
+                className={styles.analyseButton}
+                onClick={handleAnalyseClick}
+              >
+                Analyse Board
+              </button>
+            </div>
+            <InsightAnalytics graphData={insightData?.graphs || []} />
           </div>
-
-          <div className={styles.descriptionBox}>
-            {description}
-          </div>
-
-          <div className={styles.actionSection}>
-            <button 
-              className={styles.analyseButton}
-              onClick={handleAnalyseClick}
-            >
-              Analyse Board
-            </button>
-          </div>
-
-          <InsightAnalytics graphData={graphData} />
         </main>
       </div>
     </div>

@@ -1,64 +1,132 @@
 /* styles/IdeaCard.module.css */
 .card {
-    background: rgba(52, 58, 64, 0.3);
-    border-radius: 8px;
-    transition: background-color 0.2s ease;
+  position: relative;
+  width: 100%;
+}
+
+.glassEffect {
+  background: rgba(28, 28, 28, 0.4);
+  border-radius: 12px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  padding: 1.5rem;
+}
+
+/* Outer glow border */
+.glassEffect::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  padding: 1px;
+  background: linear-gradient(
+    -100deg,
+    rgba(255, 255, 255, 0.3),
+    rgba(255, 255, 255, 0.03)
+  );
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask: 
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.glassEffect:hover {
+  background: rgba(38, 38, 38, 0.4);
+}
+
+.header {
+  margin-bottom: 1rem;
+}
+
+.ideaLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #98FB98;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.bulbIcon {
+  color: #98FB98;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.description {
+  color: #E5E5E5;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.viewButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: fit-content;
+  color: #98FB98;
+  background: rgba(152, 251, 152, 0.1);
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.viewButton:hover {
+  background: rgba(152, 251, 152, 0.15);
+  transform: translateX(4px);
+}
+
+.viewButton:active {
+  transform: translateX(2px);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .glassEffect {
+    padding: 1.25rem;
   }
-  
-  .card:hover {
-    background: rgba(52, 58, 64, 0.4);
-  }
-  
-  .content {
-    padding: 1.5rem;
-  }
-  
-  .ideaHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-  
-  .ideaLabel {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #98FB98;
-  }
-  
-  .bulbIcon {
-    color: #98FB98;
-  }
-  
+
   .description {
-    color: #E5E5E5;
-    font-size: 0.95rem;
-    line-height: 1.5;
-    margin-bottom: 0.5rem;
-  }
-  
-  .subIdea {
-    color: #8F9498;
     font-size: 0.9rem;
-    margin-bottom: 1rem;
   }
-  
+
   .viewButton {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #98FB98;
-    background: rgba(152, 251, 152, 0.1);
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    cursor: pointer;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .glassEffect {
+    padding: 1rem;
+  }
+
+  .ideaLabel {
     font-size: 0.9rem;
-    transition: all 0.2s ease;
   }
-  
-  .viewButton:hover {
-    background: rgba(152, 251, 152, 0.15);
-    transform: translateX(2px);
+
+  .description {
+    font-size: 0.85rem;
   }
+
+  .viewButton {
+    width: 100%;
+    justify-content: center;
+  }
+}
