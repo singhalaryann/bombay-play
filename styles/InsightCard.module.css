@@ -1,83 +1,116 @@
-/* styles/InsightCard.module.css */
-.wrapper {
-    margin-top: 32px;
-  }
-  
-  .header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-  
-  .icon {
-    color: #82FF83;
-  }
-  
-  .title {
-    color: #FFFFFF;
-    font-size: 16px;
-    font-weight: 500;
-  }
-  
-  .card {
-    background: #161616;
-    border: 1px solid #262626;
-    border-radius: 12px;
+.card {
+  position: relative;
+  background: rgba(18, 18, 18, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  padding: 1px;
+  background: linear-gradient(180deg, 
+    rgba(255, 255, 255, 0.1) 0%, 
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask: 
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.content {
+  position: relative;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+}
+
+.messageWrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+}
+
+.bullet {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 20px;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+.description {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.investigateButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #194D1A;
+  border: none;
+  border-radius: 6px;
+  color: #82FF83;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.investigateButton:hover {
+  background: #66CC66;
+}
+
+@media (max-width: 768px) {
+  .content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
     padding: 16px;
   }
-  
+
+  .messageWrapper {
+    width: 100%;
+  }
+
+  .investigateButton {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
   .content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
+    padding: 12px;
   }
   
-  .message {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex: 1;
+  .messageWrapper {
+    gap: 8px;
   }
   
   .bullet {
-    color: #82FF83;
-    font-size: 20px;
+    font-size: 18px;
   }
   
-  .message p {
-    color: #E5E7EB;
-    font-size: 14px;
-    line-height: 1.5;
+  .description {
+    font-size: 13px;
   }
-  
-  .investigateButton {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    background: #82FF83;
-    border: none;
-    border-radius: 6px;
-    color: #FFFFFF;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
-  
-  .investigateButton:hover {
-    background: #15803D;
-  }
-  
-  @media (max-width: 768px) {
-    .content {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-  
-    .investigateButton {
-      width: 100%;
-      justify-content: center;
-    }
-  }
+}

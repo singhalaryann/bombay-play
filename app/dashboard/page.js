@@ -1,4 +1,4 @@
-// app/dashboard/page.js
+// Dashboard.js
 'use client';
 import React, { useState, useEffect } from 'react';
 import styles from '../../styles/Dashboard.module.css';
@@ -9,6 +9,7 @@ import MetricCard from '../components/dashboard/MetricCard';
 import InsightCard from '../components/dashboard/InsightCard';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import { Lightbulb } from 'lucide-react';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -33,24 +34,16 @@ export default function Dashboard() {
           time: time
         })
       });
-
       const data = await response.json();
-      console.log('Dashboard API Response:', data);
-
+      
       if (data) {
-        // Handle metrics
         if (data.metrics) {
-          console.log('Setting metrics:', data.metrics);
           setMetrics(data.metrics);
         }
-
-        // Handle insights
         if (data.insights && data.insights.length > 0) {
-          console.log('Setting insights:', data.insights);
           setInsights(data.insights);
         }
       }
-
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
@@ -60,11 +53,9 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!userId) {
-      console.log('No user ID found, redirecting to login');
       router.push('/');
       return;
     }
-
     fetchDashboardData(selectedTime);
   }, [userId, selectedTime]);
 
@@ -86,6 +77,7 @@ export default function Dashboard() {
           </div>
           
           {/* Metrics Section */}
+
           <div className={styles.metricsGrid}>
             {loading ? (
               <div className={styles.loading}>Loading...</div>
@@ -99,15 +91,25 @@ export default function Dashboard() {
           </div>
 
           {/* Insights Section */}
+
           {insights.length > 0 && (
-            <div className={styles.insightSection}>
-              {insights.map((insight, index) => (
-                <InsightCard 
-                  key={`${insight.insight_id}-${index}`}
-                  description={insight.description}
-                  insight_id={insight.insight_id}
-                />
-              ))}
+            <div className={styles.insightsSection}>
+              <div className={styles.insightsTitleContainer}>
+                <div className={styles.insightsHeader}>
+                  <Lightbulb className={styles.insightIcon} size={20} />
+                  <span className={styles.insightsTitle}>Insights</span>
+                </div>
+                <div className={styles.insightsProgress} />
+              </div>
+              <div className={styles.insightsList}>
+                {insights.map((insight, index) => (
+                  <InsightCard
+                    key={`${insight.insight_id}-${index}`}
+                    description={insight.description}
+                    insight_id={insight.insight_id}
+                  />
+                ))}
+              </div>
             </div>
           )}
         </main>

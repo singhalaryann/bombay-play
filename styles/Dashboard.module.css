@@ -1,18 +1,139 @@
+/* Dashboard.module.css */
 .container {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background: #050505;
-  }
-  
-  .mainLayout {
-    display: flex;
-    flex: 1;
-  }
-  
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #050505;
+}
+
+.mainLayout {
+  display: flex;
+  flex: 1;
+}
+
+.mainContent {
+  flex: 1;
+  padding: 24px 32px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.filterSection {
+  width: 100%;
+  margin-bottom: 32px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.filterSection::-webkit-scrollbar {
+  display: none;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: auto;
+  width: 100%;
+}
+
+.loading {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+}
+
+.noData {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 32px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.insightsSection {
+  margin-top: auto;
+  padding-top: 48px;
+  width: 100%;
+}
+
+.insightsTitleContainer {
+  margin-bottom: 20px;
+}
+
+.insightsHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.insightIcon {
+  color: #82FF83;
+}
+
+.insightsTitle {
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.insightsProgress {
+  width: 48px;
+  height: 2px;
+  background: #82FF83;
+  border-radius: 1px;
+}
+
+.insightsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+@media (max-width: 1280px) {
   .mainContent {
-    flex: 1;
-    padding: 24px;
+    padding: 20px 24px;
+  }
+  
+  .metricsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .mainContent {
+    padding: 16px;
+    overflow-x: auto;
+  }
+  
+  .metricsGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    min-width: min-content;
+  }
+  
+  .insightsSection {
+    padding-top: 32px;
+    min-width: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mainContent {
+    padding: 12px;
   }
   
   .filterSection {
@@ -20,35 +141,33 @@
   }
   
   .metricsGrid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    margin-bottom: 32px;
+    gap: 12px;
   }
   
-  .insightSection {
-    margin-top: 32px;
+  .insightsSection {
+    padding-top: 24px;
   }
   
-  .loading {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 24px;
-    color: rgba(255, 255, 255, 0.7);
+  .insightsList {
+    gap: 12px;
   }
-  
-  @media (max-width: 1024px) {
-    .metricsGrid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .mainContent {
-      padding: 16px;
-    }
-    
-    .metricsGrid {
-      grid-template-columns: 1fr;
-    }
-  }
+}
+
+/* Scrollbar styles for webkit browsers */
+.mainContent::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.mainContent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mainContent::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.mainContent::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}

@@ -2,17 +2,18 @@
 .card {
   position: relative;
   width: 100%;
+  margin-bottom: 8px;
 }
 
 .glassEffect {
-  background: rgba(28, 28, 28, 0.4);
+  background: #191C17;
   border-radius: 12px;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  padding: 1.5rem;
+  padding: 16px 24px;
 }
 
 /* Outer glow border */
@@ -27,10 +28,10 @@
     rgba(255, 255, 255, 0.3),
     rgba(255, 255, 255, 0.03)
   );
-  -webkit-mask: 
+  -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
-  mask: 
+  mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
@@ -38,95 +39,116 @@
   pointer-events: none;
 }
 
-.glassEffect:hover {
-  background: rgba(38, 38, 38, 0.4);
-}
-
-.header {
-  margin-bottom: 1rem;
+.content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
 }
 
 .ideaLabel {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  color: #98FB98;
+  gap: 8px;
+  color: #82FF83;
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: 15px;
+  min-width: fit-content;
 }
 
 .bulbIcon {
-  color: #98FB98;
-}
-
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
+  color: #82FF83;
 }
 
 .description {
-  color: #E5E5E5;
-  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 15px;
   line-height: 1.6;
+  flex: 1;
 }
 
 .viewButton {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  min-width: fit-content;
+}
+
+.viewButtonContent {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  width: fit-content;
-  color: #98FB98;
-  background: rgba(152, 251, 152, 0.1);
-  border: none;
-  padding: 0.75rem 1.25rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.9rem;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(130, 255, 131, 0.1);
+  border: 1px solid #82FF83;
+  border-radius: 6px;
+  color: #82FF83;
+  font-size: 14px;
   font-weight: 500;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
-.viewButton:hover {
-  background: rgba(152, 251, 152, 0.15);
-  transform: translateX(4px);
+.viewButtonContent svg {
+  color: #82FF83;
 }
 
-.viewButton:active {
-  transform: translateX(2px);
+.viewButton:hover .viewButtonContent {
+  background: rgba(130, 255, 131, 0.15);
 }
 
-/* Responsive Styles */
+@media (max-width: 1024px) {
+  .content {
+    gap: 16px;
+  }
+  
+  .description {
+    font-size: 14px;
+  }
+}
+
 @media (max-width: 768px) {
   .glassEffect {
-    padding: 1.25rem;
+    padding: 16px;
+  }
+
+  .content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
   }
 
   .description {
-    font-size: 0.9rem;
+    font-size: 14px;
+    width: 100%;
   }
 
   .viewButton {
-    padding: 0.6rem 1rem;
-    font-size: 0.85rem;
+    width: 100%;
+  }
+
+  .viewButtonContent {
+    width: 100%;
+    justify-content: center;
   }
 }
 
 @media (max-width: 480px) {
   .glassEffect {
-    padding: 1rem;
+    padding: 12px;
   }
 
   .ideaLabel {
-    font-size: 0.9rem;
+    font-size: 14px;
   }
 
   .description {
-    font-size: 0.85rem;
+    font-size: 13px;
   }
 
-  .viewButton {
-    width: 100%;
-    justify-content: center;
+  .viewButtonContent {
+    padding: 6px 12px;
+    font-size: 13px;
   }
 }

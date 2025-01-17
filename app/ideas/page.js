@@ -20,14 +20,10 @@ export default function IdeasPage() {
     const fetchIdeas = async () => {
       try {
         const insightId = searchParams.get('id');
-        console.log('Fetching ideas data for:', { userId, insightId });
-
         if (!userId || !insightId) {
-          console.log('Missing parameters, redirecting to dashboard');
           router.push('/dashboard');
           return;
         }
-
         const response = await fetch('https://get-ideas-q54hzgyghq-uc.a.run.app', {
           method: 'POST',
           headers: {
@@ -38,9 +34,7 @@ export default function IdeasPage() {
             insight_id: insightId
           })
         });
-
         const data = await response.json();
-        console.log('Ideas data received:', data);
         setIdeasData(data);
       } catch (error) {
         console.error('Error fetching ideas:', error);
@@ -48,11 +42,8 @@ export default function IdeasPage() {
         setLoading(false);
       }
     };
-
     fetchIdeas();
   }, [userId, searchParams, router]);
-
-  if (loading) return <div className={styles.loading}>Loading...</div>;
 
   return (
     <div className={styles.container}>
@@ -60,35 +51,40 @@ export default function IdeasPage() {
       <div className={styles.mainLayout}>
         <Sidebar />
         <main className={styles.mainContent}>
-          <div className={styles.glassEffect}>
-            <section className={styles.problemSection}>
-              <h2 className={styles.sectionTitle}>Problem statement</h2>
-              <div className={styles.problemStatement}>
-                {ideasData?.description || 'No problem statement available'}
-              </div>
-            </section>
-
-            <section className={styles.hypothesisSection}>
-              <div className={styles.hypothesisHeader}>
-                <h2 className={styles.sectionTitle}>Hypothesis</h2>
-                <HelpCircle className={styles.questionIcon} size={20} />
-              </div>
-              
-              <div className={styles.ideasContainer}>
-                {ideasData?.ideas?.map((idea, index) => (
-                  <IdeaCard
-                    key={idea.idea_id}
-                    number={index + 1}
-                    description={idea.description}
-                    ideaId={idea.idea_id}
-                    insightId={idea.insight_id}
-                  />
-                ))}
-              </div>
-            </section>
-          </div>
+          {loading ? (
+            <div className={styles.loadingWrapper}>
+              <div className={styles.loading}>Loading...</div>
+            </div>
+          ) : (
+            <div className={styles.content}>
+              <section className={styles.problemSection}>
+                <h2 className={styles.sectionTitle}>Problem statement</h2>
+                <div className={styles.problemStatement}>
+                  {ideasData?.description || 'No problem statement available'}
+                </div>
+              </section>
+              <section className={styles.hypothesisSection}>
+                <div className={styles.hypothesisHeader}>
+                  <h2 className={styles.sectionTitle}>Hypothesis</h2>
+                  <HelpCircle className={styles.questionIcon} size={30} />
+                </div>
+                <div className={styles.ideasContainer}>
+                  {ideasData?.ideas?.map((idea, index) => (
+                    <IdeaCard
+                      key={idea.idea_id}
+                      number={index + 1}
+                      description={idea.description}
+                      ideaId={idea.idea_id}
+                      insightId={idea.insight_id}
+                    />
+                  ))}
+                </div>
+              </section>
+            </div>
+          )}
         </main>
       </div>
     </div>
   );
 }
+
