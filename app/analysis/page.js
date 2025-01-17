@@ -62,18 +62,20 @@ export default function AnalysisPage() {
 
   if (loading) {
     return (
-      <div className={styles.container}>
-        <Header />
-        <div className={styles.mainLayout}>
-          <Sidebar />
-          <div className={styles.loadingWrapper}>
-            <div className={styles.loading}>Loading...</div>
-          </div>
-        </div>
+    <div className={styles.container}>
+    <Header />
+    <div className={styles.mainLayout}>
+    <Sidebar />
+    <main className={styles.mainContent}>
+      <div className={styles.loadingWrapper}>
+        <div className={styles.loading}>Loading...</div>
       </div>
+    </main>
+    </div>
+    </div>
     );
-  }
-
+    }
+    
   if (error) {
     return (
       <div className={styles.container}>
