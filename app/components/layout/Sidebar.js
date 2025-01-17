@@ -2,11 +2,13 @@
 'use client';
 import React from 'react';
 import Image from 'next/image';
+import { useRouter, usePathname } from 'next/navigation';
 import styles from '../../../styles/Sidebar.module.css';
-import { useRouter } from 'next/navigation';
 
 const Sidebar = () => {
   const router = useRouter();
+  const pathname = usePathname();
+  const isDashboardActive = pathname === '/dashboard';
 
   const handleNavigation = () => {
     console.log('Navigating to dashboard');
@@ -18,7 +20,7 @@ const Sidebar = () => {
       <div className={styles.glassEffect}>
         <div className={styles.menuItem}>
           <div
-            className={styles.menuLink}
+            className={`${styles.menuLink} ${isDashboardActive ? styles.active : ''}`}
             onClick={handleNavigation}
             role="button"
             tabIndex={0}
@@ -42,3 +44,4 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
+

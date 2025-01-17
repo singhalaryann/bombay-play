@@ -69,6 +69,17 @@
 
 .insightsTitleContainer {
   margin-bottom: 20px;
+  position: relative;
+}
+
+.insightsTitleContainer::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .insightsHeader {
@@ -89,10 +100,14 @@
 }
 
 .insightsProgress {
+  position: absolute;
+  bottom: -10px;
+  left: 0;
   width: 48px;
   height: 2px;
   background: #82FF83;
   border-radius: 1px;
+  z-index: 1;
 }
 
 .insightsList {
@@ -100,13 +115,13 @@
   flex-direction: column;
   gap: 16px;
   width: 100%;
+  margin-top: 20px;
 }
 
 @media (max-width: 1280px) {
   .mainContent {
     padding: 20px 24px;
   }
-  
   .metricsGrid {
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
@@ -118,13 +133,11 @@
     padding: 16px;
     overflow-x: auto;
   }
-  
   .metricsGrid {
     grid-template-columns: 1fr;
     gap: 16px;
     min-width: min-content;
   }
-  
   .insightsSection {
     padding-top: 32px;
     min-width: 300px;
@@ -135,19 +148,15 @@
   .mainContent {
     padding: 12px;
   }
-  
   .filterSection {
     margin-bottom: 24px;
   }
-  
   .metricsGrid {
     gap: 12px;
   }
-  
   .insightsSection {
     padding-top: 24px;
   }
-  
   .insightsList {
     gap: 12px;
   }

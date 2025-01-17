@@ -1,71 +1,53 @@
+/* InsightCard.module.css */
 .card {
   position: relative;
-  background: rgba(18, 18, 18, 0.4);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 12px;
-  overflow: hidden;
+  width: 100%;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  padding: 1px;
-  background: linear-gradient(180deg, 
-    rgba(255, 255, 255, 0.1) 0%, 
-    rgba(255, 255, 255, 0.05) 100%
-  );
-  -webkit-mask: 
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  mask: 
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
+.card:last-child {
+  border-bottom: none;
 }
 
 .content {
   position: relative;
-  padding: 16px 20px;
+  padding: 24px 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 24px;
+  gap: 32px;
 }
 
 .messageWrapper {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 16px;
   flex: 1;
 }
 
 .bullet {
   color: rgba(255, 255, 255, 0.9);
-  font-size: 20px;
-  line-height: 1.2;
+  font-size: 18px;
+  line-height: 1.4;
   flex-shrink: 0;
 }
 
 .description {
   color: rgba(255, 255, 255, 0.9);
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.5;
   margin: 0;
+  padding-top: 1px;
 }
 
 .investigateButton {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  background: #194D1A;
-  border: none;
-  border-radius: 6px;
+  gap: 8px;
+  padding: 10px 16px;
+  background: rgba(22, 163, 74, 0.15);
+  border: 1px solid #194D1A;
+  border-radius: 8px;
   color: #82FF83;
   font-size: 14px;
   font-weight: 500;
@@ -76,7 +58,7 @@
 }
 
 .investigateButton:hover {
-  background: #66CC66;
+  background: rgba(22, 163, 74, 0.25);
 }
 
 @media (max-width: 768px) {
@@ -84,7 +66,7 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
-    padding: 16px;
+    padding: 20px 0;
   }
 
   .messageWrapper {
@@ -99,18 +81,24 @@
 
 @media (max-width: 480px) {
   .content {
-    padding: 12px;
+    padding: 16px 0;
+    gap: 12px;
   }
-  
+
   .messageWrapper {
-    gap: 8px;
+    gap: 12px;
   }
-  
+
   .bullet {
-    font-size: 18px;
+    font-size: 16px;
   }
-  
+
   .description {
+    font-size: 14px;
+  }
+
+  .investigateButton {
+    padding: 8px 14px;
     font-size: 13px;
   }
 }

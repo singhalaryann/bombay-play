@@ -29,7 +29,7 @@
   padding: 1px;
   background: linear-gradient(
     -100deg,
-    rgba(255, 255, 255, 0.3),
+    rgba(255, 255, 255, 0.4),
     rgba(255, 255, 255, 0.03)
   );
   -webkit-mask:
@@ -76,7 +76,19 @@
 }
 
 .menuLink:hover {
-  background: rgba(38, 38, 38, 0.7);
+  background: rgba(130, 255, 131, 0.08);
+}
+
+.menuLink.active {
+  background: rgba(130, 255, 131, 0.1);
+}
+
+.menuLink.active .menuIcon {
+  background: rgba(130, 255, 131, 0.15);
+}
+
+.menuLink.active .menuText {
+  color: #82FF83;
 }
 
 .menuIcon {
@@ -85,7 +97,7 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  background: rgba(22, 163, 74, 0.15);
+  background: rgba(130, 255, 131, 0.1);
   border-radius: 8px;
   transition: all 0.3s ease;
 }
@@ -117,21 +129,21 @@
   .sidebar {
     width: 80px;
   }
-
+  
   .glassEffect {
     padding: 12px;
   }
-
+  
   .menuLink {
     padding: 10px;
     justify-content: center;
   }
-
+  
   .menuIcon {
     width: 32px;
     height: 32px;
   }
-
+  
   .menuText {
     display: none;
   }
@@ -142,20 +154,20 @@
     width: 70px;
     margin: 6px;
   }
-
+  
   .glassEffect {
     padding: 8px;
   }
-
+  
   .menuLink {
     padding: 8px;
   }
-
+  
   .menuIcon {
     width: 30px;
     height: 30px;
   }
-
+  
   .icon {
     width: 18px;
     height: 18px;

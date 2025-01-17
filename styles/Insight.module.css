@@ -49,7 +49,7 @@
   padding: 1px;
   background: linear-gradient(
     -100deg,
-    rgba(255, 255, 255, 0.3),
+    rgba(255, 255, 255,0.4),
     rgba(255, 255, 255, 0.03)
   );
   -webkit-mask:
