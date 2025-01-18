@@ -53,7 +53,7 @@ export default function InsightPage() {
   const handleAnalyseClick = () => {
     const insightId = searchParams.get('id');
     console.log('Navigating to ideas with insight:', insightId);
-    router.push(`/ideas?id=${insightId}`);
+    router.push(`/ideas?insight=${insightId}`);
   };
 
   if (loading) {

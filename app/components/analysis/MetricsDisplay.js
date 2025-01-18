@@ -13,26 +13,47 @@ const MetricsDisplay = ({ metrics }) => {
   return (
     <div className={styles.glassEffect}>
       <div className={styles.metricsGrid}>
-        {metrics.map((metric, index) => {
-          const isPositive = parseFloat(metric.delta) > 0;
-          const formattedDelta = `${isPositive ? '+' : ''}${metric.delta}%`;
+        {metrics.map((metric) => {
+          // Get the latest value from the values array
+          const latestValue = metric.values ? metric.values[metric.values.length - 1][1] : 0;
           
+          // Calculate percentage change if we have more than one value
+          let percentageChange = 0;
+          if (metric.values && metric.values.length > 1) {
+            const previousValue = metric.values[metric.values.length - 2][1];
+            percentageChange = ((latestValue - previousValue) / previousValue) * 100;
+          }
+
+          const isPositive = percentageChange >= 0;
+          const formattedDelta = `${isPositive ? '+' : ''}${percentageChange.toFixed(1)}%`;
+
           return (
-            <div key={index} className={styles.card}>
+            <div key={metric.metric_id} className={styles.card}>
               <div className={styles.cardInner}>
                 <div className={styles.header}>
-                  <h2 className={styles.title}>{metric.name}</h2>
-                  <div className={isPositive ? styles.trendIconUp : styles.trendIconDown}>
-                    {isPositive ? <TrendingUp size={24} /> : <TrendingDown size={24} />}
-                  </div>
+                  <h2 className={styles.title}>{metric.title}</h2>
+                  {percentageChange !== 0 && (
+                    <div className={isPositive ? styles.trendIconUp : styles.trendIconDown}>
+                      {isPositive ? <TrendingUp size={24} /> : <TrendingDown size={24} />}
+                    </div>
+                  )}
                 </div>
                 <div className={styles.mainContent}>
                   <div className={styles.valueWrapper}>
-                    <span className={styles.value}>{metric.value}</span>
-                    <span className={styles.unit}>{metric.unit}</span>
-                    <span className={`${styles.delta} ${isPositive ? styles.positive : styles.negative}`}>
-                      ({formattedDelta})
+                    <span className={styles.value}>
+                      {typeof latestValue === 'number' 
+                        ? latestValue.toLocaleString()
+                        : latestValue}
                     </span>
+                    <span className={styles.unit}>
+                      {metric.columns && metric.columns[1] ? 
+                        metric.columns[1].replace(/\(([^)]+)\)/, '$1') : ''}
+                    </span>
+                    {percentageChange !== 0 && (
+                      <span className={`${styles.delta} ${isPositive ? styles.positive : styles.negative}`}>
+                        ({formattedDelta})
+                      </span>
+                    )}
                   </div>
                 </div>
                 {metric.description && (

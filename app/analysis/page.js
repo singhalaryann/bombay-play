@@ -16,25 +16,42 @@ export default function AnalysisPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Added state for dynamic metrics and graphs
+const [dynamicMetrics, setDynamicMetrics] = useState([]);
+const [dynamicGraphs, setDynamicGraphs] = useState([]);
+
+// Add these handlers
+const handleMetricsUpdate = (newMetrics) => {
+  console.log('Setting new metrics:', newMetrics);
+  setDynamicMetrics(newMetrics); // Replace entirely, don't append
+  // Clear previous graphs when metrics update
+  setDynamicGraphs([]);
+};
+const handleGraphsUpdate = (newGraphs) => {
+  console.log('Updating graphs:', newGraphs);
+  setDynamicGraphs(prevGraphs => [...prevGraphs, ...newGraphs]);
+};
+
   useEffect(() => {
     const fetchChatData = async () => {
       try {
         const ideaId = searchParams.get('idea');
         const insightId = searchParams.get('insight');
+        const chatId = searchParams.get('chat'); // New: Get chat_id from URL
         
-        console.log('Fetching chat data with:', { userId, insightId, ideaId });
+        console.log('Fetching chat data with:', { userId, insightId, ideaId, chatId }); // Added chatId to logging
         
-        if (!userId || !insightId || !ideaId) {
+        if (!userId || !insightId || !ideaId || !chatId) { // Added chatId check
           throw new Error('Missing required parameters');
         }
-
+    
         const response = await fetch('https://get-chat-q54hzgyghq-uc.a.run.app', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            user_id: userId,
+            chat_id: chatId,     // New: Added chat_id
             insight_id: insightId,
             idea_id: ideaId
           })
@@ -107,19 +124,23 @@ export default function AnalysisPage() {
             <div className={styles.contentLayout}>
               <div className={styles.leftPanel}>
                 <div className={styles.chatSection}>
-                  <ChatInterface
-                    messages={chatData?.chat?.messages || []}
-                    ideaId={searchParams.get('idea')}
-                    insightId={searchParams.get('insight')}
-                    userId={userId}
-                    ideaDescription={chatData?.idea_description}
-                  />
+                <ChatInterface
+  messages={chatData?.chat?.messages || []}
+  ideaId={searchParams.get('idea')}
+  insightId={searchParams.get('insight')}
+  userId={userId}
+  chatId={searchParams.get('chat')} // Added chatId
+  ideaDescription={chatData?.idea_description}
+  onMetricsUpdate={handleMetricsUpdate} // Added metrics handler
+  onGraphsUpdate={handleGraphsUpdate}   // Added graphs handler
+/>
                 </div>
               </div>
               <div className={styles.rightPanel}>
-                <MetricsDisplay metrics={chatData?.metrics || []} />
-                <GraphDisplay graphs={chatData?.graphs || []} />
-              </div>
+  {/* Pass both initial and dynamic metrics/graphs */}
+  <MetricsDisplay metrics={[...(chatData?.metrics || []), ...dynamicMetrics]} />
+  <GraphDisplay graphs={chatData?.graphs?.length > 0 ? chatData.graphs : dynamicGraphs} />
+</div>
             </div>
           </div>
         </main>

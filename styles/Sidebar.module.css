@@ -6,6 +6,7 @@
   position: relative;
   z-index: 1;
   background: #191C17;
+  border-radius: 12px;
 }
 
 .glassEffect {
