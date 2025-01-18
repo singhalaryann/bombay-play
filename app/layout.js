@@ -15,6 +15,18 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "Liveops Dashboard",
   description: "Gaming Analytics Dashboard",
+  icons: {
+    apple: [
+      { url: "/apple-touch-icon.png" },
+    ],
+    shortcut: ["/favicon-16x16.png"],
+    icon: [
+      { url: "/favicon.ico", sizes: "16x16" },
+      { url: "/favicon-32x32.png", sizes: "32x32" },
+      { url: "/android-chrome-192x192.png", sizes: "192x192" },
+      { url: "/android-chrome-512x512.png", sizes: "512x512" },
+    ],
+  }
 };
 
 export default function RootLayout({ children }) {
