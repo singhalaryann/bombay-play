@@ -9,30 +9,17 @@ import MetricsDisplay from '../components/analysis/MetricsDisplay';
 import GraphDisplay from '../components/analysis/GraphDisplay';
 import styles from '../../styles/Analysis.module.css';
 
-// Helper function to transform line/bar metrics into GraphDisplay format
+// Helper function to transform the API metrics into the shape GraphDisplay expects
 function convertMetricsToGraphs(metrics) {
+  // Simply copy all the relevant fields and rename them properly
   return metrics.map((m) => {
-    // Decide the chart "type" based on metric_type
-    let chartType = 'line';
-    if (m.metric_type === 'bar') {
-      chartType = 'hist';
-    } else if (m.metric_type === 'pie') {
-      chartType = 'pie';
-    }
-    // Build categories & values arrays
-    const categories = [];
-    const values = [];
-    (m.values || []).forEach((row) => {
-      categories.push(row[0]);
-      values.push(row[1]);
-    });
     return {
-      type: chartType,
-      name: m.title,
-      categories,
-      values,
-      x_label: m.columns[0],
-      y_label: m.columns[1],
+      metric_type: m.metric_type, // GraphDisplay checks this to decide chart type
+      metric_id: m.metric_id,
+      title: m.title,
+      columns: m.columns,
+      values: m.values,
+      // Extra fields for completeness
       x_unit: '',
       y_unit: '',
       value_unit: ''
@@ -217,7 +204,8 @@ export default function AnalysisPage() {
               <div className={styles.rightPanel}>
                 {/* Combine initial + dynamic metrics (in case user updates them) */}
                 <MetricsDisplay
-                  metrics={combinedMetrics}
+                  // metrics={combinedMetrics}
+                  metrics={combinedMetrics?.filter(m => m.metric_type === 'metric' && m.values?.length === 1)}
                 />
 
                 {/* If chatData already has any existing graphs, show them.

@@ -15,8 +15,9 @@ const MetricsDisplay = ({ metrics }) => {
       <div className={styles.metricsGrid}>
         {metrics.map((metric) => {
           // Get the latest value from the values array
-          const latestValue = metric.values ? metric.values[metric.values.length - 1][1] : 0;
-          
+          const latestValue = metric.values ? 
+          (metric.metric_type === 'metric' ? metric.values[0][0] : metric.values[metric.values.length - 1][1]) 
+          : 0;          
           // Calculate percentage change if we have more than one value
           let percentageChange = 0;
           if (metric.values && metric.values.length > 1) {
@@ -41,9 +42,16 @@ const MetricsDisplay = ({ metrics }) => {
                 <div className={styles.mainContent}>
                   <div className={styles.valueWrapper}>
                     <span className={styles.value}>
-                      {typeof latestValue === 'number' 
-                        ? latestValue.toLocaleString()
-                        : latestValue}
+                    {metric.metric_type === 'metric'
+  // Limit to 3 decimals for metrics
+  ? Number(parseFloat(latestValue).toFixed(3)).toLocaleString()
+  : (
+      typeof latestValue === 'number'
+        ? latestValue.toLocaleString()
+        : latestValue
+    )
+}
+
                     </span>
                     <span className={styles.unit}>
                       {metric.columns && metric.columns[1] ? 
