@@ -1,7 +1,8 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import { Lightbulb, Send, Loader } from 'lucide-react';
-import { useRouter } from 'next/navigation'; // For routing
+import { useRouter } from 'next/navigation';
+import ReactMarkdown from 'react-markdown'; // NEW: Added for markdown support
 import styles from '../../../styles/ChatInterface.module.css';
 
 const ChatInterface = ({ 
@@ -74,7 +75,6 @@ const ChatInterface = ({
             onGraphsUpdate(metricData.graphs);
           }
           
-          
         } catch (error) {
           console.error('Metric agent error:', error);
         }
@@ -108,7 +108,7 @@ const ChatInterface = ({
         }
       }
       // Handle Data Agent
-      else if (agent_name === "ask_db_agent") { // <-- NEW: We only call data agent if explicitly asked
+      else if (agent_name === "ask_db_agent") {
         try {
           console.log('Calling data agent with instructions:', instructions);
           const dataResponse = await fetch('https://data-agent-endpoint-flnr5jia5q-uc.a.run.app', {
@@ -137,6 +137,7 @@ const ChatInterface = ({
 
   // Sends a message to the main chat endpoint
   const handleSendMessage = async () => {
+
     if (!newMessage.trim() || isLoading) return;
 
     try {
@@ -213,7 +214,10 @@ const ChatInterface = ({
                 styles.aiMessage
               }`}
             >
-              {message.content}
+              {/* NEW: Wrapped message content in ReactMarkdown */}
+              <ReactMarkdown>
+                {message.content}
+              </ReactMarkdown>
             </div>
           ))}
 

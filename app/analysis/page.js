@@ -197,7 +197,7 @@ export default function AnalysisPage() {
               <div className={styles.leftPanel}>
                 <div className={styles.chatSection}>
                   <ChatInterface
-                    messages={chatData?.chat?.messages || []}
+                    messages={chatData?.chat || []}
                     ideaId={searchParams.get('idea')}
                     insightId={searchParams.get('insight')}
                     userId={userId}
