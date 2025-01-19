@@ -73,7 +73,11 @@ export default function InsightPage() {
 
           // line / bar / pie items for GraphDisplay
           const chartCandidates = data.graphs.filter(
-            (m) => m.metric_type === 'line' || m.metric_type === 'bar' || m.metric_type === 'pie'
+            (m) =>
+              m.metric_type === 'line' ||
+              m.metric_type === 'bar' ||
+              m.metric_type === 'pie' ||
+              m.metric_type === 'hist'
           );
           setInitialGraphs(convertMetricsToGraphs(chartCandidates));
         }

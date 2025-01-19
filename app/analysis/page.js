@@ -50,11 +50,15 @@ export default function AnalysisPage() {
 
     // Convert any line/bar/pie metrics into graph objects
     const graphCandidates = newMetrics.filter(
-      (m) => m.metric_type === 'line' || m.metric_type === 'bar' || m.metric_type === 'pie'
+      (m) =>
+        m.metric_type === 'line' ||
+        m.metric_type === 'bar' ||
+        m.metric_type === 'pie' ||
+        m.metric_type === 'hist'
     );
     const newGraphs = convertMetricsToGraphs(graphCandidates);
 
-    // Reset and set the new graphs
+    // Reset and set the new graphsi 
     setDynamicGraphs(newGraphs);
   };
 
@@ -144,7 +148,11 @@ export default function AnalysisPage() {
   let initialGraphs = [];
   if (chatData?.metrics) {
     const graphCandidates = chatData.metrics.filter(
-      (m) => m.metric_type === 'line' || m.metric_type === 'bar' || m.metric_type === 'pie'
+      (m) =>
+        m.metric_type === 'line' ||
+        m.metric_type === 'bar' ||
+        m.metric_type === 'pie' ||
+        m.metric_type === 'hist'
     );
     initialGraphs = convertMetricsToGraphs(graphCandidates);
   }

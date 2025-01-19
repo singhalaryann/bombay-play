@@ -240,8 +240,8 @@ const GraphDisplay = ({ graphs }) => {
         );
       }
 
-      // ADDED: handle 'histo' charts
-      case 'histo': {
+      // ADDED: handle 'hist' charts
+      case 'hist': {
         const data = values.map(([cat, val]) => ({
           name: cat,
           value: val
