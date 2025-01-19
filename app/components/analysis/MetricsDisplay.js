@@ -56,11 +56,11 @@ const MetricsDisplay = ({ metrics }) => {
                     )}
                   </div>
                 </div>
-                {metric.description && (
+                {/* {metric.description && (
                   <div className={styles.descriptionContainer}>
                     <p className={styles.description}>{metric.description}</p>
                   </div>
-                )}
+                )} */}
               </div>
             </div>
           );

@@ -9,6 +9,37 @@ import MetricsDisplay from '../components/analysis/MetricsDisplay';
 import GraphDisplay from '../components/analysis/GraphDisplay';
 import styles from '../../styles/Analysis.module.css';
 
+// Helper function to transform line/bar metrics into GraphDisplay format
+function convertMetricsToGraphs(metrics) {
+  return metrics.map((m) => {
+    // Decide the chart "type" based on metric_type
+    let chartType = 'line';
+    if (m.metric_type === 'bar') {
+      chartType = 'hist';
+    } else if (m.metric_type === 'pie') {
+      chartType = 'pie';
+    }
+    // Build categories & values arrays
+    const categories = [];
+    const values = [];
+    (m.values || []).forEach((row) => {
+      categories.push(row[0]);
+      values.push(row[1]);
+    });
+    return {
+      type: chartType,
+      name: m.title,
+      categories,
+      values,
+      x_label: m.columns[0],
+      y_label: m.columns[1],
+      x_unit: '',
+      y_unit: '',
+      value_unit: ''
+    };
+  });
+}
+
 export default function AnalysisPage() {
   const searchParams = useSearchParams();
   const { userId } = useAuth();
@@ -16,42 +47,56 @@ export default function AnalysisPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Added state for dynamic metrics and graphs
-const [dynamicMetrics, setDynamicMetrics] = useState([]);
-const [dynamicGraphs, setDynamicGraphs] = useState([]);
+  // State for dynamic metrics and graphs
+  const [dynamicMetrics, setDynamicMetrics] = useState([]);
+  const [dynamicGraphs, setDynamicGraphs] = useState([]);
 
-// Add these handlers
-const handleMetricsUpdate = (newMetrics) => {
-  console.log('Setting new metrics:', newMetrics);
-  setDynamicMetrics(newMetrics); // Replace entirely, don't append
-  // Clear previous graphs when metrics update
-  setDynamicGraphs([]);
-};
-const handleGraphsUpdate = (newGraphs) => {
-  console.log('Updating graphs:', newGraphs);
-  setDynamicGraphs(prevGraphs => [...prevGraphs, ...newGraphs]);
-};
+  // Handlers to update metrics and graphs
+  const handleMetricsUpdate = (newMetrics) => {
+    console.log('Setting new metrics:', newMetrics);
 
+    // Keep only the "metric" ones for MetricsDisplay
+    const filteredMetrics = newMetrics.filter(
+      (m) => m.metric_type === 'metric'
+    );
+    setDynamicMetrics(filteredMetrics); // Replace entirely
+
+    // Convert any line/bar/pie metrics into graph objects
+    const graphCandidates = newMetrics.filter(
+      (m) => m.metric_type === 'line' || m.metric_type === 'bar' || m.metric_type === 'pie'
+    );
+    const newGraphs = convertMetricsToGraphs(graphCandidates);
+
+    // Reset and set the new graphs
+    setDynamicGraphs(newGraphs);
+  };
+
+  const handleGraphsUpdate = (newGraphs) => {
+    console.log('Updating graphs:', newGraphs);
+    setDynamicGraphs((prevGraphs) => [...prevGraphs, ...newGraphs]);
+  };
+
+  // Fetch the initial chat data
   useEffect(() => {
     const fetchChatData = async () => {
       try {
         const ideaId = searchParams.get('idea');
         const insightId = searchParams.get('insight');
-        const chatId = searchParams.get('chat'); // New: Get chat_id from URL
-        
-        console.log('Fetching chat data with:', { userId, insightId, ideaId, chatId }); // Added chatId to logging
-        
-        if (!userId || !insightId || !ideaId || !chatId) { // Added chatId check
+        const chatId = searchParams.get('chat');
+
+        console.log('Fetching chat data with:', { userId, insightId, ideaId, chatId });
+
+        if (!userId || !insightId || !ideaId || !chatId) {
           throw new Error('Missing required parameters');
         }
-    
+
         const response = await fetch('https://get-chat-q54hzgyghq-uc.a.run.app', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            chat_id: chatId,     // New: Added chat_id
+            chat_id: chatId,
             insight_id: insightId,
             idea_id: ideaId
           })
@@ -60,10 +105,11 @@ const handleGraphsUpdate = (newGraphs) => {
         if (!response.ok) {
           throw new Error('Failed to fetch chat data');
         }
-        
+
         const data = await response.json();
         console.log('Received chat data:', data);
         setChatData(data);
+
       } catch (error) {
         console.error('Error fetching chat data:', error);
         setError(error.message);
@@ -79,20 +125,20 @@ const handleGraphsUpdate = (newGraphs) => {
 
   if (loading) {
     return (
-    <div className={styles.container}>
-    <Header />
-    <div className={styles.mainLayout}>
-    <Sidebar />
-    <main className={styles.mainContent}>
-      <div className={styles.loadingWrapper}>
-        <div className={styles.loading}>Loading...</div>
+      <div className={styles.container}>
+        <Header />
+        <div className={styles.mainLayout}>
+          <Sidebar />
+          <main className={styles.mainContent}>
+            <div className={styles.loadingWrapper}>
+              <div className={styles.loading}>Loading...</div>
+            </div>
+          </main>
+        </div>
       </div>
-    </main>
-    </div>
-    </div>
     );
-    }
-    
+  }
+
   if (error) {
     return (
       <div className={styles.container}>
@@ -106,6 +152,37 @@ const handleGraphsUpdate = (newGraphs) => {
       </div>
     );
   }
+
+  // Convert the initial chatData.metrics (line/bar/pie) to graph format
+  let initialGraphs = [];
+  if (chatData?.metrics) {
+    const graphCandidates = chatData.metrics.filter(
+      (m) => m.metric_type === 'line' || m.metric_type === 'bar' || m.metric_type === 'pie'
+    );
+    initialGraphs = convertMetricsToGraphs(graphCandidates);
+  }
+
+  // ------------------------------ NEW LOGIC TO AVOID DUPLICATE METRIC KEYS ------------------------------
+  // We merge the original metrics with the dynamic metrics, replacing any duplicates by metric_id
+  const combinedMetrics = (() => {
+    const originalMetrics = chatData?.metrics || [];
+    const combined = [...originalMetrics];
+
+    dynamicMetrics.forEach((newMetric) => {
+      const existingIndex = combined.findIndex(
+        (m) => m.metric_id === newMetric.metric_id
+      );
+      if (existingIndex >= 0) {
+        // Replace existing metric with the updated one
+        combined[existingIndex] = newMetric;
+      } else {
+        // Otherwise just add it
+        combined.push(newMetric);
+      }
+    });
+    return combined;
+  })();
+  // ------------------------------------------------------------------------------------------------------
 
   return (
     <div className={styles.container}>
@@ -124,23 +201,36 @@ const handleGraphsUpdate = (newGraphs) => {
             <div className={styles.contentLayout}>
               <div className={styles.leftPanel}>
                 <div className={styles.chatSection}>
-                <ChatInterface
-  messages={chatData?.chat?.messages || []}
-  ideaId={searchParams.get('idea')}
-  insightId={searchParams.get('insight')}
-  userId={userId}
-  chatId={searchParams.get('chat')} // Added chatId
-  ideaDescription={chatData?.idea_description}
-  onMetricsUpdate={handleMetricsUpdate} // Added metrics handler
-  onGraphsUpdate={handleGraphsUpdate}   // Added graphs handler
-/>
+                  <ChatInterface
+                    messages={chatData?.chat?.messages || []}
+                    ideaId={searchParams.get('idea')}
+                    insightId={searchParams.get('insight')}
+                    userId={userId}
+                    chatId={searchParams.get('chat')}
+                    ideaDescription={chatData?.idea_description}
+                    onMetricsUpdate={handleMetricsUpdate}
+                    onGraphsUpdate={handleGraphsUpdate}
+                  />
                 </div>
               </div>
+
               <div className={styles.rightPanel}>
-  {/* Pass both initial and dynamic metrics/graphs */}
-  <MetricsDisplay metrics={[...(chatData?.metrics || []), ...dynamicMetrics]} />
-  <GraphDisplay graphs={chatData?.graphs?.length > 0 ? chatData.graphs : dynamicGraphs} />
-</div>
+                {/* Combine initial + dynamic metrics (in case user updates them) */}
+                <MetricsDisplay
+                  metrics={combinedMetrics}
+                />
+
+                {/* If chatData already has any existing graphs, show them.
+                    Otherwise, show the ones we built from metric transformation,
+                    plus anything dynamic. */}
+                <GraphDisplay
+                  graphs={
+                    chatData?.graphs?.length > 0
+                      ? chatData.graphs
+                      : [...initialGraphs, ...dynamicGraphs]
+                  }
+                />
+              </div>
             </div>
           </div>
         </main>

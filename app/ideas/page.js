@@ -36,16 +36,15 @@ export default function IdeasPage() {
         });
         const data = await response.json();
 
-        // Merge new ideas with existing ones (no duplicates)
-        setIdeasData(prev => {
+        // NEW: Merge any new ideas with existing ideas (no duplicates)
+        setIdeasData((prev) => {
           // If there's no previous data, just use the new data
           if (!prev) {
             return data;
           }
 
-          // Otherwise, merge the old ideas with the new ones
+          // Otherwise, merge old ideas with new ones
           const mergedIdeas = [...(prev.ideas || [])];
-
           data.ideas.forEach(newIdea => {
             // Check if this new idea already exists
             const alreadyExists = mergedIdeas.some(
@@ -59,9 +58,9 @@ export default function IdeasPage() {
 
           return {
             ...prev,
-            // (Optional) Update the problem statement if needed:
+            // (Optional) update the problem statement if needed
             description: data.description || prev.description,
-            // Use the merged ideas list:
+            // Use the merged ideas list
             ideas: mergedIdeas
           };
         });

@@ -82,11 +82,13 @@ const ChatInterface = ({
       // Handle Idea Agent
       else if (agent_name === "ask_idea_agent_to_generate_idea") {
         try {
-          console.log('Calling idea agent with:', { chatId, instructions });
+          console.log('Calling idea agent with:', { chatId, instructions, userId, insightId });
           const ideaResponse = await fetch('https://idea-agent-endpoint-flnr5jia5q-uc.a.run.app', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+              insight_id: insightId,
+              user_id: userId,
               chat_id: chatId,
               query: instructions
             })
