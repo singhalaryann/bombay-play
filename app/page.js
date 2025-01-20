@@ -1,6 +1,6 @@
 // app/page.js
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from '../styles/page.module.css';
 import { useRouter } from 'next/navigation';
 import { useAuth } from './context/AuthContext';
@@ -11,12 +11,16 @@ export default function Home() {
   const [userId, setUserId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
     try {
       const response = await fetch('https://check-user-q54hzgyghq-uc.a.run.app', {
         method: 'POST',
@@ -27,7 +31,6 @@ export default function Home() {
           user_id: userId.trim()
         })
       });
-
       const data = await response.json();
       console.log('API Response:', data);
 
@@ -49,31 +52,34 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.content}>
-        <h1 className={styles.title}>Welcome to XG</h1>
-        <p className={styles.subtitle}>Enter your user ID to continue</p>
-        
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <input
-            type="text"
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
-            placeholder="Enter your ID"
-            className={styles.input}
-            disabled={loading}
-            autoFocus
-          />
+      <div className={`${styles.content} ${mounted ? styles.mounted : ''}`}>
+        <div className={styles.glassEffect}>
+          <div className={styles.title}>
+            Welcome to <span className={styles.highlight}>XG</span>
+          </div>
+          <p className={styles.subtitle}>Enter your user ID to continue</p>
           
-          <button
-            type="submit"
-            className={styles.button}
-            disabled={loading || !userId.trim()}
-          >
-            {loading ? 'Validating...' : 'Enter'}
-          </button>
-        </form>
-        
-        {error && <p className={styles.error}>{error}</p>}
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <input
+              type="text"
+              value={userId}
+              onChange={(e) => setUserId(e.target.value)}
+              placeholder="Enter your ID"
+              className={styles.input}
+              disabled={loading}
+              autoFocus
+            />
+            <button
+              type="submit"
+              className={styles.button}
+              disabled={loading || !userId.trim()}
+            >
+              {loading ? 'Validating...' : 'Enter'}
+            </button>
+          </form>
+
+          {error && <p className={styles.error}>{error}</p>}
+        </div>
       </div>
     </div>
   );
