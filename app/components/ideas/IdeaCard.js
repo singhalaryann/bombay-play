@@ -55,16 +55,20 @@ const IdeaCard = ({ number, description, ideaId, insightId }) => {
 
           {/* NEW: conditionally render button based on isLoading */}
           {isLoading ? (
-            <button className={styles.viewButton} disabled>Loading...</button> // <-- NEW line
-          ) : (
-            <button className={styles.viewButton} onClick={handleViewIdea}>
-              <div className={styles.viewButtonContent}>
-                <Lightbulb size={16} />
-                <span>View Idea</span>
-                <ArrowRight size={16} />
-              </div>
-            </button>
-          )}
+  <button className={styles.viewButton} disabled>
+    <div className={styles.viewButtonContent}>
+      <span>Loading...</span>
+    </div>
+  </button>
+) : (
+  <button className={styles.viewButton} onClick={handleViewIdea}>
+    <div className={styles.viewButtonContent}>
+      <Lightbulb size={16} />
+      <span>View Idea</span>
+      <ArrowRight size={16} />
+    </div>
+  </button>
+)}
         </div>
       </div>
     </div>

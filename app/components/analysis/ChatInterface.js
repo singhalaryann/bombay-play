@@ -147,7 +147,7 @@ const ChatInterface = ({
       // Immediately add the user's message to the chat
       const userMessage = {
         content: newMessage,
-        sender: 'user'
+        sender: 'human'
       };
       setChatMessages(prev => [...prev, userMessage]);
       setNewMessage('');
@@ -209,7 +209,7 @@ const ChatInterface = ({
             <div
               key={index}
               className={`${styles.message} ${
-                message.sender === 'user' ? styles.userMessage :
+                message.sender === 'human' ? styles.userMessage :
                 message.sender === 'system' ? styles.systemMessage :
                 styles.aiMessage
               }`}

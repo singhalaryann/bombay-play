@@ -142,3 +142,12 @@
     font-size: 13px;
   }
 }
+
+.viewButton:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.viewButton:disabled .viewButtonContent {
+  background: rgba(130, 255, 131, 0.05);
+}
