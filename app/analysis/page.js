@@ -71,13 +71,13 @@ export default function AnalysisPage() {
   useEffect(() => {
     const fetchChatData = async () => {
       try {
-        const ideaId = searchParams.get('idea');
-        const insightId = searchParams.get('insight');
+        // const ideaId = searchParams.get('idea');
+        // const insightId = searchParams.get('insight');
         const chatId = searchParams.get('chat');
 
-        console.log('Fetching chat data with:', { userId, insightId, ideaId, chatId });
+        console.log('Fetching chat data with:', { userId, chatId });
 
-        if (!userId || !insightId || !ideaId || !chatId) {
+        if (!userId || !chatId) {
           throw new Error('Missing required parameters');
         }
 
@@ -88,8 +88,8 @@ export default function AnalysisPage() {
           },
           body: JSON.stringify({
             chat_id: chatId,
-            insight_id: insightId,
-            idea_id: ideaId
+            // insight_id: insightId,
+            // idea_id: ideaId
           })
         });
 
@@ -186,12 +186,12 @@ export default function AnalysisPage() {
         <Sidebar />
         <main className={styles.mainContent}>
           <div className={styles.content}>
-            <section className={styles.problemSection}>
-              <h2 className={styles.sectionTitle}>Problem statement</h2>
-              <div className={styles.problemStatement}>
-                {chatData?.insight_description || 'No insight available'}
-              </div>
-            </section>
+            {/* <section className={styles.problemSection}> */}
+              {/* <h2 className={styles.sectionTitle}>Problem statement</h2> */}
+              {/* <div className={styles.problemStatement}> */}
+                {/* {chatData?.insight_description || 'No insight available'} */}
+              {/* </div> */}
+            {/* </section> */}
 
             <div className={styles.contentLayout}>
               <div className={styles.leftPanel}>

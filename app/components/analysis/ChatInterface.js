@@ -142,7 +142,7 @@ const ChatInterface = ({
 
     try {
       setIsLoading(true);
-      console.log('Sending message:', { newMessage, chatId, ideaId, insightId });
+      console.log('Sending message:', { newMessage, chatId, insightId });
 
       // Immediately add the user's message to the chat
       const userMessage = {
@@ -191,7 +191,7 @@ const ChatInterface = ({
       <div className={styles.chatContainer}>
 
         {/* Idea Card */}
-        <div className={styles.ideaCard}>
+        {/* <div className={styles.ideaCard}>
           <div className={styles.ideaHeader}>
             <div className={styles.ideaIconWrapper}>
               <Lightbulb className={styles.ideaIcon} size={20} />
@@ -201,7 +201,7 @@ const ChatInterface = ({
           <p className={styles.ideaDescription}>
             {ideaDescription || 'No idea description available'}
           </p>
-        </div>
+        </div> */}
 
         {/* Messages List */}
         <div className={styles.messagesContainer}>
@@ -215,9 +215,11 @@ const ChatInterface = ({
               }`}
             >
               {/* NEW: Wrapped message content in ReactMarkdown */}
-              <ReactMarkdown>
-                {message.content}
-              </ReactMarkdown>
+             {/* Use ReactMarkdown to display the content */}
+<div className={styles.message}>
+  <ReactMarkdown>{message.content}</ReactMarkdown>
+</div>
+
             </div>
           ))}
 

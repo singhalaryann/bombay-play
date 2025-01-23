@@ -1,12 +1,13 @@
 /* styles/Sidebar.module.css */
 .sidebar {
   width: 260px;
-  min-height: calc(100vh - 24px);
+  min-height: calc(93vh - 24px); 
   margin: 12px;
   position: relative;
   z-index: 1;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: #191C17;
+  border-radius: 3%;
 }
 
 .glassEffect {
@@ -196,10 +197,12 @@
   .sidebar {
       width: 70px;
       margin: 6px;
+      border-radius: 8px; /* Added border radius for small screens */
   }
 
   .glassEffect {
       padding: 8px;
+      border-radius: 8px; /* Added border radius for glass effect */
   }
 
   .menuLink {
@@ -231,3 +234,11 @@
       background: rgba(130, 255, 131, 0.08);
   }
 }
+
+
+
+
+
+
+
+

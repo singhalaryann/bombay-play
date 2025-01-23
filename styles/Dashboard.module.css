@@ -82,12 +82,12 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-.insightsHeader {
+/* .insightsHeader {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 8px;
-}
+} */
 
 .insightIcon {
   color: #82FF83;
@@ -179,4 +179,47 @@
 
 .mainContent::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+/* Dashboard.module.css additions */
+.insightGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Update these CSS classes */
+.insightsHeader {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 8px;
+}
+
+.brainstormIcon {
+  filter: brightness(0) saturate(100%) invert(95%) sepia(12%) saturate(1000%) hue-rotate(68deg) brightness(92%) contrast(99%);
+}
+
+.brainstormButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.brainstormButton.active,
+.brainstormButton:hover {
+  color: #82FF83;
+}
+
+.brainstormButton.active .brainstormIcon,
+.brainstormButton:hover .brainstormIcon {
+  filter: brightness(0) saturate(100%) invert(95%) sepia(12%) saturate(1000%) hue-rotate(68deg) brightness(92%) contrast(99%);
 }
