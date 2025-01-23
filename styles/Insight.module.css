@@ -3,20 +3,24 @@
   min-height: 100vh;
   background: #050505;
   color: white;
+  display: flex;
+  flex-direction: column;
 }
 
 .mainLayout {
   display: flex;
+  flex: 1;
   min-height: calc(100vh - 64px);
 }
 
 .mainContent {
   flex: 1;
-  padding: 24px;
+  padding: 32px;
   overflow-y: auto;
   background: #050505;
   max-width: 1600px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .contentLoading {
@@ -31,7 +35,7 @@
 .glassBox {
   background: #191C17;
   border-radius: 12px;
-  padding: 16px 20px;
+  padding: 20px 24px;
   color: rgba(255, 255, 255, 0.9);
   font-size: 15px;
   line-height: 1.5;
@@ -48,16 +52,16 @@
   border-radius: 12px;
   padding: 1px;
   background: linear-gradient(
-    -100deg,
-    rgba(255, 255, 255,0.4),
-    rgba(255, 255, 255, 0.03)
+      -100deg,
+      rgba(255, 255, 255, 0.3),
+      rgba(255, 255, 255, 0.03)
   );
   -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
   mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
@@ -67,7 +71,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 40px;
+  margin: 32px 0;
   gap: 32px;
 }
 
@@ -77,6 +81,7 @@
   line-height: 1.5;
   flex: 1;
   max-width: 800px;
+  margin: 0;
 }
 
 .analyseButton {
@@ -86,7 +91,7 @@
   background: #82FF83;
   color: #000000;
   border: none;
-  padding: 10px 16px;
+  padding: 12px 20px;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
@@ -103,8 +108,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
 }
 
 .buttonIcon {
@@ -112,8 +117,16 @@
   height: 100%;
 }
 
-/* Section for handling multiple graphs */
-.graphsContainer {
+/* Metrics Display Section */
+.metricsDisplay {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+/* Graph Display Section */
+.graphsGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
@@ -121,123 +134,91 @@
 }
 
 .graphCard {
-  background: #191C17;
+  background: rgba(18, 18, 18, 0.4);
   border-radius: 12px;
   padding: 24px;
-  display: flex;
-  flex-direction: column;
+  min-height: 400px;
+  position: relative;
 }
 
 .graphTitle {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.graphName {
   font-size: 18px;
   color: rgba(255, 255, 255, 0.9);
-}
-
-.exploreButton {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(22, 163, 74, 0.15);
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  color: #82FF83;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.exploreButton:hover {
-  background: rgba(22, 163, 74, 0.25);
+  margin-bottom: 24px;
+  font-weight: 500;
 }
 
 /* Responsive Design */
 @media (max-width: 1280px) {
   .mainContent {
-    padding: 20px;
+      padding: 24px;
   }
   
-  .graphsContainer {
-    gap: 20px;
-  }
-  
-  .graphCard {
-    padding: 20px;
+  .graphsGrid {
+      gap: 20px;
   }
 }
 
 @media (max-width: 1024px) {
-  .mainContent {
-    padding: 20px;
+  .graphsGrid {
+      grid-template-columns: 1fr;
   }
 
   .actionRow {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+      margin: 24px 0;
   }
 
   .analyseButton {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .graphsContainer {
-    grid-template-columns: 1fr;
+      width: 100%;
+      justify-content: center;
   }
 }
 
 @media (max-width: 768px) {
   .mainContent {
-    padding: 16px;
+      padding: 16px;
   }
 
   .glassBox {
-    padding: 16px;
-    font-size: 14px;
-    margin-bottom: 24px;
+      padding: 16px;
+      font-size: 14px;
+      margin-bottom: 24px;
   }
 
   .subText {
-    font-size: 14px;
+      font-size: 14px;
   }
 
-  .actionRow {
-    margin-bottom: 32px;
-  }
-  
   .graphCard {
-    padding: 16px;
+      padding: 16px;
+      min-height: 350px;
   }
-  
-  .graphName {
-    font-size: 16px;
+
+  .graphTitle {
+      font-size: 16px;
   }
 }
 
 @media (max-width: 480px) {
   .mainContent {
-    padding: 12px;
+      padding: 12px;
   }
 
   .glassBox {
-    padding: 14px;
-    margin-bottom: 20px;
+      padding: 14px;
+      margin-bottom: 20px;
   }
 
   .analyseButton {
-    padding: 8px 14px;
-    font-size: 13px;
+      padding: 10px 16px;
+      font-size: 13px;
   }
-  
+
   .graphCard {
-    padding: 14px;
+      padding: 14px;
+      min-height: 300px;
   }
 }

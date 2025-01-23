@@ -33,30 +33,30 @@
 /* Responsive Styles */
 @media (max-width: 768px) {
   .filterContainer {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
   }
 
   .filterContainer::-webkit-scrollbar {
-    display: none;
+      display: none;
   }
 
   .filterButton {
-    white-space: nowrap;
-    padding: 8px 14px;
+      white-space: nowrap;
+      padding:10px 14px;
   }
 }
 
 @media (max-width: 480px) {
   .filterButton {
-    padding: 6px 12px;
-    font-size: 13px;
+      padding: 10px 12px;
+      font-size: 13px;
   }
-
+  
   .filterContainer {
-    padding: 3px;
+      padding: 3px;
   }
 }

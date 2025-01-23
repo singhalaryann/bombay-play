@@ -99,15 +99,15 @@ export default function IdeasPage() {
                   <HelpCircle className={styles.questionIcon} size={30} />
                 </div>
                 <div className={styles.ideasContainer}>
-                  {ideasData?.ideas?.map(idea => (
-                    <IdeaCard
-                      key={idea.idea_id}
-                      number={idea.idea_id}
-                      description={idea.description}
-                      ideaId={idea.idea_id}
-                      insightId={idea.insight_id}
-                    />
-                  ))}
+                {ideasData?.ideas?.map((idea, index) => (  // Added index parameter
+  <IdeaCard
+    key={idea.idea_id}
+    number={index + 1}  // Using index+1 for sequential numbering
+    description={idea.description}
+    ideaId={idea.idea_id}
+    insightId={idea.insight_id}
+  />
+))}
                 </div>
               </section>
             </div>

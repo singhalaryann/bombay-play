@@ -20,13 +20,15 @@ const MetricCard = ({ name, value, delta, description, unit }) => {
           </div>
         </div>
         <div className={styles.mainContent}>
-          <div className={styles.valueWrapper}>
-            <span className={styles.value}>{value}</span>
-            <span className={styles.unit}>{unit}</span>
-            <span className={`${styles.delta} ${isPositive ? styles.positive : styles.negative}`}>
-              ({formattedDelta})
-            </span>
-          </div>
+        <div className={styles.valueSection}>
+    <div className={styles.valueWrapper}>
+        <span className={styles.value}>{value}</span>
+        <span className={styles.unit}>{unit}</span>
+    </div>
+    <span className={`${styles.delta} ${isPositive ? styles.positive : styles.negative}`}>
+        ({formattedDelta})
+    </span>
+</div>
         </div>
         <div className={styles.descriptionContainer}>
           <p className={styles.description}>{description}</p>

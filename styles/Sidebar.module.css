@@ -1,12 +1,12 @@
 /* styles/Sidebar.module.css */
 .sidebar {
   width: 260px;
-  min-height: calc(90vh - 24px);
+  min-height: calc(100vh - 24px);
   margin: 12px;
   position: relative;
   z-index: 1;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: #191C17;
-  border-radius: 12px;
 }
 
 .glassEffect {
@@ -19,6 +19,8 @@
   position: relative;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
 }
 
 /* Outer glow border */
@@ -29,16 +31,16 @@
   border-radius: 12px;
   padding: 1px;
   background: linear-gradient(
-    -100deg,
-    rgba(255, 255, 255, 0.4),
-    rgba(255, 255, 255, 0.03)
+      -100deg,
+      rgba(255, 255, 255, 0.4),
+      rgba(255, 255, 255, 0.03)
   );
   -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
   mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
@@ -53,10 +55,10 @@
   right: 0;
   height: 1px;
   background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.08),
-    transparent
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.08),
+      transparent
   );
 }
 
@@ -74,10 +76,17 @@
   cursor: pointer;
   transition: all 0.2s ease;
   background: rgba(28, 28, 28, 0.6);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .menuLink:hover {
   background: rgba(130, 255, 131, 0.08);
+}
+
+.menuLink:focus-visible {
+  outline: 2px solid rgba(130, 255, 131, 0.3);
+  outline-offset: 2px;
 }
 
 .menuLink.active {
@@ -101,6 +110,7 @@
   background: rgba(130, 255, 131, 0.1);
   border-radius: 8px;
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .icon {
@@ -108,69 +118,116 @@
   height: 20px;
   color: #82FF83;
   filter: brightness(1.2);
+  transition: transform 0.2s ease;
+}
+
+.menuLink:hover .icon {
+  transform: scale(1.1);
 }
 
 .menuText {
   color: rgba(255, 255, 255, 0.9);
   font-size: 15px;
   font-weight: 500;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Responsive Styles */
+@media (max-width: 1280px) {
+  .sidebar {
+      width: 240px;
+      margin: 10px;
+  }
+
+  .menuIcon {
+      width: 34px;
+      height: 34px;
+  }
+}
+
 @media (max-width: 1024px) {
   .sidebar {
-    width: 240px;
-    margin: 8px;
+      width: 220px;
+      margin: 8px;
+  }
+
+  .glassEffect {
+      padding: 14px;
+  }
+
+  .menuIcon {
+      width: 32px;
+      height: 32px;
   }
 }
 
 @media (max-width: 768px) {
   .sidebar {
-    width: 80px;
+      width: 80px;
+      margin: 8px;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   .glassEffect {
-    padding: 12px;
+      padding: 12px;
   }
-  
+
   .menuLink {
-    padding: 10px;
-    justify-content: center;
+      padding: 10px;
+      justify-content: center;
   }
-  
+
   .menuIcon {
-    width: 32px;
-    height: 32px;
+      width: 32px;
+      height: 32px;
   }
-  
+
   .menuText {
-    display: none;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.2s ease;
   }
 }
 
 @media (max-width: 480px) {
   .sidebar {
-    width: 70px;
-    margin: 6px;
+      width: 70px;
+      margin: 6px;
   }
-  
+
   .glassEffect {
-    padding: 8px;
+      padding: 8px;
   }
-  
+
   .menuLink {
-    padding: 8px;
+      padding: 8px;
   }
-  
+
   .menuIcon {
-    width: 30px;
-    height: 30px;
+      width: 30px;
+      height: 30px;
   }
-  
+
   .icon {
-    width: 18px;
-    height: 18px;
+      width: 18px;
+      height: 18px;
+  }
+
+  .menuItem {
+      padding: 3px;
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) {
+  .menuLink:hover {
+      background: rgba(28, 28, 28, 0.6);
+  }
+
+  .menuLink:active {
+      background: rgba(130, 255, 131, 0.08);
   }
 }
