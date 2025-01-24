@@ -1,5 +1,4 @@
 /* styles/IdeationChat.module.css */
-
 .container {
   height: 100vh;
   display: flex;
@@ -355,3 +354,86 @@
   border-radius: 8px;
   margin: 16px 0;
 }
+
+.insightGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 24px;
+  margin-top: 120px;
+  width: 100%;
+}
+
+.insightBlock {
+  background: #191C17;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  position: relative;
+}
+
+.insightBlock:hover {
+  background: rgba(25, 28, 23, 0.4);
+}
+
+.insightContent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.insightIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.insightContent span {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Add these media queries at the end of your CSS file */
+
+@media (max-width: 1200px) {
+  .insightGrid {
+    margin-top: 80px;
+  }
+ }
+ 
+ @media (max-width: 768px) {
+  .insightGrid {
+    grid-template-columns: 1fr;
+    padding: 16px;
+    margin-top: 60px;
+  }
+  
+  .insightBlock {
+    padding: 16px;
+  }
+ 
+  .insightContent span {
+    font-size: 13px;
+  }
+ }
+ 
+ @media (max-width: 480px) {
+  .insightGrid {
+    padding: 12px;
+    margin-top: 40px;
+  }
+  
+  .insightBlock {
+    padding: 12px;
+  }
+  
+  .insightContent {
+    gap: 8px;
+  }
+ 
+  .insightIcon {
+    width: 14px;
+    height: 14px;
+  }
+ }

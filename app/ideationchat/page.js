@@ -1,3 +1,4 @@
+// IdeationChat.js
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -5,9 +6,17 @@ import styles from "../../styles/IdeationChat.module.css";
 import Header from "../components/layout/Header";
 import Sidebar from "../components/layout/Sidebar";
 import { Send, Loader } from "lucide-react";
-
-// 1) IMPORT ReactMarkdown for markdown rendering
 import ReactMarkdown from "react-markdown";
+import Image from 'next/image';
+
+const InsightBlock = ({ text, onClick }) => (
+  <div className={styles.insightBlock} onClick={() => onClick(text)}>
+    <div className={styles.insightContent}>
+      <Image src="/star.png" width={20} height={20} alt="star" className={styles.insightIcon} />
+      <span>{text}</span>
+    </div>
+  </div>
+);
 
 export default function IdeationChat() {
   const [messages, setMessages] = useState([]);
@@ -17,17 +26,24 @@ export default function IdeationChat() {
   const messagesEndRef = useRef(null);
   const router = useRouter();
 
-  // Scroll to bottom on new messages
+  const insights = [
+    "MAU declined by 4%, possibly due to a lack of sustained engagement or post-event drop-off.",
+    "Average session duration fell by 3%, indicating users may be disengaging sooner.",
+    "Retention dropped by 2%, suggesting new users are not finding enough value to stay.",
+    "Social mentions decreased by 8%, likely due to reduced buzz after the recent event ended."
+  ];
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Send typed message to the API
+  const handleInsightClick = (text) => {
+    setInput(text);
+  };
+
   const handleSend = async () => {
-    // If blank or AI is busy, do nothing
     if (!input.trim() || isLoading) return;
 
-    // Add user's message to local chat
     setMessages((prev) => [...prev, { content: input, sender: "human" }]);
     setIsLoading(true);
 
@@ -43,7 +59,6 @@ export default function IdeationChat() {
       if (response.ok) {
         const data = await response.json();
         console.log("API response data:", data);
-        // If we get chat_id, go to analysis
         if (data.chat_id) {
           console.log("Redirecting to /analysis?chat=", data.chat_id);
           router.push(`/analysis?chat=${data.chat_id}`);
@@ -54,7 +69,6 @@ export default function IdeationChat() {
     } catch (err) {
       console.error("Error in handleSend:", err);
     } finally {
-      // Clear input, end 'thinking' state
       setInput("");
       setIsLoading(false);
     }
@@ -62,28 +76,39 @@ export default function IdeationChat() {
 
   return (
     <div className={styles.container}>
-    <Header />
-    <div className={styles.mainLayout}>
-      <Sidebar />
-      <main className={styles.mainContent}>
-        <h1 className={styles.title}>AI Chat</h1>
-        <div className={styles.chatContainer}>
-          <div className={styles.glassWrapper}>
-            <div className={styles.messagesArea}>
-              {messages.map((msg, idx) => (
-                <div
-                  key={idx}
-                  className={`${styles.message} ${
-                    msg.sender === "human" ? styles.userMessage : styles.aiMessage
-                  }`}
-                >
-                  <div className={styles.messageContent}>
-                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+      <Header />
+      <div className={styles.mainLayout}>
+        <Sidebar />
+        <main className={styles.mainContent}>
+          <h1 className={styles.title}>AI Chat</h1>
+          <div className={styles.chatContainer}>
+            <div className={styles.glassWrapper}>
+              <div className={styles.messagesArea}>
+                {messages.length === 0 && (
+                  <div className={styles.insightGrid}>
+                    {insights.map((insight, idx) => (
+                      <InsightBlock
+                        key={idx}
+                        text={insight}
+                        onClick={handleInsightClick}
+                      />
+                    ))}
                   </div>
-                </div>
-              ))}
+                )}
 
-                {/* AI thinking indicator */}
+                {messages.map((msg, idx) => (
+                  <div
+                    key={idx}
+                    className={`${styles.message} ${
+                      msg.sender === "human" ? styles.userMessage : styles.aiMessage
+                    }`}
+                  >
+                    <div className={styles.messageContent}>
+                      <ReactMarkdown>{msg.content}</ReactMarkdown>
+                    </div>
+                  </div>
+                ))}
+
                 {isLoading && (
                   <div className={styles.loadingMessage}>
                     <Loader className={styles.loadingIcon} size={20} />
@@ -93,12 +118,6 @@ export default function IdeationChat() {
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Captain prompt if no messages */}
-              {/* {messages.length === 0 && (
-                <h2 className={styles.captainPrompt}>What idea is on your mind, captain?</h2>
-              )} */}
-
-              {/* Input area, disabled while AI is thinking */}
               <div className={styles.inputWrapper}>
                 <div className={styles.inputContainer}>
                   <input
@@ -108,7 +127,7 @@ export default function IdeationChat() {
                     placeholder="What's on your mind? Share your thoughts..."
                     className={styles.input}
                     onKeyPress={(e) => e.key === "Enter" && handleSend()}
-                    disabled={isLoading}  // prevent typing if AI is thinking
+                    disabled={isLoading}
                   />
                   <button
                     onClick={handleSend}
