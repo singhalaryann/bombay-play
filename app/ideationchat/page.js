@@ -27,10 +27,10 @@ export default function IdeationChat() {
   const router = useRouter();
 
   const insights = [
-    "MAU declined by 4%, possibly due to a lack of sustained engagement or post-event drop-off.",
-    "Average session duration fell by 3%, indicating users may be disengaging sooner.",
-    "Retention dropped by 2%, suggesting new users are not finding enough value to stay.",
-    "Social mentions decreased by 8%, likely due to reduced buzz after the recent event ended."
+    "Generate offers :",
+    "Generate Ideas :",
+    "Generate Segments :",
+    "Generate Metrics :"
   ];
 
   useEffect(() => {
