@@ -205,21 +205,17 @@ const ChatInterface = ({
 
         {/* Messages List */}
         <div className={styles.messagesContainer}>
-          {chatMessages.map((message, index) => (
-            <div
-              key={index}
-              className={`${styles.message} ${
-                message.sender === 'human' ? styles.userMessage :
-                message.sender === 'system' ? styles.systemMessage :
-                styles.aiMessage
-              }`}
-            >
-              {/* NEW: Wrapped message content in ReactMarkdown */}
-             {/* Use ReactMarkdown to display the content */}
-<div className={styles.message}>
-  <ReactMarkdown>{message.content}</ReactMarkdown>
-</div>
-
+  {chatMessages.map((message, index) => (
+    // Remove extra message div wrapping, keeping single div with message styling
+    <div
+      key={index}
+      className={`${styles.message} ${
+        message.sender === 'human' ? styles.userMessage :
+        message.sender === 'system' ? styles.systemMessage :
+        styles.aiMessage
+      }`}
+    >
+      <ReactMarkdown>{message.content}</ReactMarkdown>
             </div>
           ))}
 

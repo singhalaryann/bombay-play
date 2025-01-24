@@ -38,9 +38,9 @@ const CustomPieTooltip = ({ active, payload }) => {
     return (
       <div className={styles.customTooltip}>
         <p className={styles.tooltipLabel}>{payload[0].name}</p>
-        <p className={styles.tooltipValue}>{`${payload[0].value}${
-          payload[0].payload.unit ? ` ${payload[0].payload.unit}` : ''
-        }`}</p>
+        <p className={styles.tooltipValue}>
+          {`${payload[0].value}${payload[0].payload.unit ? ` ${payload[0].payload.unit}` : ''}`}
+        </p>
       </div>
     );
   }
@@ -52,12 +52,8 @@ const LineTooltip = ({ active, payload, x_label, y_label, x_unit, y_unit }) => {
   if (active && payload && payload.length) {
     return (
       <div className={styles.customTooltip}>
-        <p>{`${x_label}: ${payload[0].payload.x}${
-          x_unit ? ` ${x_unit}` : ''
-        }`}</p>
-        <p>{`${y_label}: ${payload[0].payload.y}${
-          y_unit ? ` ${y_unit}` : ''
-        }`}</p>
+        <p>{`${x_label}: ${payload[0].payload.x}${x_unit ? ` ${x_unit}` : ''}`}</p>
+        <p>{`${y_label}: ${payload[0].payload.y}${y_unit ? ` ${y_unit}` : ''}`}</p>
       </div>
     );
   }
@@ -65,52 +61,36 @@ const LineTooltip = ({ active, payload, x_label, y_label, x_unit, y_unit }) => {
 };
 
 const GraphDisplay = ({ graphs }) => {
-  // If no graphs to show, skip rendering
-  if (!graphs || graphs.length === 0) {
-    return null;
-  }
+  if (!graphs || graphs.length === 0) return null;
 
-  /**
-   * Renders a single metric as a chart, if supported.
-   * @param {Object} graph – The metric object from your API
-   */
   const renderChart = (graph) => {
-    const {
-      metric_type,  // 'line', 'bar', 'pie', etc.
-      title,        // e.g. "Daily Active Users"
-      columns,      // e.g. ["Day", "Users"]
-      values,       // e.g. [["Fri,10 Jan", 116], ["Sat,11 Jan",190], ...]
-      x_unit,       // optional
-      y_unit,       // optional
-      value_unit    // optional
-    } = graph;
+    const { metric_type, title, columns, values, x_unit, y_unit, value_unit } = graph;
 
-    // Safety check: if values is not an array, return nothing
-    if (!Array.isArray(values)) {
-      return null;
-    }
+    if (!Array.isArray(values)) return null;
 
-    // Derive x_label and y_label from columns if they exist
     const x_label = columns?.[0] || 'X';
     const y_label = columns?.[1] || 'Y';
 
-    // Switch on metric_type to decide which chart to render:
+    const calculateDomain = (data, key) => {
+      const values = data.map(d => parseFloat(d[key]));
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      const padding = (max - min) * 0.1;
+      return [min - padding, max + padding];
+    };
+
     switch (metric_type) {
       case 'bar': {
-        // Transform each [xVal, yVal] -> { name, value }
         const data = values.map(([cat, val]) => ({
           name: cat,
-          value: val
+          value: parseFloat(val)
         }));
+        const yDomain = calculateDomain(data, 'value');
 
         return (
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="rgba(255,255,255,0.1)"
-                vertical={false}
-              />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
               <XAxis
                 dataKey="name"
                 stroke="rgba(255,255,255,0.6)"
@@ -132,12 +112,10 @@ const GraphDisplay = ({ graphs }) => {
                   fill: 'rgba(255,255,255,0.6)',
                   fontSize: 12
                 }}
+                domain={yDomain}
+                scale="linear"
               />
-              <Tooltip
-                content={(props) => (
-                  <CustomTooltip {...props} valueUnit={value_unit} />
-                )}
-              />
+              <Tooltip content={(props) => <CustomTooltip {...props} valueUnit={value_unit} />} />
               <Bar dataKey="value" fill="#82FF83" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -145,10 +123,9 @@ const GraphDisplay = ({ graphs }) => {
       }
 
       case 'pie': {
-        // Transform each [xVal, yVal] -> { name, value, unit }
         const data = values.map(([cat, val]) => ({
           name: cat,
-          value: val,
+          value: parseFloat(val),
           unit: value_unit
         }));
 
@@ -164,16 +141,11 @@ const GraphDisplay = ({ graphs }) => {
                 fill="#8884d8"
                 paddingAngle={2}
                 dataKey="value"
-                label={({ name, percent }) =>
-                  `${name} (${(percent * 100).toFixed(0)}%)`
-                }
+                label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
                 labelLine={{ stroke: 'rgba(255,255,255,0.3)' }}
               >
                 {data.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip content={<CustomPieTooltip />} />
@@ -182,18 +154,17 @@ const GraphDisplay = ({ graphs }) => {
         );
       }
 
-      // For "line" or anything that’s basically line-based
       case 'line': {
-        // Transform each [xVal, yVal] -> { x, y }
         const data = values.map(([xVal, yVal]) => ({
           x: xVal,
-          y: yVal
+          y: parseFloat(yVal)
         }));
+        const yDomain = calculateDomain(data, 'y');
 
         return (
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
               <XAxis
                 dataKey="x"
                 stroke="rgba(255,255,255,0.6)"
@@ -215,6 +186,8 @@ const GraphDisplay = ({ graphs }) => {
                   fill: 'rgba(255,255,255,0.6)',
                   fontSize: 12
                 }}
+                domain={yDomain}
+                scale="linear"
               />
               <Tooltip
                 content={(props) => (
@@ -240,21 +213,17 @@ const GraphDisplay = ({ graphs }) => {
         );
       }
 
-      // ADDED: handle 'hist' charts
       case 'hist': {
         const data = values.map(([cat, val]) => ({
           name: cat,
-          value: val
+          value: parseFloat(val)
         }));
+        const yDomain = calculateDomain(data, 'value');
 
         return (
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="rgba(255,255,255,0.1)"
-                vertical={false}
-              />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
               <XAxis
                 dataKey="name"
                 stroke="rgba(255,255,255,0.6)"
@@ -276,19 +245,21 @@ const GraphDisplay = ({ graphs }) => {
                   fill: 'rgba(255,255,255,0.6)',
                   fontSize: 12
                 }}
+                domain={yDomain}
+                scale="linear"
               />
-              <Tooltip
+               <Tooltip
                 content={(props) => (
                   <CustomTooltip {...props} valueUnit={value_unit} />
                 )}
-              />
+              />             
               <Bar dataKey="value" fill="#82FF83" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         );
       }
 
-      // Anything else (like "metric") => just skip it
+         // Anything else (like "metric") => just skip it
       default:
         return null;
     }

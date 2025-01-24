@@ -48,6 +48,8 @@
   flex-direction: column;
   overflow: hidden;
   margin: 0 0 12px 0;
+  /* height: 83vh; */
+
 }
 
 .glassWrapper::after {

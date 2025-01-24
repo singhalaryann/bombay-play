@@ -2,139 +2,146 @@
   min-height: 100vh;
   background: #050505;
   color: white;
-}
-
-.mainLayout {
+  width: 100%;
+ }
+ 
+ .mainLayout {
   display: flex;
   min-height: calc(100vh - 64px);
-}
-
-.mainContent {
+ }
+ 
+ .mainContent {
   flex: 1;
   padding: 24px 32px;
-  overflow-y: auto;
+  /* overflow-y: auto; */
   background: #050505;
-}
-
-.content {
+ }
+ 
+ .content {
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
-}
-
-/* Main Content Layout */
-.contentLayout {
+ }
+ 
+ .contentLayout {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
-  height: calc(100vh - 250px);
-}
-
-.leftPanel {
+  min-height: calc(100vh - 250px);
+  position: relative;
+ }
+ 
+ .leftPanel {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  height: 125%;
-  overflow: hidden;
+  height: 100vh; /* Fixed height */
+    overflow: hidden; /* Keep this */
+  position: sticky;
+  top: 0;
 }
-
+ 
 .rightPanel {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  height: 125%;
+  height: calc(100vh - 100px); /* Adjust height */
   overflow-y: auto;
+  position: relative;
+  z-index: 1;
+  padding-bottom: 24px; /* Add padding */
 }
-
-.chatSection {
+ 
+ .chatSection {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
   height: 100%;
-}
-
-/* Loading and Error States */
-.errorWrapper {
+ }
+ 
+ .errorWrapper {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: calc(100vh - 200px);
-}
-
-.error {
+ }
+ 
+ .error {
   padding: 24px;
   border-radius: 12px;
   background: rgba(18, 18, 18, 0.4);
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.error {
   color: #ff6b6b;
-}
-
-.loadingWrapper {
+ }
+ 
+ .loadingWrapper {
   width: 100%;
   height: calc(100vh - 200px);
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.loading {
+ }
+ 
+ .loading {
   color: rgba(255, 255, 255, 0.9);
   font-size: 16px;
-}
-
-/* Scrollbar Styles */
-.mainContent::-webkit-scrollbar,
-.rightPanel::-webkit-scrollbar {
+ }
+ 
+ /* Scrollbars */
+ .mainContent::-webkit-scrollbar,
+ .rightPanel::-webkit-scrollbar {
   width: 6px;
   height: 6px;
-}
-
-.mainContent::-webkit-scrollbar-track,
-.rightPanel::-webkit-scrollbar-track {
+ }
+ 
+ .mainContent::-webkit-scrollbar-track,
+ .rightPanel::-webkit-scrollbar-track {
   background: transparent;
-}
-
-.mainContent::-webkit-scrollbar-thumb,
-.rightPanel::-webkit-scrollbar-thumb {
+ }
+ 
+ .mainContent::-webkit-scrollbar-thumb,
+ .rightPanel::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
-}
-
-.mainContent::-webkit-scrollbar-thumb:hover,
-.rightPanel::-webkit-scrollbar-thumb:hover {
+ }
+ 
+ .mainContent::-webkit-scrollbar-thumb:hover,
+ .rightPanel::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
-}
-
-/* Responsive Design */
-@media (min-width: 1441px) {
+ }
+ 
+ /* Media Queries */
+ @media (min-width: 1441px) {
   .content {
     max-width: 1600px;
   }
-}
-
-@media (max-width: 1280px) {
+ }
+ 
+ @media (max-width: 1280px) {
   .contentLayout {
     grid-template-columns: 1fr 1fr;
-    height: calc(100vh - 220px);
+    min-height: calc(100vh - 220px);
   }
   .mainContent {
     padding: 20px 24px;
   }
-}
-
-@media (max-width: 1024px) {
+ }
+ 
+ @media (max-width: 1024px) {
   .contentLayout {
     grid-template-columns: 1fr;
-    height: auto;
+    min-height: auto;
+    gap: 32px;
   }
+  
   .rightPanel {
     height: auto;
-    overflow-y: visible;
+    min-height: 500px;
+  }
+  .leftPanel {
+    position: relative;
+    min-height: 500px;
   }
   .mainContent {
     padding: 20px;
@@ -142,22 +149,30 @@
   .content {
     max-width: 100%;
   }
-}
-
-@media (max-width: 768px) {
+ }
+ 
+ @media (max-width: 768px) {
   .mainContent {
     padding: 16px;
   }
   .contentLayout {
-    gap: 16px;
+    gap: 24px;
   }
-}
-
-@media (max-width: 480px) {
+  .leftPanel,
+  .rightPanel {
+    min-height: 400px;
+  }
+ }
+ 
+ @media (max-width: 480px) {
   .mainContent {
     padding: 12px;
   }
   .contentLayout {
-    gap: 12px;
+    gap: 20px;
   }
-}
+  .leftPanel,
+  .rightPanel {
+    min-height: 350px;
+  }
+ }
