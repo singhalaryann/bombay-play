@@ -1,4 +1,3 @@
-/* styles/Header.module.css */
 .header {
   display: flex;
   align-items: center;
@@ -34,32 +33,33 @@
   gap: 1rem;
 }
 
-.logoutButton {
+/* + AI Chat button */
+.aiChatButton {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: rgba(28, 28, 28, 0.7);
-  border: 1px solid #262626;
-  border-radius: 8px;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  border-radius: 0;
   padding: 0.625rem;
   cursor: pointer;
-  color: #E5E7EB;
+  color: #82FF83; /* Bright green, adjust as desired */
   transition: all 0.2s ease;
 }
 
-.logoutButton:hover {
-  background: rgba(38, 38, 38, 0.8);
+.aiChatButton:hover {
   color: #ffffff;
 }
+
 
 .userBlock {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background: rgba(28, 28, 28, 0.7);
+  background: #191c17;
   border: 1px solid #262626;
   border-radius: 8px;
-  padding: 0.5rem 1rem;
+  padding: 0rem 0.5rem;
   min-width: 200px;
 }
 
@@ -76,7 +76,22 @@
   text-overflow: ellipsis;
 }
 
-/* Responsive styles */
+.logoutButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 0.625rem;
+  cursor: pointer;
+  color: #E5E7EB;
+  transition: all 0.2s ease;
+}
+.logoutButton:hover {
+  color: #ffffff;
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
   .header {
@@ -117,6 +132,10 @@
   }
 
   .logoutButton {
+    padding: 0.5rem;
+  }
+
+  .aiChatButton {
     padding: 0.5rem;
   }
 }

@@ -78,46 +78,15 @@ export default function Dashboard() {
             <TabFilter selected={selectedTime} onChange={handleTimeChange} />
           </div>
 
-          {/* Metrics Section */}
-
-          <div className={styles.metricsGrid}>
-            {loading ? (
-              <div className={styles.loading}>Loading...</div>
-            ) : metrics.length > 0 ? (
-              metrics.map((metric, index) => (
-                <MetricCard key={`${metric.name}-${index}`} {...metric} />
-              ))
-            ) : (
-              <div className={styles.noData}>No metrics available</div>
-            )}
-          </div>
-
           {/* Insights Section */}
-
           {insights.length > 0 && (
             <div className={styles.insightsSection}>
               <div className={styles.insightsTitleContainer}>
                 <div className={styles.insightsHeader}>
-                  <Lightbulb className={styles.insightIcon} size={20} />
-                  <span className={styles.insightsTitle}>Insights</span>
-                  <button
-                    className={`${styles.brainstormButton} ${
-                      isActive ? styles.active : ""
-                    }`}
-                    onClick={() => {
-                      setIsActive(true);
-                      router.push("/ideationchat");
-                    }}
-                  >
-                    <Image
-                      src="/datasourceicon.png"
-                      width={20}
-                      height={20}
-                      alt="Brainstorm"
-                      className={styles.brainstormIcon}
-                    />
-                    <span>Brainstorm with AI</span>
-                  </button>
+                  <div className={styles.insightGroup}>
+                    <Lightbulb className={styles.insightIcon} size={20} />
+                    <span className={styles.insightsTitle}>Insights</span>
+                  </div>
                 </div>
                 <div className={styles.insightsProgress} />
               </div>
@@ -132,6 +101,19 @@ export default function Dashboard() {
               </div>
             </div>
           )}
+
+          {/* Metrics Section */}
+          <div className={styles.metricsGrid}>
+            {loading ? (
+              <div className={styles.loading}>Loading...</div>
+            ) : metrics.length > 0 ? (
+              metrics.map((metric, index) => (
+                <MetricCard key={`${metric.name}-${index}`} {...metric} />
+              ))
+            ) : (
+              <div className={styles.noData}>No metrics available</div>
+            )}
+          </div>
         </main>
       </div>
     </div>

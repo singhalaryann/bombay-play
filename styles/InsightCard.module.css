@@ -1,6 +1,5 @@
 /* InsightCard.module.css */
 .card {
-  position: relative;
   width: 100%;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -10,38 +9,30 @@
 }
 
 .content {
-  position: relative;
-  padding: 24px 32px;
+  padding: 0px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 32px;
+  gap: 24px;
 }
 
 .messageWrapper {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
   flex: 1;
-  min-width: 0; /* Prevents flex item from overflowing */
+  min-width: 0;
+}
+
+.description {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 .bullet {
   color: rgba(255, 255, 255, 0.9);
-  font-size: 18px;
-  line-height: 1.4;
-  flex-shrink: 0;
-}
-
-.description {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 15px;
-  line-height: 1.5;
-  margin: 0;
-  padding-top: 1px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-size: 16px;
 }
 
 .investigateButton {
@@ -58,52 +49,50 @@
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
-  flex-shrink: 0;
 }
 
 .investigateButton:hover {
   background: rgba(22, 163, 74, 0.25);
 }
 
-/* Tablet and Mobile Responsiveness */
+/* InsightCard.module.css */
+/* Previous styles remain unchanged, add these media queries */
+
 @media (max-width: 768px) {
   .content {
-      padding: 20px 24px;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 16px;
+    padding: 14px 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
   }
-
+ 
   .messageWrapper {
-      width: 100%;
+    width: 100%;
   }
-
-  .description {
-      white-space: normal;
-  }
-
+ 
   .investigateButton {
-      width: 100%;
-      justify-content: center;
+    width: 100%;
+    justify-content: center;
   }
-}
-
-/* Small Mobile Responsiveness */
-@media (max-width: 480px) {
+ }
+ 
+ @media (max-width: 480px) {
   .content {
-      padding: 16px 20px;
+    padding: 12px 0;
+    gap: 10px;
   }
-
-  .bullet {
-      font-size: 16px;
-  }
-
+ 
   .description {
-      font-size: 14px;
+    font-size: 13px;
+    gap: 8px;
   }
-
+ 
+  .bullet {
+    font-size: 14px;
+  }
+ 
   .investigateButton {
-      padding: 8px 14px;
-      font-size: 13px;
+    padding: 8px 12px;
+    font-size: 13px;
   }
-}
+ }

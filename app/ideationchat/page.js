@@ -94,9 +94,9 @@ export default function IdeationChat() {
               </div>
 
               {/* Captain prompt if no messages */}
-              {messages.length === 0 && (
+              {/* {messages.length === 0 && (
                 <h2 className={styles.captainPrompt}>What idea is on your mind, captain?</h2>
-              )}
+              )} */}
 
               {/* Input area, disabled while AI is thinking */}
               <div className={styles.inputWrapper}>
@@ -105,7 +105,7 @@ export default function IdeationChat() {
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Message Here.."
+                    placeholder="What's on your mind? Share your thoughts..."
                     className={styles.input}
                     onKeyPress={(e) => e.key === "Enter" && handleSend()}
                     disabled={isLoading}  // prevent typing if AI is thinking
