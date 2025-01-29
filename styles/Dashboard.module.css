@@ -1,4 +1,3 @@
-/* Base Container */
 .container {
   min-height: 100vh;
   display: flex;
@@ -24,7 +23,6 @@
 /* Filter Section */
 .filterSection {
   width: 100%;
-  margin-bottom: 32px;
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -73,8 +71,9 @@
 .insightsSection {
   margin-bottom: 80px;
   width: 100%;
-  margin-top: -16px;
+  /* margin-top: -16px; */
   border-radius: 12px;
+  
 }
 
 .insightsTitleContainer {
@@ -127,23 +126,51 @@
   margin-top: 10px;
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar (for mainContent) */
 .mainContent::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
-
 .mainContent::-webkit-scrollbar-track {
   background: transparent;
 }
-
 .mainContent::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
 }
-
 .mainContent::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+/* Tab Content Wrapper */
+.tabContent {
+  width: 100%;
+}
+
+/* Experiment Section */
+.experimentSection {
+  padding: 24px 0;
+}
+.experimentHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  color: rgba(255, 255, 255, 0.9);
+}
+.experimentTitle {
+  font-size: 16px;
+  font-weight: 500;
+}
+.experimentContent {
+  width: 100%;
+}
+.experimentPlaceholder {
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
 }
 
 /* Responsive Breakpoints */
@@ -151,7 +178,6 @@
   .mainContent {
     padding: 20px 24px;
   }
-
   .metricsGrid {
     gap: 20px;
   }
@@ -162,20 +188,23 @@
     padding: 16px;
     overflow-x: hidden;
   }
-
   .metricsGrid {
     grid-template-columns: 1fr;
     gap: 16px;
   }
-
   .insightsSection {
     padding: 16px;
     margin-bottom: 40px;
   }
-
   .insightsHeader {
     flex-wrap: wrap;
     gap: 12px;
+  }
+  .experimentSection {
+    padding: 16px 0;
+  }
+  .experimentHeader {
+    margin-bottom: 16px;
   }
 }
 
@@ -183,21 +212,24 @@
   .mainContent {
     padding: 12px;
   }
-
   .metricsGrid {
     gap: 12px;
   }
-
   .insightsList {
     gap: 12px;
   }
-
   .insightsSection {
     padding: 12px;
     margin-bottom: 32px;
   }
-
   .insightGroup {
     gap: 8px;
+  }
+  .experimentTitle {
+    font-size: 14px;
+  }
+  .experimentPlaceholder {
+    padding: 16px;
+    font-size: 13px;
   }
 }

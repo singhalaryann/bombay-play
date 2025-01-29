@@ -1,13 +1,15 @@
-'use client';
-import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { useAuth } from '../context/AuthContext';
-import Header from '../components/layout/Header';
-import Sidebar from '../components/layout/Sidebar';
-import ChatInterface from '../components/analysis/ChatInterface';
-import MetricsDisplay from '../components/analysis/MetricsDisplay';
-import GraphDisplay from '../components/analysis/GraphDisplay';
-import styles from '../../styles/Analysis.module.css';
+"use client";
+import React, { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useAuth } from "../context/AuthContext";
+import Header from "../components/layout/Header";
+import Sidebar from "../components/layout/Sidebar";
+import ChatInterface from "../components/analysis/ChatInterface";
+import MetricsDisplay from "../components/analysis/MetricsDisplay";
+import GraphDisplay from "../components/analysis/GraphDisplay";
+import styles from "../../styles/Analysis.module.css";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 // Helper function to transform the API metrics into the shape GraphDisplay expects
 function convertMetricsToGraphs(metrics) {
@@ -20,9 +22,9 @@ function convertMetricsToGraphs(metrics) {
       columns: m.columns,
       values: m.values,
       // Extra fields for completeness
-      x_unit: '',
-      y_unit: '',
-      value_unit: ''
+      x_unit: "",
+      y_unit: "",
+      value_unit: "",
     };
   });
 }
@@ -33,6 +35,12 @@ export default function AnalysisPage() {
   const [chatData, setChatData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const router = useRouter();
+
+  const handleContinue = () => {
+    console.log("Continue button clicked");
+    router.push("/experiment");
+  };
 
   // State for dynamic metrics and graphs
   const [dynamicMetrics, setDynamicMetrics] = useState([]);
@@ -40,30 +48,30 @@ export default function AnalysisPage() {
 
   // Handlers to update metrics and graphs
   const handleMetricsUpdate = (newMetrics) => {
-    console.log('Setting new metrics:', newMetrics);
+    console.log("Setting new metrics:", newMetrics);
 
     // Keep only the "metric" ones for MetricsDisplay
     const filteredMetrics = newMetrics.filter(
-      (m) => m.metric_type === 'metric'
+      (m) => m.metric_type === "metric"
     );
     setDynamicMetrics(filteredMetrics); // Replace entirely
 
     // Convert any line/bar/pie metrics into graph objects
     const graphCandidates = newMetrics.filter(
       (m) =>
-        m.metric_type === 'line' ||
-        m.metric_type === 'bar' ||
-        m.metric_type === 'pie' ||
-        m.metric_type === 'hist'
+        m.metric_type === "line" ||
+        m.metric_type === "bar" ||
+        m.metric_type === "pie" ||
+        m.metric_type === "hist"
     );
     const newGraphs = convertMetricsToGraphs(graphCandidates);
 
-    // Reset and set the new graphsi 
+    // Reset and set the new graphsi
     setDynamicGraphs(newGraphs);
   };
 
   const handleGraphsUpdate = (newGraphs) => {
-    console.log('Updating graphs:', newGraphs);
+    console.log("Updating graphs:", newGraphs);
     setDynamicGraphs((prevGraphs) => [...prevGraphs, ...newGraphs]);
   };
 
@@ -73,36 +81,38 @@ export default function AnalysisPage() {
       try {
         // const ideaId = searchParams.get('idea');
         // const insightId = searchParams.get('insight');
-        const chatId = searchParams.get('chat');
+        const chatId = searchParams.get("chat");
 
-        console.log('Fetching chat data with:', { userId, chatId });
+        console.log("Fetching chat data with:", { userId, chatId });
 
         if (!userId || !chatId) {
-          throw new Error('Missing required parameters');
+          throw new Error("Missing required parameters");
         }
 
-        const response = await fetch('https://get-chat-q54hzgyghq-uc.a.run.app', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            chat_id: chatId,
-            // insight_id: insightId,
-            // idea_id: ideaId
-          })
-        });
+        const response = await fetch(
+          "https://get-chat-q54hzgyghq-uc.a.run.app",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              chat_id: chatId,
+              // insight_id: insightId,
+              // idea_id: ideaId
+            }),
+          }
+        );
 
         if (!response.ok) {
-          throw new Error('Failed to fetch chat data');
+          throw new Error("Failed to fetch chat data");
         }
 
         const data = await response.json();
-        console.log('Received chat data:', data);
+        console.log("Received chat data:", data);
         setChatData(data);
-
       } catch (error) {
-        console.error('Error fetching chat data:', error);
+        console.error("Error fetching chat data:", error);
         setError(error.message);
       } finally {
         setLoading(false);
@@ -149,10 +159,10 @@ export default function AnalysisPage() {
   if (chatData?.metrics) {
     const graphCandidates = chatData.metrics.filter(
       (m) =>
-        m.metric_type === 'line' ||
-        m.metric_type === 'bar' ||
-        m.metric_type === 'pie' ||
-        m.metric_type === 'hist'
+        m.metric_type === "line" ||
+        m.metric_type === "bar" ||
+        m.metric_type === "pie" ||
+        m.metric_type === "hist"
     );
     initialGraphs = convertMetricsToGraphs(graphCandidates);
   }
@@ -177,8 +187,6 @@ export default function AnalysisPage() {
     });
     return combined;
   })();
-  // ------------------------------------------------------------------------------------------------------
-
   return (
     <div className={styles.container}>
       <Header />
@@ -187,10 +195,10 @@ export default function AnalysisPage() {
         <main className={styles.mainContent}>
           <div className={styles.content}>
             {/* <section className={styles.problemSection}> */}
-              {/* <h2 className={styles.sectionTitle}>Problem statement</h2> */}
-              {/* <div className={styles.problemStatement}> */}
-                {/* {chatData?.insight_description || 'No insight available'} */}
-              {/* </div> */}
+            {/* <h2 className={styles.sectionTitle}>Problem statement</h2> */}
+            {/* <div className={styles.problemStatement}> */}
+            {/* {chatData?.insight_description || 'No insight available'} */}
+            {/* </div> */}
             {/* </section> */}
 
             <div className={styles.contentLayout}>
@@ -198,10 +206,10 @@ export default function AnalysisPage() {
                 <div className={styles.chatSection}>
                   <ChatInterface
                     messages={chatData?.chat || []}
-                    ideaId={searchParams.get('idea')}
-                    insightId={searchParams.get('insight')}
+                    ideaId={searchParams.get("idea")}
+                    insightId={searchParams.get("insight")}
                     userId={userId}
-                    chatId={searchParams.get('chat')}
+                    chatId={searchParams.get("chat")}
                     ideaDescription={chatData?.idea_description}
                     onMetricsUpdate={handleMetricsUpdate}
                     onGraphsUpdate={handleGraphsUpdate}
@@ -210,10 +218,31 @@ export default function AnalysisPage() {
               </div>
 
               <div className={styles.rightPanel}>
+                {/* New button container */}
+                <div className={styles.continueButtonContainer}>
+                  <button
+                    className={styles.continueButton}
+                    onClick={handleContinue}
+                  >
+                    <span>Continue</span>
+                    <div className={styles.iconWrapper}>
+                      <Image
+                        src="/Analyse_icon.svg"
+                        alt="Continue"
+                        width={24}
+                        height={24}
+                        className={styles.buttonIcon}
+                        priority
+                      />
+                    </div>
+                  </button>
+                </div>
                 {/* Combine initial + dynamic metrics (in case user updates them) */}
                 <MetricsDisplay
                   // metrics={combinedMetrics}
-                  metrics={combinedMetrics?.filter(m => m.metric_type === 'metric' && m.values?.length === 1)}
+                  metrics={combinedMetrics?.filter(
+                    (m) => m.metric_type === "metric" && m.values?.length === 1
+                  )}
                 />
 
                 {/* If chatData already has any existing graphs, show them.

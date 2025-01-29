@@ -1,0 +1,135 @@
+/* Variant Section Layout */
+.variantSection {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+  
+  /* Individual Variant Box */
+  .variantGroup {
+    background: rgba(28, 28, 28, 0.4);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  .variantGroup::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    padding: 1px;
+    background: linear-gradient(
+      -100deg,
+      rgba(255, 255, 255, 0.2),
+      rgba(255, 255, 255, 0.02)
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  
+  .variantTitle {
+    font-size: 16px;
+    margin-bottom: 16px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+  }
+  
+  /* Content Layout */
+  .variantContent {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .linkGroup {
+    margin-bottom: 16px;
+  }
+  
+  .label {
+    display: block;
+    margin-bottom: 8px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+  }
+  
+  .input {
+    width: 100%;
+    padding: 12px;
+    background: #272E24;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+  }
+  
+  /* Feature List */
+  .featureList {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 12px;
+    background: rgba(28, 28, 28, 0.3);
+    border-radius: 8px;
+  }
+  
+  .featureItem {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    padding: 4px 8px;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 1280px) {
+    .variantSection {
+      gap: 20px;
+    }
+  }
+  
+  @media (max-width: 1024px) {
+    .variantSection {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .variantGroup {
+      padding: 16px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .featureList {
+      grid-template-columns: 1fr;
+    }
+    .variantTitle {
+      font-size: 15px;
+    }
+    .label {
+      font-size: 13px;
+    }
+    .input {
+      padding: 10px;
+      font-size: 13px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .variantGroup {
+      padding: 12px;
+    }
+    .featureItem {
+      font-size: 13px;
+    }
+    .input {
+      font-size: 12px;
+    }
+  }

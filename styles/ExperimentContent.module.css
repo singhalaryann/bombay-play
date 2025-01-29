@@ -1,0 +1,81 @@
+.experimentSection {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 24px 0;
+  }
+  
+  /* Each bundle card with glass effect */
+  .bundleCard {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Bundle title */
+  .bundleTitle {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  /* Table container with horizontal scroll if needed */
+  .tableWrapper {
+    width: 100%;
+    overflow-x: auto;
+  }
+  
+  /* Experiment table styling */
+  .bundleTable {
+    width: 100%;
+    border-collapse: collapse;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 15px;
+  }
+  
+  .bundleTable thead th {
+    background: rgba(255, 255, 255, 0.08);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.95);
+  }
+  
+  .bundleTable th,
+  .bundleTable td {
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .bundleTable tr:last-child td {
+    border-bottom: none;
+  }
+  
+  /* Slight hover effect on rows */
+  .bundleTable tbody tr:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .bundleCard {
+      padding: 16px;
+    }
+    
+    .bundleTitle {
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+    
+    .bundleTable th,
+    .bundleTable td {
+      padding: 10px 12px;
+    }
+  }
+  

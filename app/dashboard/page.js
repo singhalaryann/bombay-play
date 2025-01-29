@@ -1,4 +1,3 @@
-// Dashboard.js
 "use client";
 import React, { useState, useEffect } from "react";
 import styles from "../../styles/Dashboard.module.css";
@@ -7,40 +6,42 @@ import Sidebar from "../components/layout/Sidebar";
 import TabFilter from "../components/dashboard/TabFilter";
 import MetricCard from "../components/dashboard/MetricCard";
 import InsightCard from "../components/dashboard/InsightCard";
+import DashboardTabs from "../components/dashboard/DashboardTabs";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
-import { Lightbulb } from "lucide-react";
-import Image from "next/image";
+
+// Import your separate ExperimentContent component
+import ExperimentContent from "../components/dashboard/ExperimentContent";
 
 export default function Dashboard() {
   const router = useRouter();
   const { userId } = useAuth();
+
+  // State management
   const [selectedTime, setSelectedTime] = useState("Today");
   const [metrics, setMetrics] = useState([]);
   const [insights, setInsights] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isActive, setIsActive] = useState(false);
+  const [activeTab, setActiveTab] = useState("insights");
 
+  // Fetch dashboard data
   const fetchDashboardData = async (time) => {
     try {
       setLoading(true);
       console.log("Fetching dashboard data:", { userId, time });
 
-      const response = await fetch(
-        "https://dashboard-q54hzgyghq-uc.a.run.app",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user_id: userId,
-            time: time,
-          }),
-        }
-      );
-      const data = await response.json();
+      const response = await fetch("https://dashboard-q54hzgyghq-uc.a.run.app", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          time: time,
+        }),
+      });
 
+      const data = await response.json();
       if (data) {
         if (data.metrics) {
           setMetrics(data.metrics);
@@ -56,6 +57,7 @@ export default function Dashboard() {
     }
   };
 
+  // Effect to handle data fetching and authentication
   useEffect(() => {
     if (!userId) {
       router.push("/");
@@ -64,10 +66,42 @@ export default function Dashboard() {
     fetchDashboardData(selectedTime);
   }, [userId, selectedTime]);
 
+  // Handle time filter changes
   const handleTimeChange = (newTime) => {
     setSelectedTime(newTime);
   };
 
+  // Render insights section content
+  const renderInsightsContent = () => (
+    <>
+      {insights.length > 0 && (
+        <div className={styles.insightsSection}>
+          <div className={styles.insightsList}>
+            {insights.map((insight, index) => (
+              <InsightCard
+                key={`${insight.insight_id}-${index}`}
+                description={insight.description}
+                insight_id={insight.insight_id}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+      <div className={styles.metricsGrid}>
+        {loading ? (
+          <div className={styles.loading}>Loading...</div>
+        ) : metrics.length > 0 ? (
+          metrics.map((metric, index) => (
+            <MetricCard key={`${metric.name}-${index}`} {...metric} />
+          ))
+        ) : (
+          <div className={styles.noData}>No metrics available</div>
+        )}
+      </div>
+    </>
+  );
+
+  // Main render
   return (
     <div className={styles.container}>
       <Header />
@@ -78,42 +112,13 @@ export default function Dashboard() {
             <TabFilter selected={selectedTime} onChange={handleTimeChange} />
           </div>
 
-          {/* Insights Section */}
-          {insights.length > 0 && (
-            <div className={styles.insightsSection}>
-              <div className={styles.insightsTitleContainer}>
-                <div className={styles.insightsHeader}>
-                  <div className={styles.insightGroup}>
-                    <Lightbulb className={styles.insightIcon} size={20} />
-                    <span className={styles.insightsTitle}>Insights</span>
-                  </div>
-                </div>
-                <div className={styles.insightsProgress} />
-              </div>
-              <div className={styles.insightsList}>
-                {insights.map((insight, index) => (
-                  <InsightCard
-                    key={`${insight.insight_id}-${index}`}
-                    description={insight.description}
-                    insight_id={insight.insight_id}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Metrics Section */}
-          <div className={styles.metricsGrid}>
-            {loading ? (
-              <div className={styles.loading}>Loading...</div>
-            ) : metrics.length > 0 ? (
-              metrics.map((metric, index) => (
-                <MetricCard key={`${metric.name}-${index}`} {...metric} />
-              ))
-            ) : (
-              <div className={styles.noData}>No metrics available</div>
-            )}
-          </div>
+          <DashboardTabs
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            experimentContent={<ExperimentContent />}
+          >
+            {renderInsightsContent()}
+          </DashboardTabs>
         </main>
       </div>
     </div>

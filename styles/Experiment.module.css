@@ -1,0 +1,117 @@
+/* Base Container */
+.container {
+    min-height: 100vh;
+    background: #050505;
+    color: white;
+    width: 100%;
+  }
+  
+  /* Main Layout */
+  .mainLayout {
+    display: flex;
+    min-height: calc(100vh - 64px);
+  }
+  
+  .mainContent {
+    flex: 1;
+    padding: 24px 32px;
+    background: #050505;
+  }
+  
+  /* Content Wrapper */
+  .contentWrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Button Group */
+  .buttonGroup {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: auto;
+    padding-top: 24px;
+  }
+  
+  .addVariantButton {
+    padding: 10px 20px;
+    border: 1px solid #82FF83;
+    background: transparent;
+    color: #82FF83;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .addVariantButton:hover {
+    background: rgba(130, 255, 131, 0.1);
+  }
+  
+  .launchButton {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #82FF83;
+    color: #000000;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .launchButton:hover {
+    background: #98FF98;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 1280px) {
+    .mainContent {
+      padding: 20px 24px;
+    }
+  }
+  
+  @media (max-width: 1024px) {
+    .mainContent {
+      padding: 16px 20px;
+    }
+    
+    .buttonGroup {
+      flex-direction: column;
+    }
+    
+    .addVariantButton,
+    .launchButton {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .mainContent {
+      padding: 12px 16px;
+    }
+    
+    .buttonGroup {
+      padding-top: 20px;
+      gap: 12px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .mainContent {
+      padding: 12px;
+    }
+    
+    .addVariantButton,
+    .launchButton {
+      padding: 8px 16px;
+      font-size: 13px;
+    }
+  }
