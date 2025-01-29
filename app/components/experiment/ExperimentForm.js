@@ -16,15 +16,22 @@ const ExperimentForm = ({ experimentData, setExperimentData }) => {
     }));
   };
 
+  // CHANGED: Updated formatDate function to only return the selected day
+  const formatDate = (date) => {
+    if (!date) return '';
+    // Instead of calculating difference with today's date,
+    // we simply return the day number from selected date
+    return `${date.getDate()} days`;
+  };
+
+  // CHANGED: Simplified handleDateChange to use the new formatDate
   const handleDateChange = (date) => {
     setStartDate(date);
-    if (date) {
-      const days = Math.ceil((date - new Date()) / (1000 * 60 * 60 * 24));
-      setExperimentData(prev => ({
-        ...prev,
-        duration: `${days} days`
-      }));
-    }
+    const formattedDuration = formatDate(date);
+    setExperimentData(prev => ({
+      ...prev,
+      duration: formattedDuration
+    }));
     setIsCalendarOpen(false);
   };
 
@@ -37,11 +44,10 @@ const ExperimentForm = ({ experimentData, setExperimentData }) => {
 
   return (
     <div className={styles.outerWrapper}>
-              <div className={styles.glassContainer}>
-
-      <div className={styles.experimentTag}>
-        Experiment
-      </div>
+      <div className={styles.glassContainer}>
+        <div className={styles.experimentTag}>
+          Experiment
+        </div>
 
         {/* Label Input */}
         <div className={styles.formGroup}>
@@ -73,7 +79,7 @@ const ExperimentForm = ({ experimentData, setExperimentData }) => {
             >
               <Image
                 src="/calender.png"
-                alt="Calender"
+                alt="Calendar"
                 width={20}
                 height={20}
                 className={styles.calendarIcon}
@@ -94,32 +100,36 @@ const ExperimentForm = ({ experimentData, setExperimentData }) => {
         </div>
 
         {/* Traffic Split Slider */}
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Traffic Split</label>
-          <div className={styles.sliderContainer}>
-            <div className={styles.sliderBox}>
-              <div 
-                className={styles.sliderTrack} 
-                style={{
-                  background: `linear-gradient(to right, #82FF83 ${experimentData.trafficSplit}%, rgba(130, 255, 131, 0.2) ${experimentData.trafficSplit}%)`
-                }}
-              />
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={experimentData.trafficSplit}
-                onChange={(e) => handleTrafficSplitChange(Number(e.target.value))}
-                className={styles.slider}
-              />
-              <div 
-                className={styles.sliderValue} 
-                style={{ left: `${experimentData.trafficSplit}%` }}
-              >
-                {experimentData.trafficSplit}
-              </div>
-            </div>
-            <div className={styles.sliderLabels}>
+{/* Traffic Split Slider */}
+<div className={styles.formGroup}>
+  <label className={styles.label}>Traffic Split</label>
+  <div className={styles.sliderContainer}>
+    <div className={styles.sliderBox}>
+    <div 
+  className={styles.sliderTrack} 
+>
+  <div 
+    className={styles.sliderFill}
+    style={{
+      width: `${experimentData.trafficSplit}%`
+    }}
+  />
+</div>
+      <input
+        type="range"
+        min="0"
+        max="100"
+        value={experimentData.trafficSplit}
+        onChange={(e) => handleTrafficSplitChange(Number(e.target.value))}
+        className={styles.slider}
+      />
+      <div 
+        className={styles.sliderValue} 
+        style={{ left: `calc(${experimentData.trafficSplit}% - 12px)` }}
+      >
+        {experimentData.trafficSplit}
+      </div>
+    </div>            <div className={styles.sliderLabels}>
               <span>0%</span>
               <span>20%</span>
               <span>40%</span>

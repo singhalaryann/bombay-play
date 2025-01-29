@@ -6,21 +6,21 @@ export default function ExperimentContent() {
   return (
     <div className={styles.experimentSection}>
       {/* XG Warrior Bundle */}
-      <div className={styles.bundleCard}>
-        <h3 className={styles.bundleTitle}>XG Warrior Bundle</h3>
+      <div className={styles.bundleContainer}>
+        <h2 className={styles.bundleTitle}>XG Warrior Bundle</h2>
         <div className={styles.tableWrapper}>
           <table className={styles.bundleTable}>
             <thead>
-              <tr>
+              <tr className={styles.headerRow}>
                 <th>Test Group</th>
                 <th>Overall</th>
                 <th>Daily Average</th>
-                <th>Daily Avg per User</th>
+                <th>Daily Average per User</th>
                 <th>Overall Lift %</th>
                 <th>P-Value</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className={styles.glassEffect}>
               <tr>
                 <td>Control (Control)</td>
                 <td>11.01k</td>
@@ -43,21 +43,21 @@ export default function ExperimentContent() {
       </div>
 
       {/* XG Expert Bundle */}
-      <div className={styles.bundleCard}>
-        <h3 className={styles.bundleTitle}>XG Expert Bundle</h3>
+      <div className={styles.bundleContainer}>
+        <h2 className={styles.bundleTitle}>XG Expert Bundle</h2>
         <div className={styles.tableWrapper}>
           <table className={styles.bundleTable}>
             <thead>
-              <tr>
+              <tr className={styles.headerRow}>
                 <th>Test Group</th>
                 <th>Overall</th>
                 <th>Daily Average</th>
-                <th>Daily Avg per User</th>
+                <th>Daily Average per User</th>
                 <th>Overall Lift %</th>
                 <th>P-Value</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className={styles.glassEffect}>
               <tr>
                 <td>Control (Control)</td>
                 <td>6.32k</td>

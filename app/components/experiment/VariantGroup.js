@@ -51,13 +51,15 @@ const VariantGroup = () => {
               readOnly
             />
           </div>
-          <div className={styles.featureList}>
-            {mockData.control.features.map((feature, index) => (
-              <div key={index} className={styles.featureItem}>
-                • {feature}
-              </div>
-            ))}
-          </div>
+          <div className={styles.glassBox}>
+  <div className={styles.featureList}>
+    {mockData.control.features.map((feature, index) => (
+      <div key={index} className={styles.featureItem}>
+        • {feature}
+      </div>
+    ))}
+  </div>
+</div>
         </div>
       </div>
 
@@ -74,13 +76,15 @@ const VariantGroup = () => {
               readOnly
             />
           </div>
-          <div className={styles.featureList}>
-            {mockData.variantA.features.map((feature, index) => (
-              <div key={index} className={styles.featureItem}>
-                • {feature}
-              </div>
-            ))}
-          </div>
+          <div className={styles.glassBox}>
+  <div className={styles.featureList}>
+    {mockData.control.features.map((feature, index) => (
+      <div key={index} className={styles.featureItem}>
+        • {feature}
+      </div>
+    ))}
+  </div>
+</div>
         </div>
       </div>
     </div>

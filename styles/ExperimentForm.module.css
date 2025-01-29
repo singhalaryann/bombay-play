@@ -1,276 +1,333 @@
 /* Main Wrapper */
 .outerWrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  
-  /* Experiment Tag */
-  .experimentTag {
-    display: inline-flex;
-    padding: 4px 10px;
-    background: #272E24;
-    border-radius: 8px;
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 14px;
-    width: fit-content;
-  }
-  
-  /* Glass Container */
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+/* Experiment Tag */
+.experimentTag {
+  display: inline-flex;
+  padding: 6px 12px;
+  background: rgba(39, 46, 36, 0.8);
+  border-radius: 20px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-weight: 500;
+  width: fit-content;
+  margin-bottom: 24px;
+}
+
+/* Glass Container */
+.glassContainer {
+  background: rgba(18, 18, 18, 0.7);
+  border-radius: 16px;
+  padding: 32px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  position: relative;
+  margin-bottom: 2%;
+  box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.25);
+}
+
+.glassContainer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  padding: 1px;
+  background: linear-gradient(
+    -100deg,
+    rgba(255, 255, 255, 0.15),
+    rgba(255, 255, 255, 0.03)
+  );
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Form Groups */
+.formGroup {
+  margin-bottom: 32px;
+}
+
+.formGroup:last-child {
+  margin-bottom: 0;
+}
+
+.label {
+  display: block;
+  margin-bottom: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* Input Styles */
+.input {
+  width: 100%;
+  height: 48px;
+  padding: 0 16px;
+  background: rgba(39, 46, 36, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: rgba(130, 255, 131, 0.5);
+  box-shadow: 0 0 0 2px rgba(130, 255, 131, 0.1);
+}
+
+/* Duration Input */
+.durationWrapper {
+  position: relative;
+}
+
+.durationInput {
+  padding-right: 48px;
+  cursor: pointer;
+}
+
+.calendarButton {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calendarIcon {
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.calendarButton:hover .calendarIcon {
+  opacity: 1;
+}
+
+/* Calendar Styles */
+.calendarContainer {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 999;
+  background: rgba(39, 46, 36, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.3);
+}
+
+.calendar {
+  background: transparent !important;
+  border-radius: 12px !important;
+  padding: 20px !important;
+  width: 100% !important;
+  position: relative;
+}
+
+/* Calendar Global Styles */
+.calendar :global(.react-datepicker) {
+  background: transparent !important;
+  border: none !important;
+}
+
+.calendar :global(.react-datepicker__header) {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  padding-top: 0;
+}
+
+.calendar :global(.react-datepicker__current-month) {
+  color: white !important;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.calendar :global(.react-datepicker__day-name),
+.calendar :global(.react-datepicker__day) {
+  color: rgba(255, 255, 255, 0.9) !important;
+  width: 36px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  margin: 2px !important;
+  border-radius: 4px !important;
+}
+
+.calendar :global(.react-datepicker__day:hover) {
+  background: rgba(130, 255, 131, 0.2) !important;
+}
+
+.calendar :global(.react-datepicker__day--selected) {
+  background: #82FF83 !important;
+  color: rgba(0, 0, 0, 0.9) !important;
+  font-weight: 500;
+}
+
+.calendar :global(.react-datepicker__day--disabled) {
+  color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.calendar :global(.react-datepicker__navigation) {
+  top: 16px;
+}
+
+.calendar :global(.react-datepicker__navigation-icon::before) {
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+/* Slider Styles */
+.sliderContainer {
+  padding-top: 24px;
+}
+
+.sliderBox {
+  position: relative;
+  height: 4px;
+  margin: 8px 0;
+}
+
+.slider {
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  background: transparent;
+  z-index: 2;
+}
+
+.sliderValue {
+  position: absolute;
+  top: -28px;
+  transform: translateX(-50%);
+  background: #82FF83;
+  color: #000000;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  min-width: 28px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.sliderTrack {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;  /* Increased thickness */
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: visible;
+}
+
+.sliderTrack::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 9.5%,
+    rgba(255, 255, 255, 0.1) 9.5%,
+    rgba(255, 255, 255, 0.1) 10%
+  );  /* Changed to 10% intervals for ticks at every 10% */
+  pointer-events: none;
+}
+
+.sliderFill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: #82FF83;
+  border-radius: 2px;
+  transition: width 0.2s ease;
+  box-shadow: 0 0 4px rgba(130, 255, 131, 0.4);  /* Subtle glow */
+}
+
+.sliderLabels {
+  display: flex;
+  justify-content: space-between;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  margin-top: 16px;
+  padding: 0 2px;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-top: -8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 2;  /* Keep thumb above the track */
+}
+
+.slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+.slider::-webkit-slider-runnable-track {
+  height: 4px;
+  background: transparent;
+  border: none;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
   .glassContainer {
-    background: rgba(28, 28, 28, 0.4);
-    border-radius: 12px;
     padding: 24px;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    position: relative;
-    margin-bottom: 2%
   }
   
-  .glassContainer::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 12px;
-    padding: 1px;
-    background: linear-gradient(
-      -100deg,
-      rgba(255, 255, 255, 0.2),
-      rgba(255, 255, 255, 0.05)
-    );
-    -webkit-mask: 
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-  }
-  
-  /* Form Groups */
-  .formGroup {
-    margin-bottom: 24px;
-  }
-  
-  .formGroup:last-child {
-    margin-bottom: 0;
-  }
-  
-  .label {
-    display: block;
-    margin-bottom: 8px;
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 15px;
-  }
-  
-  /* Input Styles */
   .input {
-    width: 100%;
-    padding: 12px;
-    background: #272E24;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 14px;
-    transition: border-color 0.2s ease;
-  }
-  
-  .input:focus {
-    outline: none;
-    border-color: rgba(130, 255, 131, 0.5);
-  }
-  
-  /* Duration Input */
-  .durationWrapper {
-    position: relative;
-  }
-  
-  .durationInput {
-    padding-right: 40px;
-    cursor: pointer;
-  }
-  
-  .calendarButton {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .calendarIcon {
-    opacity: 0.7;
-    transition: opacity 0.2s;
-  }
-  
-  .calendarButton:hover .calendarIcon {
-    opacity: 1;
-  }
-  
-  /* Calendar Styles */
-  .calendarContainer {
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 0;
-    z-index: 10;
-  }
-  
-  .calendar {
-    background: #272E24 !important;
-    color: white !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 8px !important;
-    font-family: inherit;
-    padding: 16px !important;
-  }
-  
-  /* Calendar Global Styles */
-  .calendar :global(.react-datepicker) {
-    background: #272E24 !important;
-    border: none !important;
-  }
-  
-  .calendar :global(.react-datepicker__header) {
-    background: #272E24 !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-    padding-top: 0;
-  }
-  
-  .calendar :global(.react-datepicker__current-month) {
-    color: white !important;
-    font-size: 14px;
-    margin-bottom: 8px;
-  }
-  
-  .calendar :global(.react-datepicker__day-name),
-  .calendar :global(.react-datepicker__day) {
-    color: rgba(255, 255, 255, 0.9) !important;
-    width: 36px !important;
-    line-height: 36px !important;
-    margin: 2px !important;
-  }
-  
-  .calendar :global(.react-datepicker__day:hover) {
-    background: rgba(130, 255, 131, 0.2) !important;
-    border-radius: 4px;
-  }
-  
-  .calendar :global(.react-datepicker__day--selected) {
-    background: #82FF83 !important;
-    color: black !important;
-    border-radius: 4px;
-  }
-  
-  .calendar :global(.react-datepicker__day--disabled) {
-    color: rgba(255, 255, 255, 0.3) !important;
-  }
-  
-  /* Slider Styles */
-  .sliderContainer {
-    padding-top: 24px;
-  }
-  
-  .sliderBox {
-    position: relative;
-    height: 4px;
-    margin: 8px 0;
-  }
-  
-  .sliderTrack {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 100%;
-    border-radius: 2px;
-  }
-  
-  .slider {
-    position: absolute;
-    width: 100%;
-    height: 4px;
-    -webkit-appearance: none;
-    background: transparent;
-    z-index: 2;
-  }
-  
-  .slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
-    background: #82FF83;
-    border: 3px solid #272E24;
-    border-radius: 50%;
-    cursor: pointer;
-    margin-top: -6px;
-    transition: transform 0.2s;
-  }
-  
-  .slider::-webkit-slider-thumb:hover {
-    transform: scale(1.1);
-  }
-  
-  .sliderValue {
-    position: absolute;
-    top: -30px;
-    transform: translateX(-50%);
-    background: #82FF83;
-    color: black;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 500;
+    height: 44px;
   }
   
   .sliderLabels {
-    display: flex;
-    justify-content: space-between;
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 12px;
-    margin-top: 16px;
+    font-size: 11px;
   }
-  
-  /* Responsive Styles */
-  @media (max-width: 768px) {
-    .glassContainer {
-      padding: 20px;
-      margin-bottom: 5%;
+}
 
-    }
-    
-    .input {
-      padding: 10px;
-    }
-    
-    .sliderLabels {
-      font-size: 11px;
-    }
+@media (max-width: 480px) {
+  .glassContainer {
+    padding: 20px;
   }
   
-  @media (max-width: 480px) {
-    .glassContainer {
-      padding: 16px;
-      margin-bottom: 5%;
-    }
-    
-    .experimentTag {
-      font-size: 13px;
-      padding: 6px 12px;
-    }
-    
-    .label {
-      font-size: 14px;
-    }
-    
-    .input {
-      font-size: 13px;
-    }
+  .experimentTag {
+    font-size: 13px;
   }
+  
+  .label {
+    font-size: 14px;
+  }
+  
+  .input {
+    height: 40px;
+    font-size: 13px;
+  }
+}

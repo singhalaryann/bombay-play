@@ -1,42 +1,38 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
-
-// Import your existing Header and Sidebar
 import Header from "../components/layout/Header";
 import Sidebar from "../components/layout/Sidebar";
-
-// Import the updated CSS module below
 import styles from "../../styles/ExperimentLaunch.module.css";
 
 export default function ExperimentLaunch() {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    // Trigger animation after component mounts
+    setIsVisible(true);
+  }, []);
+
   return (
     <div className={styles.container}>
-      {/* 1) Header at the top */}
       <Header />
-
-      {/* 2) Main layout: Sidebar on the left, main content on the right */}
       <div className={styles.mainLayout}>
         <Sidebar />
-
         <main className={styles.mainContent}>
           <div className={styles.experimentGlass}>
-            {/* The large glass-effect rectangle */}
-            <div className={styles.glassEffect}>
+            <div className={`${styles.glassEffect} ${isVisible ? styles.visible : ''}`}>
               <div className={styles.contentRow}>
-                {/* The circular glass around the rocket */}
-                <div className={styles.rocketCircle}>
+                <div className={`${styles.rocketCircle} ${isVisible ? styles.animate : ''}`}>
                   <Image
                     src="/rocket.svg"
                     alt="Rocket Icon"
                     width={80}
                     height={80}
                     priority
+                    className={styles.rocketIcon}
                   />
                 </div>
-
-                {/* Success text */}
-                <h1 className={styles.launchTitle}>
+                <h1 className={`${styles.launchTitle} ${isVisible ? styles.visible : ''}`}>
                   Experiment Successfully Launched!
                 </h1>
               </div>
