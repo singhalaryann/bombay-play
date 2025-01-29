@@ -1,4 +1,4 @@
-/* Dashboard.module.css */
+/* Base Container */
 .container {
   min-height: 100vh;
   display: flex;
@@ -18,28 +18,34 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  overflow-y: auto; /* Added to enable vertical scrolling */
+  overflow-y: auto;
 }
 
+/* Filter Section */
 .filterSection {
   width: 100%;
   margin-bottom: 32px;
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .filterSection::-webkit-scrollbar {
   display: none;
 }
 
+/* Metrics Grid */
 .metricsGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 24px;
   width: 100%;
 }
 
+/* Loading State */
 .loading {
   grid-column: 1 / -1;
   display: flex;
@@ -50,6 +56,7 @@
   font-size: 16px;
 }
 
+/* No Data State */
 .noData {
   grid-column: 1 / -1;
   text-align: center;
@@ -58,12 +65,16 @@
   font-size: 16px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
+/* Insights Section */
 .insightsSection {
   margin-bottom: 80px;
   width: 100%;
   margin-top: -16px;
+  border-radius: 12px;
 }
 
 .insightsTitleContainer {
@@ -89,8 +100,8 @@
   align-items: center;
   gap: 12px;
   padding-bottom: 2px;
-  /* border-bottom: 2px solid #82FF83; */
 }
+
 .insightsHeader {
   display: flex;
   align-items: center;
@@ -116,52 +127,7 @@
   margin-top: 10px;
 }
 
-@media (max-width: 1280px) {
-  .mainContent {
-    padding: 20px 24px;
-  }
-  .metricsGrid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-}
-
-@media (max-width: 768px) {
-  .mainContent {
-    padding: 16px;
-    overflow-x: auto;
-  }
-  .metricsGrid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-    min-width: min-content;
-  }
-  .insightsSection {
-    min-width: 300px;
-  }
-  .insightsHeader {
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  .brainstormButton {
-    margin-left: 0;
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .mainContent {
-    padding: 12px;
-  }
-  .metricsGrid {
-    gap: 12px;
-  }
-  .insightsList {
-    gap: 12px;
-  }
-}
-
+/* Custom Scrollbar */
 .mainContent::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -178,4 +144,60 @@
 
 .mainContent::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1280px) {
+  .mainContent {
+    padding: 20px 24px;
+  }
+
+  .metricsGrid {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .mainContent {
+    padding: 16px;
+    overflow-x: hidden;
+  }
+
+  .metricsGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .insightsSection {
+    padding: 16px;
+    margin-bottom: 40px;
+  }
+
+  .insightsHeader {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mainContent {
+    padding: 12px;
+  }
+
+  .metricsGrid {
+    gap: 12px;
+  }
+
+  .insightsList {
+    gap: 12px;
+  }
+
+  .insightsSection {
+    padding: 12px;
+    margin-bottom: 32px;
+  }
+
+  .insightGroup {
+    gap: 8px;
+  }
 }

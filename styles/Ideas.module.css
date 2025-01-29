@@ -1,4 +1,4 @@
-/* styles/Ideas.module.css */
+/* Base Container */
 .container {
   min-height: 100vh;
   background: #050505;
@@ -20,6 +20,7 @@
   background: #050505;
 }
 
+/* Loading State */
 .loadingWrapper {
   width: 100%;
   height: calc(100vh - 200px);
@@ -33,12 +34,14 @@
   font-size: 16px;
 }
 
+/* Content Layout */
 .content {
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
 }
 
+/* Section Titles */
 .sectionTitle {
   color: #FFFFFF;
   font-size: 24px;
@@ -46,6 +49,7 @@
   margin: 0 0 24px 0;
 }
 
+/* Problem Section */
 .problemSection {
   margin-bottom: 48px;
   position: sticky;
@@ -65,6 +69,7 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* Hypothesis Section */
 .hypothesisSection {
   margin-top: 32px;
   position: sticky;
@@ -101,6 +106,7 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
+/* Ideas Container */
 .ideasContainer {
   display: flex;
   flex-direction: column;
@@ -108,7 +114,7 @@
   width: 100%;
 }
 
-/* Scrollbar styles */
+/* Scrollbar Styles */
 .mainContent::-webkit-scrollbar {
   width: 6px;
 }
@@ -127,111 +133,111 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Responsive styles */
+/* Responsive Breakpoints */
 @media (min-width: 1441px) {
   .content {
-      max-width: 1400px;
+    max-width: 1400px;
   }
 }
 
 @media (max-width: 1280px) {
   .mainContent {
-      padding: 28px;
+    padding: 28px;
   }
 
   .sectionTitle {
-      font-size: 22px;
+    font-size: 22px;
   }
 
   .problemSection {
-      margin-bottom: 40px;
+    margin-bottom: 40px;
   }
 
   .problemStatement {
-      padding: 18px 22px;
+    padding: 18px 22px;
   }
 }
 
 @media (max-width: 1024px) {
   .mainContent {
-      padding: 24px;
+    padding: 24px;
   }
 
   .content {
-      max-width: 100%;
+    max-width: 100%;
   }
 
   .hypothesisSection {
-      top: 120px;
+    top: 120px;
   }
 }
 
 @media (max-width: 768px) {
   .mainContent {
-      padding: 20px;
+    padding: 20px;
   }
 
   .sectionTitle {
-      font-size: 20px;
-      margin-bottom: 20px;
+    font-size: 20px;
+    margin-bottom: 20px;
   }
 
   .problemStatement {
-      padding: 16px;
-      font-size: 14px;
+    padding: 16px;
+    font-size: 14px;
   }
 
   .hypothesisHeader {
-      margin-bottom: 24px;
+    margin-bottom: 24px;
   }
 
   .questionIcon {
-      width: 26px;
-      height: 26px;
-      padding: 5px;
+    width: 26px;
+    height: 26px;
+    padding: 5px;
   }
 
   .ideasContainer {
-      gap: 14px;
+    gap: 14px;
   }
 
   .hypothesisSection {
-      top: 100px;
+    top: 100px;
   }
 }
 
 @media (max-width: 480px) {
   .mainContent {
-      padding: 16px;
+    padding: 16px;
   }
 
   .sectionTitle {
-      font-size: 18px;
-      margin-bottom: 16px;
+    font-size: 18px;
+    margin-bottom: 16px;
   }
 
   .problemSection {
-      margin-bottom: 32px;
-      padding: 16px 0;
+    margin-bottom: 32px;
+    padding: 16px 0;
   }
 
   .problemStatement {
-      padding: 14px;
+    padding: 14px;
   }
 
   .hypothesisHeader {
-      gap: 8px;
-      margin-bottom: 20px;
+    gap: 8px;
+    margin-bottom: 20px;
   }
 
   .questionIcon {
-      width: 24px;
-      height: 24px;
-      padding: 4px;
+    width: 24px;
+    height: 24px;
+    padding: 4px;
   }
 
   .hypothesisSection {
-      top: 80px;
-      padding: 16px 0;
+    top: 80px;
+    padding: 16px 0;
   }
 }

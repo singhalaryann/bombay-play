@@ -1,178 +1,208 @@
+/* Base Container */
 .container {
   min-height: 100vh;
   background: #050505;
   color: white;
   width: 100%;
- }
- 
- .mainLayout {
+}
+
+/* Main Layout Structure */
+.mainLayout {
   display: flex;
   min-height: calc(100vh - 64px);
- }
- 
- .mainContent {
+}
+
+.mainContent {
   flex: 1;
   padding: 24px 32px;
-  /* overflow-y: auto; */
   background: #050505;
- }
- 
- .content {
+}
+
+/* Content Wrapper */
+.content {
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
- }
- 
- .contentLayout {
+}
+
+/* Two Column Layout */
+.contentLayout {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); /* UPDATED: Prevent overflow */
   gap: 24px;
-  min-height: calc(100vh - 250px);
   position: relative;
- }
- 
- .leftPanel {
+  height: calc(100vh - 120px); /* UPDATED: Fixed height for better control */
+}
+
+/* Left Panel - Chat Section */
+.leftPanel {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  height: 100vh; /* Fixed height */
-    overflow: hidden; /* Keep this */
+  height: 100%; /* UPDATED: Match parent height */
+  overflow: hidden;
   position: sticky;
   top: 0;
+  /* background: #12121266; ADDED: Subtle background */
+  border-radius: 12px; /* ADDED: Rounded corners */
+  /* padding: 16px; ADDED: Inner spacing */
 }
- 
+
+/* Right Panel - Metrics & Graphs */
 .rightPanel {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  height: calc(100vh - 100px); /* Adjust height */
+  height: 100%; /* UPDATED: Match parent height */
   overflow-y: auto;
   position: relative;
   z-index: 1;
-  padding-bottom: 24px; /* Add padding */
+  /* padding: 16px; ADDED: Consistent padding */
+  /* background: rgba(18, 18, 18, 0.4); ADDED: Matching background */
+  border-radius: 12px; /* ADDED: Rounded corners */
 }
- 
- .chatSection {
+
+/* Chat Section Container */
+.chatSection {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
   height: 100%;
- }
- 
- .errorWrapper {
+  overflow-y: auto; /* ADDED: Scrolling for chat */
+}
+
+/* Error States */
+.errorWrapper {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: calc(100vh - 200px);
- }
- 
- .error {
+}
+
+.error {
   padding: 24px;
   border-radius: 12px;
   background: rgba(18, 18, 18, 0.4);
   color: #ff6b6b;
- }
- 
- .loadingWrapper {
+}
+
+/* Loading States */
+.loadingWrapper {
   width: 100%;
   height: calc(100vh - 200px);
   display: flex;
   align-items: center;
   justify-content: center;
- }
- 
- .loading {
+}
+
+.loading {
   color: rgba(255, 255, 255, 0.9);
   font-size: 16px;
- }
- 
- /* Scrollbars */
- .mainContent::-webkit-scrollbar,
- .rightPanel::-webkit-scrollbar {
+}
+
+/* Custom Scrollbars */
+.mainContent::-webkit-scrollbar,
+.rightPanel::-webkit-scrollbar,
+.chatSection::-webkit-scrollbar { /* ADDED: Chat scrollbar */
   width: 6px;
   height: 6px;
- }
- 
- .mainContent::-webkit-scrollbar-track,
- .rightPanel::-webkit-scrollbar-track {
+}
+
+.mainContent::-webkit-scrollbar-track,
+.rightPanel::-webkit-scrollbar-track,
+.chatSection::-webkit-scrollbar-track {
   background: transparent;
- }
- 
- .mainContent::-webkit-scrollbar-thumb,
- .rightPanel::-webkit-scrollbar-thumb {
+}
+
+.mainContent::-webkit-scrollbar-thumb,
+.rightPanel::-webkit-scrollbar-thumb,
+.chatSection::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
- }
- 
- .mainContent::-webkit-scrollbar-thumb:hover,
- .rightPanel::-webkit-scrollbar-thumb:hover {
+}
+
+.mainContent::-webkit-scrollbar-thumb:hover,
+.rightPanel::-webkit-scrollbar-thumb:hover,
+.chatSection::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
- }
- 
- /* Media Queries */
- @media (min-width: 1441px) {
+}
+
+/* Responsive Breakpoints */
+@media (min-width: 1441px) {
   .content {
     max-width: 1600px;
   }
- }
- 
- @media (max-width: 1280px) {
+}
+
+@media (max-width: 1280px) {
   .contentLayout {
-    grid-template-columns: 1fr 1fr;
-    min-height: calc(100vh - 220px);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    height: calc(100vh - 100px);
   }
+  
   .mainContent {
     padding: 20px 24px;
   }
- }
- 
- @media (max-width: 1024px) {
+}
+
+@media (max-width: 1024px) {
   .contentLayout {
     grid-template-columns: 1fr;
-    min-height: auto;
-    gap: 32px;
-  }
-  
-  .rightPanel {
     height: auto;
-    min-height: 500px;
+    gap: 24px;
   }
-  .leftPanel {
+
+  .leftPanel,
+  .rightPanel {
+    height: 600px; /* UPDATED: Fixed height for tablets */
     position: relative;
-    min-height: 500px;
   }
+
   .mainContent {
     padding: 20px;
   }
-  .content {
-    max-width: 100%;
-  }
- }
- 
- @media (max-width: 768px) {
+}
+
+@media (max-width: 768px) {
   .mainContent {
     padding: 16px;
   }
-  .contentLayout {
-    gap: 24px;
-  }
-  .leftPanel,
-  .rightPanel {
-    min-height: 400px;
-  }
- }
- 
- @media (max-width: 480px) {
-  .mainContent {
-    padding: 12px;
-  }
+
   .contentLayout {
     gap: 20px;
   }
+
   .leftPanel,
   .rightPanel {
-    min-height: 350px;
+    height: 500px; /* UPDATED: Shorter height for mobile */
   }
- }
+
+  /* ADDED: Adjust padding for mobile */
+  .leftPanel,
+  .rightPanel {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mainContent {
+    padding: 12px;
+  }
+
+  .contentLayout {
+    gap: 16px;
+  }
+
+  .leftPanel,
+  .rightPanel {
+    height: 400px; /* UPDATED: Even shorter for small mobile */
+  }
+
+  /* ADDED: Minimal padding for small screens */
+  .leftPanel,
+  .rightPanel {
+    padding: 8px;
+  }
+}
