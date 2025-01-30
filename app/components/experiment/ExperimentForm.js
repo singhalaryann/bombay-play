@@ -52,9 +52,10 @@ const ExperimentForm = ({
     
     // Calculate traffic split for both groups based on total users
     const totalUsers = segmentData?.total_players || 0;
-    const controlUsers = Math.round((splitValue / 100) * totalUsers);
-    const variantUsers = totalUsers - controlUsers;
-    
+// Pure frontend calculation without state updates
+const controlUsers = Math.round((splitValue / 100) * totalUsers);
+const variantUsers = totalUsers - controlUsers;
+
     // Update experiment data with split and calculated users
     setExperimentData(prev => ({
       ...prev,
@@ -71,6 +72,7 @@ const ExperimentForm = ({
         }
       }
     }));
+    onSplitChange(splitValue, controlUsers, variantUsers);
   };
 
   // Format segment data for display

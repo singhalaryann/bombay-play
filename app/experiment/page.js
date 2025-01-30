@@ -66,16 +66,18 @@ export default function ExperimentPage() {
   // Fetch all details in parallel
   useEffect(() => {
     const fetchAllDetails = async () => {
-      if (!experimentData) return;
-
+      if (!experimentData) return;  // <-- Add early return
+     // Only set loading for initial data fetch, not slider updates
+     if (!segmentData || !offerData) {
       setLoading(true);
+    }
       console.log("Fetching additional details for experiment");
 
       try {
         const fetchPromises = [];
 
         // Add segment fetch
-        if (experimentData.segment_id) {
+        if (experimentData?.segment_id) {
           fetchPromises.push(
             fetch("https://get-segment-q54hzgyghq-uc.a.run.app", {
               method: "POST",
@@ -88,28 +90,27 @@ export default function ExperimentPage() {
         // Add offer fetches for both groups
         // CHANGED: now we grab the top-level offer_id instead of inside groups
         // Now we grab the offer IDs from each group (control, A) instead of the top level
-const controlOfferId = experimentData.groups?.control?.offer_id;
-if (controlOfferId) {
-  fetchPromises.push(
-    fetch("https://get-offer-q54hzgyghq-uc.a.run.app", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ offer_id: controlOfferId }),
-    })
-  );
-}
+        const controlOfferId = experimentData.groups?.control?.offer_id;
+        if (controlOfferId) {
+          fetchPromises.push(
+            fetch("https://get-offer-q54hzgyghq-uc.a.run.app", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ offer_id: controlOfferId }),
+            })
+          );
+        }
 
-const variantOfferId = experimentData.groups?.A?.offer_id;
-if (variantOfferId) {
-  fetchPromises.push(
-    fetch("https://get-offer-q54hzgyghq-uc.a.run.app", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ offer_id: variantOfferId }),
-    })
-  );
-}
-
+        const variantOfferId = experimentData.groups?.A?.offer_id;
+        if (variantOfferId) {
+          fetchPromises.push(
+            fetch("https://get-offer-q54hzgyghq-uc.a.run.app", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ offer_id: variantOfferId }),
+            })
+          );
+        }
 
         if (fetchPromises.length === 0) {
           setLoading(false);
@@ -129,19 +130,18 @@ if (variantOfferId) {
 
         // Next responses are offer data
         // Next response is the single top-level offer data (using topLevelOfferId)
-       // First item in responseData is the segment data
-const segmentRes = responseData[0];
-setSegmentData(segmentRes.segment);
+        // First item in responseData is the segment data
+        const segmentRes = responseData[0];
+        setSegmentData(segmentRes.segment);
 
-// Next items (if present) are the control and variant offers
-if (responseData.length === 3) {
-  const [, controlRes, variantRes] = responseData;
-  setOfferData({
-    control: controlRes.offer,
-    variant: variantRes.offer,
-  });
-}
-
+        // Next items (if present) are the control and variant offers
+        if (responseData.length === 3) {
+          const [, controlRes, variantRes] = responseData;
+          setOfferData({
+            control: controlRes.offer,
+            variant: variantRes.offer,
+          });
+        }
 
         setError(null);
       } catch (err) {
@@ -212,7 +212,7 @@ if (responseData.length === 3) {
     return { control: controlUsers, variant: variantUsers };
   };
 
-  const handleSplitUpdate = (splitValue) => {
+  const handleSplitUpdate = (splitValue, controlUsers, variantUsers) => {
     if (!segmentData?.total_players) return;
 
     const { control, variant } = calculateTrafficSplit(
@@ -220,20 +220,20 @@ if (responseData.length === 3) {
       splitValue
     );
 
-    setExperimentData((prev) => ({
+    setExperimentData(prev => ({
       ...prev,
       split: splitValue,
       groups: {
         ...prev.groups,
         control: {
-          ...prev.groups.control,
-          traffic_split: control,
+          ...prev.groups?.control,
+          traffic_split: controlUsers
         },
         A: {
-          ...prev.groups.A,
-          traffic_split: variant,
-        },
-      },
+          ...prev.groups?.A,
+          traffic_split: variantUsers
+        }
+      }
     }));
   };
 

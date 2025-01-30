@@ -8,11 +8,9 @@ const VariantGroup = ({ experimentData, offerData }) => {
     experimentData,
     offerData
   });
-
-  if (!experimentData?.groups) {
-    return <div>Loading variant data...</div>;
-  }
-
+  // if (!experimentData?.groups) {
+  //   return <div>Loading variant data...</div>;
+  // }
   const { control, A } = experimentData.groups;
 
   const renderVariantSection = (groupData, title, isControl = false) => {
