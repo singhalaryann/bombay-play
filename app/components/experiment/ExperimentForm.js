@@ -27,14 +27,17 @@ const ExperimentForm = ({
     setStartDate(date);
     setIsCalendarOpen(false);
     
-    // Get the day of the month directly
+    // Get the selected day directly
     const selectedDay = date.getDate();
-    console.log("Selected day:", selectedDay);
+    const durationInSeconds = selectedDay * 24 * 60 * 60;
+    
+    console.log('Selected days:', selectedDay);
+    console.log('Converted to seconds:', durationInSeconds);
     
     setExperimentData(prev => ({
       ...prev,
-      duration: selectedDay * 24 * 60 * 60 // Convert days to seconds
-          }));
+      duration: durationInSeconds
+    }));
   };
 
   // Handle experiment label change
@@ -104,7 +107,7 @@ const variantUsers = totalUsers - controlUsers;
             <input
               type="text"
               className={`${styles.input} ${styles.durationInput}`}
-              value={experimentData?.duration ? `${experimentData.duration} days` : ""}
+              value={startDate ? `${startDate.getDate()} days` : ""}
               placeholder="Select duration"
               onClick={() => setIsCalendarOpen(!isCalendarOpen)}
               readOnly
