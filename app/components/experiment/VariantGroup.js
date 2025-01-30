@@ -31,12 +31,12 @@ const VariantGroup = ({ experimentData, offerData }) => {
           <div className={styles.inputGroup}>
             <label className={styles.label}>Bundle Name</label>
             {/* Bundle Name: now using the experiment’s label */}
-<input
-  type="text"
-  className={styles.input}
-  value={experimentData?.label || ""}
-  readOnly
-/>
+            <input
+              type="text"
+              className={styles.input}
+              value={experimentData?.label || ""}
+              readOnly
+            />
           </div>
 
           {/* Traffic Split Display */}
@@ -54,12 +54,12 @@ const VariantGroup = ({ experimentData, offerData }) => {
           <div className={styles.inputGroup}>
             <label className={styles.label}>Offer ID</label>
             {/* Offer ID: now using the top-level experimentData.offer_id */}
-<input
-  type="text"
-  className={styles.input}
-  value={experimentData?.offer_id || ""}
-  readOnly
-/>
+            <input
+              type="text"
+              className={styles.input}
+              value={groupData?.offer_id || ""}
+              readOnly
+            />
           </div>
 
           {/* Items Table */}
@@ -76,7 +76,9 @@ const VariantGroup = ({ experimentData, offerData }) => {
                   groupOfferData.items.map((item, index) => (
                     <tr key={`${item.name}-${index}`}>
                       <td className={styles.tableCell}>{item.name}</td>
-                      <td className={`${styles.tableCell} ${styles.quantityCell}`}>
+                      <td
+                        className={`${styles.tableCell} ${styles.quantityCell}`}
+                      >
                         {item.amount}
                       </td>
                     </tr>
@@ -100,15 +102,13 @@ const VariantGroup = ({ experimentData, offerData }) => {
     <div className={styles.variantSection}>
       {/* Render Control Group */}
       {control && renderVariantSection(control, "Control Group", true)}
-      
+
       {/* Render Variant A */}
       {A && renderVariantSection(A, "Variant A", false)}
-      
+
       {/* Show message if no variants available */}
       {!control && !A && (
-        <div className={styles.noVariants}>
-          No variant groups available
-        </div>
+        <div className={styles.noVariants}>No variant groups available</div>
       )}
     </div>
   );

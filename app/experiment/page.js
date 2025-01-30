@@ -87,17 +87,29 @@ export default function ExperimentPage() {
 
         // Add offer fetches for both groups
         // CHANGED: now we grab the top-level offer_id instead of inside groups
-        const topLevelOfferId = experimentData.offer_id;
+        // Now we grab the offer IDs from each group (control, A) instead of the top level
+const controlOfferId = experimentData.groups?.control?.offer_id;
+if (controlOfferId) {
+  fetchPromises.push(
+    fetch("https://get-offer-q54hzgyghq-uc.a.run.app", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ offer_id: controlOfferId }),
+    })
+  );
+}
 
-        if (topLevelOfferId) {
-          fetchPromises.push(
-            fetch("https://get-offer-q54hzgyghq-uc.a.run.app", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ offer_id: topLevelOfferId }),
-            })
-          );
-        }
+const variantOfferId = experimentData.groups?.A?.offer_id;
+if (variantOfferId) {
+  fetchPromises.push(
+    fetch("https://get-offer-q54hzgyghq-uc.a.run.app", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ offer_id: variantOfferId }),
+    })
+  );
+}
+
 
         if (fetchPromises.length === 0) {
           setLoading(false);
@@ -117,12 +129,19 @@ export default function ExperimentPage() {
 
         // Next responses are offer data
         // Next response is the single top-level offer data (using topLevelOfferId)
-        if (responseData.length > 1) {
-          // The second item in responseData is the actual offer
-          const [, offerResponse] = responseData;
-          // If you only have one top-level offer, just store it
-          setOfferData(offerResponse.offer);
-        }
+       // First item in responseData is the segment data
+const segmentRes = responseData[0];
+setSegmentData(segmentRes.segment);
+
+// Next items (if present) are the control and variant offers
+if (responseData.length === 3) {
+  const [, controlRes, variantRes] = responseData;
+  setOfferData({
+    control: controlRes.offer,
+    variant: variantRes.offer,
+  });
+}
+
 
         setError(null);
       } catch (err) {
