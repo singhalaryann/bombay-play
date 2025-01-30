@@ -7,7 +7,7 @@ import TabFilter from "../components/dashboard/TabFilter";
 import MetricCard from "../components/dashboard/MetricCard";
 import InsightCard from "../components/dashboard/InsightCard";
 import DashboardTabs from "../components/dashboard/DashboardTabs";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 
 // Import your separate ExperimentContent component
@@ -22,7 +22,25 @@ export default function Dashboard() {
   const [metrics, setMetrics] = useState([]);
   const [insights, setInsights] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("insights");
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState(
+    searchParams.get("tab") || "insights"
+  );
+
+  // Add new effect to handle URL param changes
+  useEffect(() => {
+    // Update active tab when URL params change
+    const tabParam = searchParams.get("tab");
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    // Update URL without full page reload
+    router.push(`/dashboard?tab=${tab}`, { shallow: true });
+  };
 
   // Fetch dashboard data
   const fetchDashboardData = async (time) => {
@@ -30,16 +48,19 @@ export default function Dashboard() {
       setLoading(true);
       console.log("Fetching dashboard data:", { userId, time });
 
-      const response = await fetch("https://dashboard-q54hzgyghq-uc.a.run.app", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user_id: userId,
-          time: time,
-        }),
-      });
+      const response = await fetch(
+        "https://dashboard-q54hzgyghq-uc.a.run.app",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            user_id: userId,
+            time: time,
+          }),
+        }
+      );
 
       const data = await response.json();
       if (data) {
@@ -114,8 +135,8 @@ export default function Dashboard() {
 
           <DashboardTabs
             activeTab={activeTab}
-            onTabChange={setActiveTab}
-            experimentContent={<ExperimentContent />}
+            onTabChange={handleTabChange} // Use new handler
+            experimentContent={<ExperimentContent userId={userId} />}
           >
             {renderInsightsContent()}
           </DashboardTabs>

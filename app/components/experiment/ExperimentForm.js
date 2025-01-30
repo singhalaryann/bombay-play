@@ -1,14 +1,43 @@
-'use client';
-import React, { useState } from 'react';
+"use client";
+import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import Image from 'next/image';
-import styles from '../../../styles/ExperimentForm.module.css';
+import Image from "next/image";
+import styles from "../../../styles/ExperimentForm.module.css";
 
-const ExperimentForm = ({ experimentData, setExperimentData }) => {
+const ExperimentForm = ({ 
+  experimentData, 
+  segmentData, 
+  setExperimentData,
+  onSplitChange 
+}) => {
   const [startDate, setStartDate] = useState(null);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
+  // Debug log for incoming data
+  useEffect(() => {
+    console.log("ExperimentForm - Current data:", {
+      experimentData,
+      segmentData
+    });
+  }, [experimentData, segmentData]);
+
+  // UPDATED: Simplified date handling to use day directly as seconds
+  const handleDateChange = (date) => {
+    setStartDate(date);
+    setIsCalendarOpen(false);
+    
+    // Get the day of the month directly
+    const selectedDay = date.getDate();
+    console.log("Selected day:", selectedDay);
+    
+    setExperimentData(prev => ({
+      ...prev,
+      duration: selectedDay * 24 * 60 * 60 // Convert days to seconds
+          }));
+  };
+
+  // Handle experiment label change
   const handleLabelChange = (e) => {
     setExperimentData(prev => ({
       ...prev,
@@ -16,66 +45,72 @@ const ExperimentForm = ({ experimentData, setExperimentData }) => {
     }));
   };
 
-  // CHANGED: Updated formatDate function to only return the selected day
-  const formatDate = (date) => {
-    if (!date) return '';
-    // Instead of calculating difference with today's date,
-    // we simply return the day number from selected date
-    return `${date.getDate()} days`;
-  };
-
-  // CHANGED: Simplified handleDateChange to use the new formatDate
-  const handleDateChange = (date) => {
-    setStartDate(date);
-    const formattedDuration = formatDate(date);
+  // UPDATED: Enhanced traffic split handling with direct group updates
+  const handleSplitChange = (value) => {
+    const splitValue = Number(value);
+    console.log("Traffic split changed to:", splitValue);
+    
+    // Calculate traffic split for both groups based on total users
+    const totalUsers = segmentData?.total_players || 0;
+    const controlUsers = Math.round((splitValue / 100) * totalUsers);
+    const variantUsers = totalUsers - controlUsers;
+    
+    // Update experiment data with split and calculated users
     setExperimentData(prev => ({
       ...prev,
-      duration: formattedDuration
+      split: splitValue,
+      groups: {
+        ...prev.groups,
+        control: {
+          ...prev.groups?.control,
+          traffic_split: controlUsers
+        },
+        A: {
+          ...prev.groups?.A,
+          traffic_split: variantUsers
+        }
+      }
     }));
-    setIsCalendarOpen(false);
   };
 
-  const handleTrafficSplitChange = (value) => {
-    setExperimentData(prev => ({
-      ...prev,
-      trafficSplit: value
-    }));
+  // Format segment data for display
+  const formatSegmentDisplay = () => {
+    if (!segmentData?.total_players) return "";
+    return `All Users (${segmentData.total_players})`;
   };
 
   return (
     <div className={styles.outerWrapper}>
-      <div className={styles.glassContainer}>
-        <div className={styles.experimentTag}>
-          Experiment
-        </div>
-
-        {/* Label Input */}
+      {/* Label Row */}
+      <div className={styles.rowGroup}>
+        {/* Experiment Label */}
         <div className={styles.formGroup}>
-          <label className={styles.label}>Label</label>
+          <label className={styles.label}>Experiment Label</label>
           <input
             type="text"
             className={styles.input}
-            value={experimentData.label}
+            value={experimentData?.label || ""}
             onChange={handleLabelChange}
-            placeholder="XG Warrior"
+            placeholder="Enter experiment label"
           />
         </div>
 
-        {/* Duration Input with Calendar */}
+        {/* Duration with Calendar - UPDATED display logic */}
         <div className={styles.formGroup}>
           <label className={styles.label}>Experiment Duration</label>
           <div className={styles.durationWrapper}>
             <input
               type="text"
               className={`${styles.input} ${styles.durationInput}`}
-              value={experimentData.duration || ''}
-              readOnly
-              placeholder="15 days"
+              value={experimentData?.duration ? `${experimentData.duration} days` : ""}
+              placeholder="Select duration"
               onClick={() => setIsCalendarOpen(!isCalendarOpen)}
+              readOnly
             />
-            <button 
+            <button
               className={styles.calendarButton}
               onClick={() => setIsCalendarOpen(!isCalendarOpen)}
+              type="button"
             >
               <Image
                 src="/calender.png"
@@ -98,47 +133,69 @@ const ExperimentForm = ({ experimentData, setExperimentData }) => {
             )}
           </div>
         </div>
-
-        {/* Traffic Split Slider */}
-{/* Traffic Split Slider */}
-<div className={styles.formGroup}>
-  <label className={styles.label}>Traffic Split</label>
-  <div className={styles.sliderContainer}>
-    <div className={styles.sliderBox}>
-    <div 
-  className={styles.sliderTrack} 
->
-  <div 
-    className={styles.sliderFill}
-    style={{
-      width: `${experimentData.trafficSplit}%`
-    }}
-  />
-</div>
-      <input
-        type="range"
-        min="0"
-        max="100"
-        value={experimentData.trafficSplit}
-        onChange={(e) => handleTrafficSplitChange(Number(e.target.value))}
-        className={styles.slider}
-      />
-      <div 
-        className={styles.sliderValue} 
-        style={{ left: `calc(${experimentData.trafficSplit}% - 12px)` }}
-      >
-        {experimentData.trafficSplit}
       </div>
-    </div>            <div className={styles.sliderLabels}>
-              <span>0%</span>
-              <span>20%</span>
-              <span>40%</span>
-              <span>60%</span>
-              <span>80%</span>
-              <span>100%</span>
+
+      {/* Segment Information */}
+      <div className={styles.formGroup}>
+        <label className={styles.label}>
+          Users 
+        </label>
+        <input
+          type="text"
+          className={styles.input}
+          value={formatSegmentDisplay()}
+          readOnly
+          disabled
+        />
+      </div>
+
+      {/* Traffic Split Slider */}
+      <div className={styles.formGroup}>
+        <label className={styles.label}>
+          Traffic Split 
+        </label>
+        <div className={styles.sliderContainer}>
+          <div className={styles.sliderBox}>
+            <div className={styles.sliderTrack}>
+              <div
+                className={styles.sliderFill}
+                style={{
+                  width: `${experimentData?.split || 0}%`
+                }}
+              />
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={experimentData?.split || 0}
+              onChange={(e) => handleSplitChange(e.target.value)}
+              className={styles.slider}
+            />
+            <div
+              className={styles.sliderBubble}
+              style={{
+                left: `calc(${experimentData?.split || 0}% - 15px)`
+              }}
+            >
+              {experimentData?.split || 0}%
             </div>
           </div>
+          <div className={styles.sliderLabels}>
+            <span>0%</span>
+            <span>20%</span>
+            <span>40%</span>
+            <span>60%</span>
+            <span>80%</span>
+            <span>100%</span>
+          </div>
         </div>
+        {/* Real-time split display */}
+        {/* <div className={styles.splitInfo}>
+          Control Group: {Math.round((experimentData?.split || 0) * (segmentData?.total_players || 0) / 100)} users
+          <br />
+          Variant A: {Math.round((100 - (experimentData?.split || 0)) * (segmentData?.total_players || 0) / 100)} users
+        </div> */}
       </div>
     </div>
   );

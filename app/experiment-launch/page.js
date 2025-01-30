@@ -1,17 +1,27 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Header from "../components/layout/Header";
 import Sidebar from "../components/layout/Sidebar";
 import styles from "../../styles/ExperimentLaunch.module.css";
 
 export default function ExperimentLaunch() {
+  const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     // Trigger animation after component mounts
     setIsVisible(true);
-  }, []);
+
+    // Auto redirect after 3 seconds
+    const timer = setTimeout(() => {
+      console.log("Redirecting to experiment dashboard...");
+      router.push("/experiment-dashboard");
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [router]);
 
   return (
     <div className={styles.container}>

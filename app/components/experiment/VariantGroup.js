@@ -1,92 +1,115 @@
-'use client';
-import React from 'react';
-import styles from '../../../styles/VariantGroup.module.css';
+"use client";
+import React from "react";
+import styles from "../../../styles/VariantGroup.module.css";
 
-const VariantGroup = () => {
-  // Will be replaced with API data later
-  const mockData = {
-    control: {
-      link: 'https://hmvvjh,jh2323jhb34rhjhb/4br5',
-      features: [
-        '3x Homes',
-        '3 Concurrent Auctions',
-        '6 row Backpack',
-        '/craft',
-        '/recipe',
-        '/disposal',
-        '/near',
-        '/hat',
-        '/feed'
-      ]
-    },
-    variantA: {
-      link: 'https://hmvvjh,jh2323jhb34rhjhb/4br5',
-      features: [
-        '5x Homes',
-        '5 Concurrent Auctions',
-        '6 row Backpack',
-        '/craft',
-        '/recipe',
-        '/disposal',
-        '/near',
-        '/hat',
-        '/feed',
-        '/enderchest'
-      ]
-    }
+const VariantGroup = ({ experimentData, offerData }) => {
+  // Debug logging
+  console.log("VariantGroup received props:", {
+    experimentData,
+    offerData
+  });
+
+  if (!experimentData?.groups) {
+    return <div>Loading variant data...</div>;
+  }
+
+  const { control, A } = experimentData.groups;
+
+  const renderVariantSection = (groupData, title, isControl = false) => {
+    const groupOfferData = isControl ? offerData?.control : offerData?.variant;
+    const trafficSplit = groupData?.traffic_split || 0;
+
+    return (
+      <div className={styles.variantGroup}>
+        {/* Variant Title */}
+        <div className={styles.variantTitleContainer}>
+          <span className={styles.variantTitle}>{title}</span>
+        </div>
+
+        <div className={styles.variantContent}>
+          {/* Bundle Name */}
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>Bundle Name</label>
+            {/* Bundle Name: now using the experiment’s label */}
+<input
+  type="text"
+  className={styles.input}
+  value={experimentData?.label || ""}
+  readOnly
+/>
+          </div>
+
+          {/* Traffic Split Display */}
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>Traffic Split</label>
+            <input
+              type="text"
+              className={styles.input}
+              value={`${trafficSplit} users`}
+              readOnly
+            />
+          </div>
+
+          {/* Offer ID */}
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>Offer ID</label>
+            {/* Offer ID: now using the top-level experimentData.offer_id */}
+<input
+  type="text"
+  className={styles.input}
+  value={experimentData?.offer_id || ""}
+  readOnly
+/>
+          </div>
+
+          {/* Items Table */}
+          <div className={styles.glassBox}>
+            <table className={styles.featureTable}>
+              <thead>
+                <tr>
+                  <th className={styles.tableHeader}>Name</th>
+                  <th className={styles.tableHeader}>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {groupOfferData?.items?.length > 0 ? (
+                  groupOfferData.items.map((item, index) => (
+                    <tr key={`${item.name}-${index}`}>
+                      <td className={styles.tableCell}>{item.name}</td>
+                      <td className={`${styles.tableCell} ${styles.quantityCell}`}>
+                        {item.amount}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={2} className={styles.tableCell}>
+                      No items available
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
     <div className={styles.variantSection}>
-      {/* Control Group */}
-      <div className={styles.variantGroup}>
-        <h3 className={styles.variantTitle}>Control Group</h3>
-        <div className={styles.variantContent}>
-          <div className={styles.linkGroup}>
-            <label className={styles.label}>Link</label>
-            <input
-              type="text"
-              className={styles.input}
-              value={mockData.control.link}
-              readOnly
-            />
-          </div>
-          <div className={styles.glassBox}>
-  <div className={styles.featureList}>
-    {mockData.control.features.map((feature, index) => (
-      <div key={index} className={styles.featureItem}>
-        • {feature}
-      </div>
-    ))}
-  </div>
-</div>
+      {/* Render Control Group */}
+      {control && renderVariantSection(control, "Control Group", true)}
+      
+      {/* Render Variant A */}
+      {A && renderVariantSection(A, "Variant A", false)}
+      
+      {/* Show message if no variants available */}
+      {!control && !A && (
+        <div className={styles.noVariants}>
+          No variant groups available
         </div>
-      </div>
-
-      {/* Variant A */}
-      <div className={styles.variantGroup}>
-        <h3 className={styles.variantTitle}>Variant A</h3>
-        <div className={styles.variantContent}>
-          <div className={styles.linkGroup}>
-            <label className={styles.label}>Link Details</label>
-            <input
-              type="text"
-              className={styles.input}
-              value={mockData.variantA.link}
-              readOnly
-            />
-          </div>
-          <div className={styles.glassBox}>
-  <div className={styles.featureList}>
-    {mockData.control.features.map((feature, index) => (
-      <div key={index} className={styles.featureItem}>
-        • {feature}
-      </div>
-    ))}
-  </div>
-</div>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

@@ -37,16 +37,56 @@ export default function AnalysisPage() {
   const [error, setError] = useState(null);
   const router = useRouter();
 
-  const handleContinue = () => {
-    console.log("Continue button clicked");
-    router.push("/experiment");
-  };
-
   // State for dynamic metrics and graphs
   const [dynamicMetrics, setDynamicMetrics] = useState([]);
   const [dynamicGraphs, setDynamicGraphs] = useState([]);
 
-  // Handlers to update metrics and graphs
+  // ------------------------------------------------------------------------
+  // 1) Modified handleContinue to fetch experiment IDs using chatId
+  //    and then pass them to /experiment in the URL.
+  // ------------------------------------------------------------------------
+  const handleContinue = async () => {
+    console.log("Continue button clicked – fetching experiment IDs.");
+
+    const chatId = searchParams.get("chat");
+    if (!chatId) {
+      console.error("No chatId found in the URL!");
+      return;
+    }
+
+    try {
+      // Call the get-experiments API with chatId
+      const response = await fetch(
+        "https://get-experiments-q54hzgyghq-uc.a.run.app",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ chat_id: chatId }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch experiment IDs");
+      }
+
+      const data = await response.json();
+      console.log("Received experiment IDs:", data.experiment_ids);
+
+      // Convert array of IDs to a comma-separated string for the query param
+      const idsParam = data.experiment_ids.join(",");
+
+      // Now navigate to /experiment, including both chatId AND idsParam
+      router.push(`/experiment?chat=${chatId}&ids=${idsParam}`);
+    } catch (err) {
+      console.error("Error fetching experiment IDs:", err);
+      setError("Failed to load experiments. Please try again."); // Show error to user
+      setLoading(false);
+      return;
+    }
+  };
+  // ------------------------------------------------------------------------
+
+  // Handle new metrics coming from the chat interface
   const handleMetricsUpdate = (newMetrics) => {
     console.log("Setting new metrics:", newMetrics);
 
@@ -66,23 +106,21 @@ export default function AnalysisPage() {
     );
     const newGraphs = convertMetricsToGraphs(graphCandidates);
 
-    // Reset and set the new graphsi
+    // Reset and set the new graphs
     setDynamicGraphs(newGraphs);
   };
 
+  // Handle new graphs (if needed separately)
   const handleGraphsUpdate = (newGraphs) => {
     console.log("Updating graphs:", newGraphs);
     setDynamicGraphs((prevGraphs) => [...prevGraphs, ...newGraphs]);
   };
 
-  // Fetch the initial chat data
+  // On initial load, fetch the chat data from the given chatId
   useEffect(() => {
     const fetchChatData = async () => {
       try {
-        // const ideaId = searchParams.get('idea');
-        // const insightId = searchParams.get('insight');
         const chatId = searchParams.get("chat");
-
         console.log("Fetching chat data with:", { userId, chatId });
 
         if (!userId || !chatId) {
@@ -98,8 +136,6 @@ export default function AnalysisPage() {
             },
             body: JSON.stringify({
               chat_id: chatId,
-              // insight_id: insightId,
-              // idea_id: ideaId
             }),
           }
         );
@@ -124,6 +160,7 @@ export default function AnalysisPage() {
     }
   }, [userId, searchParams]);
 
+  // Loading state
   if (loading) {
     return (
       <div className={styles.container}>
@@ -140,6 +177,7 @@ export default function AnalysisPage() {
     );
   }
 
+  // Error state
   if (error) {
     return (
       <div className={styles.container}>
@@ -154,7 +192,7 @@ export default function AnalysisPage() {
     );
   }
 
-  // Convert the initial chatData.metrics (line/bar/pie) to graph format
+  // Convert the initial chatData.metrics to graph format (line/bar/pie/hist)
   let initialGraphs = [];
   if (chatData?.metrics) {
     const graphCandidates = chatData.metrics.filter(
@@ -167,8 +205,7 @@ export default function AnalysisPage() {
     initialGraphs = convertMetricsToGraphs(graphCandidates);
   }
 
-  // ------------------------------ NEW LOGIC TO AVOID DUPLICATE METRIC KEYS ------------------------------
-  // We merge the original metrics with the dynamic metrics, replacing any duplicates by metric_id
+  // Merge original metrics with any dynamic updates (avoid duplicates)
   const combinedMetrics = (() => {
     const originalMetrics = chatData?.metrics || [];
     const combined = [...originalMetrics];
@@ -187,6 +224,7 @@ export default function AnalysisPage() {
     });
     return combined;
   })();
+
   return (
     <div className={styles.container}>
       <Header />
@@ -194,13 +232,6 @@ export default function AnalysisPage() {
         <Sidebar />
         <main className={styles.mainContent}>
           <div className={styles.content}>
-            {/* <section className={styles.problemSection}> */}
-            {/* <h2 className={styles.sectionTitle}>Problem statement</h2> */}
-            {/* <div className={styles.problemStatement}> */}
-            {/* {chatData?.insight_description || 'No insight available'} */}
-            {/* </div> */}
-            {/* </section> */}
-
             <div className={styles.contentLayout}>
               <div className={styles.leftPanel}>
                 <div className={styles.chatSection}>
@@ -218,7 +249,7 @@ export default function AnalysisPage() {
               </div>
 
               <div className={styles.rightPanel}>
-                {/* New button container */}
+                {/* Continue button triggers handleContinue */}
                 <div className={styles.continueButtonContainer}>
                   <button
                     className={styles.continueButton}
@@ -237,17 +268,16 @@ export default function AnalysisPage() {
                     </div>
                   </button>
                 </div>
-                {/* Combine initial + dynamic metrics (in case user updates them) */}
+
+                {/* Show metrics (filter for single-value "metric" type) */}
                 <MetricsDisplay
-                  // metrics={combinedMetrics}
                   metrics={combinedMetrics?.filter(
                     (m) => m.metric_type === "metric" && m.values?.length === 1
                   )}
                 />
 
-                {/* If chatData already has any existing graphs, show them.
-                    Otherwise, show the ones we built from metric transformation,
-                    plus anything dynamic. */}
+                {/* If chatData already has its own graphs, show them.
+                    Else show the ones from our conversion plus dynamic ones. */}
                 <GraphDisplay
                   graphs={
                     chatData?.graphs?.length > 0

@@ -1,67 +1,28 @@
-/* Main Wrapper */
+/* Main Layout */
 .outerWrapper {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  /* gap: 24px; */
   width: 100%;
 }
 
-/* Experiment Tag */
-.experimentTag {
-  display: inline-flex;
-  padding: 6px 12px;
-  background: rgba(39, 46, 36, 0.8);
-  border-radius: 20px;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 14px;
-  font-weight: 500;
-  width: fit-content;
-  margin-bottom: 24px;
+/* Row Layout */
+.rowGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
 }
 
-/* Glass Container */
-.glassContainer {
-  background: rgba(18, 18, 18, 0.7);
-  border-radius: 16px;
-  padding: 32px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  position: relative;
-  margin-bottom: 2%;
-  box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.25);
-}
-
-.glassContainer::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  padding: 1px;
-  background: linear-gradient(
-    -100deg,
-    rgba(255, 255, 255, 0.15),
-    rgba(255, 255, 255, 0.03)
-  );
-  -webkit-mask: 
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
-
-/* Form Groups */
+/* Form Group */
 .formGroup {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 .formGroup:last-child {
   margin-bottom: 0;
 }
 
+/* Labels */
 .label {
   display: block;
   margin-bottom: 12px;
@@ -70,8 +31,15 @@
   font-weight: 500;
 }
 
-/* Input Styles */
-.input {
+/* Inputs */
+/* Select Wrapper and Input styles */
+.selectWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input,
+select.input {
   width: 100%;
   height: 48px;
   padding: 0 16px;
@@ -81,6 +49,19 @@
   color: rgba(255, 255, 255, 0.9);
   font-size: 14px;
   transition: all 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.selectArrow {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  font-size: 12px;
 }
 
 .input:focus {
@@ -122,7 +103,7 @@
   opacity: 1;
 }
 
-/* Calendar Styles */
+/* Calendar */
 .calendarContainer {
   position: absolute;
   top: calc(100% + 8px);
@@ -135,13 +116,12 @@
 
 .calendar {
   background: transparent !important;
+  border: none !important;
   border-radius: 12px !important;
   padding: 20px !important;
-  width: 100% !important;
-  position: relative;
 }
 
-/* Calendar Global Styles */
+/* Calendar Customization */
 .calendar :global(.react-datepicker) {
   background: transparent !important;
   border: none !important;
@@ -184,15 +164,7 @@
   color: rgba(255, 255, 255, 0.3) !important;
 }
 
-.calendar :global(.react-datepicker__navigation) {
-  top: 16px;
-}
-
-.calendar :global(.react-datepicker__navigation-icon::before) {
-  border-color: rgba(255, 255, 255, 0.6);
-}
-
-/* Slider Styles */
+/* Slider */
 .sliderContainer {
   padding-top: 24px;
 }
@@ -203,39 +175,14 @@
   margin: 8px 0;
 }
 
-.slider {
-  position: absolute;
-  width: 100%;
-  height: 4px;
-  -webkit-appearance: none;
-  background: transparent;
-  z-index: 2;
-}
-
-.sliderValue {
-  position: absolute;
-  top: -28px;
-  transform: translateX(-50%);
-  background: #82FF83;
-  color: #000000;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
-  min-width: 28px;
-  text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
 .sliderTrack {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;  /* Increased thickness */
+  height: 4px;
   border-radius: 4px;
   background: rgba(255, 255, 255, 0.1);
-  overflow: visible;
 }
 
 .sliderTrack::after {
@@ -262,16 +209,15 @@
   background: #82FF83;
   border-radius: 2px;
   transition: width 0.2s ease;
-  box-shadow: 0 0 4px rgba(130, 255, 131, 0.4);  /* Subtle glow */
 }
 
-.sliderLabels {
-  display: flex;
-  justify-content: space-between;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 12px;
-  margin-top: 16px;
-  padding: 0 2px;
+.slider {
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  background: transparent;
+  z-index: 2;
 }
 
 .slider::-webkit-slider-thumb {
@@ -284,12 +230,6 @@
   cursor: pointer;
   margin-top: -8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  position: relative;
-  z-index: 2;  /* Keep thumb above the track */
-}
-
-.slider::-webkit-slider-thumb:hover {
-  transform: scale(1.1);
 }
 
 .slider::-webkit-slider-runnable-track {
@@ -298,14 +238,54 @@
   border: none;
 }
 
-/* Responsive Styles */
+.sliderBubble {
+  position: absolute;
+  top: -28px;
+  transform: translateX(-50%);
+  background: #82FF83;
+  color: #000000;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  min-width: 28px;
+  text-align: center;
+  z-index: 3;
+}
+
+.sliderLabels {
+  display: flex;
+  justify-content: space-between;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  margin-top: 16px;
+  padding: 0 2px;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-  .glassContainer {
-    padding: 24px;
+  .rowGroup {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
   
   .input {
     height: 44px;
+  }
+
+  .label {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .input {
+    height: 40px;
+    font-size: 13px;
+  }
+  
+  .label {
+    font-size: 13px;
   }
   
   .sliderLabels {
@@ -313,21 +293,8 @@
   }
 }
 
-@media (max-width: 480px) {
-  .glassContainer {
-    padding: 20px;
-  }
-  
-  .experimentTag {
-    font-size: 13px;
-  }
-  
-  .label {
-    font-size: 14px;
-  }
-  
-  .input {
-    height: 40px;
-    font-size: 13px;
-  }
+.segmentDescription {
+  margin-top: 8px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
 }
