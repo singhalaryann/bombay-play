@@ -11,9 +11,31 @@ const ExperimentForm = ({
   setExperimentData,
   onSplitChange 
 }) => {
-  const [startDate, setStartDate] = useState(null);
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [startDate, setStartDate] = useState(() => {
+    const date = new Date();
+    date.setDate(date.getDate() + 7);
+    return date;
+  });
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
+    // ADDED: Set default duration on mount
+  useEffect(() => {
+    if (!experimentData?.duration) {
+      // Convert default 7 days to seconds same way as handleDateChange
+      const selectedDay = 7;
+      const durationInSeconds = selectedDay * 24 * 60 * 60;
+      
+      console.log('Default selected days:', selectedDay);
+    console.log('Default duration converted to seconds:', durationInSeconds);
+
+      setExperimentData(prev => ({
+        ...prev,
+        duration: durationInSeconds,
+        split: prev?.split || experimentData?.split || 50
+      }));
+    }
+  }, []);
+  
   // Debug log for incoming data
   useEffect(() => {
     console.log("ExperimentForm - Current data:", {
@@ -81,7 +103,7 @@ const variantUsers = totalUsers - controlUsers;
   // Format segment data for display
   const formatSegmentDisplay = () => {
     if (!segmentData?.total_players) return "";
-    return `All Users (${segmentData.total_players})`;
+    return `All Users ${segmentData.total_players}`;
   };
 
   return (

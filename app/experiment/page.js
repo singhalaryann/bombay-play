@@ -66,11 +66,11 @@ export default function ExperimentPage() {
   // Fetch all details in parallel
   useEffect(() => {
     const fetchAllDetails = async () => {
-      if (!experimentData) return;  // <-- Add early return
-     // Only set loading for initial data fetch, not slider updates
-     if (!segmentData || !offerData) {
-      setLoading(true);
-    }
+      if (!experimentData) return; // <-- Add early return
+      // Only set loading for initial data fetch, not slider updates
+      if (!segmentData || !offerData) {
+        setLoading(true);
+      }
       console.log("Fetching additional details for experiment");
 
       try {
@@ -165,14 +165,24 @@ export default function ExperimentPage() {
 
   const handleLaunchExperiment = async () => {
     try {
+      console.log("Current experiment status:", experimentData?.status);
       if (experimentData.status !== "active") {
         console.log("Cannot launch: Experiment is not active");
         setError("Cannot launch experiment: Status is not active");
         return;
       }
 
-      const duration = experimentData.duration || 60; // Use experiment duration or default to 60
+      // Use duration from form (either default 7 days or user selected)
+      const duration = experimentData.duration || 7 * 24 * 60 * 60;
 
+      // Use split from either user slider change or keep initial API value
+      const split = experimentData.split;
+
+      console.log("Launching experiment with:", {
+        duration,
+        split,
+        experiment_id: activeExperimentId,
+      });
       const response = await fetch(
         "https://set-experiment-q54hzgyghq-uc.a.run.app",
         {
@@ -192,10 +202,8 @@ export default function ExperimentPage() {
       console.log("Launch experiment response:", data);
 
       if (data.success) {
+        // Simply route to launch page, let it handle the next redirect
         router.push("/experiment-launch");
-        setTimeout(() => {
-          router.push("/components/experimentcontent");
-        }, 5000);
       }
     } catch (err) {
       console.error("Error launching experiment:", err);
@@ -220,20 +228,20 @@ export default function ExperimentPage() {
       splitValue
     );
 
-    setExperimentData(prev => ({
+    setExperimentData((prev) => ({
       ...prev,
       split: splitValue,
       groups: {
         ...prev.groups,
         control: {
           ...prev.groups?.control,
-          traffic_split: controlUsers
+          traffic_split: controlUsers,
         },
         A: {
           ...prev.groups?.A,
-          traffic_split: variantUsers
-        }
-      }
+          traffic_split: variantUsers,
+        },
+      },
     }));
   };
 
@@ -310,12 +318,12 @@ export default function ExperimentPage() {
                       offerData={offerData}
                     />
                     <div className={styles.buttonGroup}>
-                      <button
+                      {/* <button
                         className={styles.addVariantButton}
                         onClick={handleAddVariant}
                       >
                         + Add Variant
-                      </button>
+                      </button> */}
                       <button
                         className={styles.launchButton}
                         onClick={handleLaunchExperiment}

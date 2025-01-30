@@ -1,21 +1,22 @@
 .experimentSection {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
   width: 100%;
-  margin-top: 50px;
- }
- 
- .bundleContainer {
+  padding: 20px;
+}
+
+.bundleContainer {
   width: 100%;
   position: relative;
   border-radius: 16px;
   background: rgba(18, 18, 18, 0.7);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
- }
- 
- .bundleContainer::after {
+  overflow: hidden;
+}
+
+.bundleContainer::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -26,195 +27,147 @@
     rgba(255, 255, 255, 0.2),
     rgba(255, 255, 255, 0.05)
   );
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
- }
- 
- .bundleTitle {
-  font-size: 24px;
+}
+
+.bundleTitle {
+  font-size: 20px;
   font-weight: 500;
   color: #fff;
-  margin: 24px 24px 16px;
- }
- 
- .tableWrapper {
-  position: relative;
+  margin: 0;
+  padding: 20px;
+  background: rgba(22, 22, 22, 0.7);
+}
+
+.tableWrapper {
   width: 100%;
   overflow-x: auto;
- }
- 
- .bundleTable {
+}
+
+.bundleTable {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
+  border-collapse: collapse;
   font-size: 14px;
-  min-width: 650px;
- }
- 
- /* Header Styles */
- .headerRow {
-  background: rgba(39, 46, 36, 0.8);
- }
- 
- .headerRow th {
-  padding: 16px 24px;
+  color: #fff;
+}
+
+.headerRow {
+  background: rgba(22, 28, 21, 0.95);
+}
+
+.headerRow th {
+  padding: 16px 20px;
   text-align: left;
   color: #82FF83;
   font-weight: 500;
   font-size: 14px;
-  white-space: nowrap;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
- }
- 
- /* Table Body Styles */
- .glassEffect tr:first-child {
-  background: rgba(18, 18, 18, 0.8);
- }
- 
- .glassEffect tr:last-child {
-  background: rgba(18, 18, 18, 0.4);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  position: relative;
- }
- 
- .glassEffect tr:last-child::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    -100deg,
-    rgba(255, 255, 255, 0.4),
-    rgba(255, 255, 255, 0.03)
-  );
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
- }
- 
- .glassEffect td {
-  padding: 16px 24px;
-  color: rgba(255, 255, 255, 0.9);
+}
+
+.glassEffect td {
+  padding: 16px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  position: relative;
-  z-index: 1;
- }
- 
- .glassEffect tr:last-child td {
-  border-bottom: none;
- }
- 
- .glassEffect tr td:first-child {
-  color: #82FF83;
+}
+
+.groupCell {
+  color: #82FF83 !important;
   font-weight: 500;
- }
- 
- /* Custom Scrollbar */
- .tableWrapper::-webkit-scrollbar {
+  width: 140px;
+  vertical-align: top;
+}
+
+.nameCell {
+  color: rgba(255, 255, 255, 0.9);
+  min-width: 120px;
+}
+
+.valueCell {
+  color: rgba(255, 255, 255, 0.9);
+  text-align: right;
+  width: 100px;
+}
+
+/* Loading, Error, Empty States */
+.loadingContainer,
+.errorContainer,
+.emptyContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  width: 100%;
+  background: rgba(18, 18, 18, 0.7);
+  border-radius: 16px;
+  color: #fff;
+}
+
+.loading,
+.error,
+.emptyMessage {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Scrollbar Styles */
+.tableWrapper::-webkit-scrollbar {
   height: 6px;
- }
- 
- .tableWrapper::-webkit-scrollbar-track {
+}
+
+.tableWrapper::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
- }
- 
- .tableWrapper::-webkit-scrollbar-thumb {
+}
+
+.tableWrapper::-webkit-scrollbar-thumb {
   background: rgba(130, 255, 131, 0.3);
   border-radius: 3px;
- }
- 
- .tableWrapper::-webkit-scrollbar-thumb:hover {
+}
+
+.tableWrapper::-webkit-scrollbar-thumb:hover {
   background: rgba(130, 255, 131, 0.5);
- }
- 
- /* Hover States */
- .glassEffect tr:hover {
-  background: rgba(130, 255, 131, 0.08);
- }
- 
- /* Responsive Styles */
- @media (max-width: 1280px) {
-  .bundleTitle {
-    font-size: 20px;
-    margin: 20px 20px 12px;
-  }
- 
-  .headerRow th,
-  .glassEffect td {
-    padding: 14px 20px;
-  }
- }
- 
- @media (max-width: 1024px) {
-  .bundleTable {
-    min-width: 700px;
-  }
- }
- 
- @media (max-width: 768px) {
+}
+
+/* Row Hover Effect */
+.glassEffect tr:hover {
+  background: rgba(130, 255, 131, 0.05);
+}
+
+@media (max-width: 768px) {
   .experimentSection {
     padding: 16px;
-    gap: 24px;
+    gap: 16px;
   }
- 
+  
   .bundleTitle {
     font-size: 18px;
-    margin: 16px 16px 12px;
+    padding: 16px;
   }
- 
+  
   .headerRow th,
   .glassEffect td {
     padding: 12px 16px;
     font-size: 13px;
   }
- 
-  .bundleTable {
-    min-width: 600px;
+  
+  .groupCell {
+    width: 120px;
   }
- }
- 
- @media (max-width: 480px) {
+}
+
+@media (max-width: 480px) {
+  .experimentSection {
+    padding: 12px;
+  }
+  
   .bundleContainer {
-    border-radius: 8px;
+    border-radius: 12px;
   }
- 
+  
   .bundleTitle {
     font-size: 16px;
-    margin: 12px 12px 8px;
+    padding: 14px;
   }
- 
-  .headerRow th,
-  .glassEffect td {
-    padding: 10px 12px;
-    font-size: 12px;
-  }
- 
-  .bundleTable {
-    min-width: 500px;
-  }
- }
- 
- /* Touch Device Optimizations */
- @media (hover: none) {
-  .glassEffect tr:hover {
-    background: inherit;
-  }
- 
-  .glassEffect tr:active {
-    background: rgba(130, 255, 131, 0.08);
-  }
- }
+}
