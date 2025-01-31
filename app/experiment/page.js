@@ -26,21 +26,26 @@ export default function ExperimentPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // CHANGED: We removed the original two separate useEffect calls and combined them here.
+  //          Now we only set `loading` once at the start, and turn it off at the end.
   useEffect(() => {
     let isSubscribed = true;
-    console.log("Starting experiment fetch with ID:", activeExperimentId);
 
-    const fetchExperimentDetails = async () => {
-      if (!activeExperimentId) {
-        setLoading(false);
-        return;
-      }
+    // CHANGED: Single async function to handle both experiment fetch & subsequent segment/offer fetch
+    const fetchAllData = async () => {
+      setLoading(true); // CHANGED: Only set loading once
+      setError(null);
 
       try {
-        setLoading(true);
-        setError(null);
+        if (!activeExperimentId) {
+          // If there's no active experiment, we can't fetch
+          setLoading(false);
+          return;
+        }
 
-        const response = await fetch(
+        // 1) Fetch the main experiment data
+        console.log("Starting experiment fetch with ID:", activeExperimentId);
+        const expResponse = await fetch(
           "https://get-experiment-q54hzgyghq-uc.a.run.app",
           {
             method: "POST",
@@ -49,65 +54,40 @@ export default function ExperimentPage() {
           }
         );
 
-        if (!response.ok) {
+        if (!expResponse.ok) {
           throw new Error(
-            `Failed to fetch experiment details: ${response.statusText}`
+            `Failed to fetch experiment details: ${expResponse.statusText}`
           );
         }
 
-        const data = await response.json();
-        if (!data.experiment) {
+        const expData = await expResponse.json();
+        if (!expData.experiment) {
           throw new Error("No experiment data received");
         }
 
+        // Set experiment data
         if (isSubscribed) {
-          console.log("Experiment Status:", data.experiment.status);
-          setExperimentData(data.experiment);
+          console.log("Experiment Status:", expData.experiment.status);
+          setExperimentData(expData.experiment);
         }
-      } catch (err) {
-        console.error("Error fetching experiment details:", err);
-        if (isSubscribed) {
-          setError(err.message);
-        }
-      } finally {
-        if (isSubscribed) {
-          setLoading(false);
-        }
-      }
-    };
 
-    fetchExperimentDetails();
-    return () => {
-      isSubscribed = false;
-    };
-  }, [activeExperimentId]);
-
-  useEffect(() => {
-    let isSubscribed = true;
-
-    const fetchAllDetails = async () => {
-      if (!experimentData) return;
-
-      try {
-        if (!segmentData || !offerData) {
-          setLoading(true);
-        }
-        setError(null);
-
+        // 2) Prepare to fetch segment/offers in parallel if needed
         const fetchPromises = [];
 
-        if (experimentData?.segment_id) {
+        if (expData.experiment?.segment_id) {
           fetchPromises.push(
             fetch("https://get-segment-q54hzgyghq-uc.a.run.app", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ segment_id: experimentData.segment_id }),
+              body: JSON.stringify({
+                segment_id: expData.experiment.segment_id,
+              }),
             })
           );
         }
 
-        const controlOfferId = experimentData.groups?.control?.offer_id;
-        const variantOfferId = experimentData.groups?.A?.offer_id;
+        const controlOfferId = expData.experiment.groups?.control?.offer_id;
+        const variantOfferId = expData.experiment.groups?.A?.offer_id;
 
         if (controlOfferId) {
           fetchPromises.push(
@@ -129,57 +109,67 @@ export default function ExperimentPage() {
           );
         }
 
-        if (fetchPromises.length === 0) {
-          setLoading(false);
-          return;
-        }
+        // 3) Fetch those in parallel (if there are any)
+        if (fetchPromises.length > 0) {
+          const responses = await Promise.all(fetchPromises);
+          responses.forEach((response, index) => {
+            if (!response.ok) {
+              throw new Error(`Failed to fetch data for request ${index + 1}`);
+            }
+          });
 
-        const responses = await Promise.all(fetchPromises);
-        responses.forEach((response, index) => {
-          if (!response.ok) {
-            throw new Error(`Failed to fetch data for request ${index + 1}`);
-          }
-        });
+          const responseData = await Promise.all(
+            responses.map((r) => r.json())
+          );
 
-        const responseData = await Promise.all(responses.map((r) => r.json()));
+          // 4) Map responses to the correct data sets
+          //    The first successful fetch might be segment if present,
+          //    followed by up to two offer fetches, depending on the order you pushed them.
 
-        if (isSubscribed) {
-          if (responseData[0]?.segment) {
-            setSegmentData(responseData[0].segment);
-          }
+          if (isSubscribed) {
+            // If the first fetchPromises was segment, it's responseData[0] if present
+            if (responseData[0]?.segment) {
+              setSegmentData(responseData[0].segment);
+            }
 
-          if (responseData.length === 3) {
-            const [, controlRes, variantRes] = responseData;
-            setOfferData({
-              control: {
-                ...controlRes.offer,
-                name: controlRes.offer?.name || "No Bundle Name",
-              },
-              variant: {
-                ...variantRes.offer,
-                name: variantRes.offer?.name || "No Bundle Name",
-              },
-            });
+            // If we have three fetches, that means segment + 2 offers
+            if (responseData.length === 3) {
+              const [, controlRes, variantRes] = responseData;
+              setOfferData({
+                control: {
+                  ...controlRes.offer,
+                  name: controlRes.offer?.name || "No Bundle Name",
+                },
+                variant: {
+                  ...variantRes.offer,
+                  name: variantRes.offer?.name || "No Bundle Name",
+                },
+              });
+            }
+            // NOTE: If you have a different array order or fewer fetches, adjust accordingly
           }
         }
       } catch (err) {
-        console.error("Error fetching details:", err);
+        console.error("Error fetching data:", err);
         if (isSubscribed) {
           setError(err.message);
         }
       } finally {
+        // CHANGED: Only clear loading once at the very end of the combined fetch
         if (isSubscribed) {
           setLoading(false);
         }
       }
     };
 
-    fetchAllDetails();
+    fetchAllData();
+
     return () => {
       isSubscribed = false;
     };
-  }, [experimentData]);
+  }, [activeExperimentId]); // CHANGED: No second effect here
 
+  // CHANGED: Removed the second useEffect altogether
   const handleTabClick = (experimentId) => {
     setActiveExperimentId(experimentId);
   };
@@ -283,17 +273,19 @@ export default function ExperimentPage() {
           <h2 className={styles.pageTitle}>Setting up Experiments</h2>
 
           <div className={styles.tabContainer}>
-            {experimentIds.map((expId, index) => (
-              <div
-                key={expId}
-                className={`${styles.tab} ${
-                  activeExperimentId === expId ? styles.activeTab : ""
-                }`}
-                onClick={() => handleTabClick(expId)}
-              >
-                Experiment {index + 1}
-              </div>
-            ))}
+            <div className={styles.tabHeader}>
+              {experimentIds.map((expId, index) => (
+                <button
+                  key={expId}
+                  className={`${styles.tab} ${
+                    activeExperimentId === expId ? styles.activeTab : ""
+                  }`}
+                  onClick={() => handleTabClick(expId)}
+                >
+                  Experiment {index + 1}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className={styles.tabUnderline}>
@@ -311,50 +303,44 @@ export default function ExperimentPage() {
           </div>
 
           <div className={styles.scrollableSection}>
-            <div className={styles.glassWrapper}>
-              {loading ? (
-                <div className={styles.loadingWrapper}>
-                  <div className={styles.loading}>Loading...</div>
+            {loading ? (
+              // Loading state without glass effect
+              <div className={styles.loadingWrapper}>
+                <div className={styles.loading}>Loading...</div>
+              </div>
+            ) : (
+              // Main content with glass effect
+              experimentData && (
+                <div className={styles.glassWrapper}>
+                  <ExperimentForm
+                    experimentData={experimentData}
+                    segmentData={segmentData}
+                    setExperimentData={setExperimentData}
+                    onSplitChange={handleSplitUpdate}
+                  />
+                  <VariantGroup
+                    experimentData={experimentData}
+                    offerData={offerData}
+                  />
+                  <div className={styles.buttonGroup}>
+                    <button
+                      className={styles.launchButton}
+                      onClick={handleLaunchExperiment}
+                      disabled={experimentData.status !== "pending"}
+                    >
+                      Launch Experiment
+                      <Image
+                        src="/experiment.png"
+                        alt="Launch"
+                        width={24}
+                        height={24}
+                        priority
+                      />
+                    </button>
+                  </div>
                 </div>
-              ) : (
-                experimentData && (
-                  <>
-                    <ExperimentForm
-                      experimentData={experimentData}
-                      segmentData={segmentData}
-                      setExperimentData={setExperimentData}
-                      onSplitChange={handleSplitUpdate}
-                    />
-                    <VariantGroup
-                      experimentData={experimentData}
-                      offerData={offerData}
-                    />
-                    <div className={styles.buttonGroup}>
-                      {/* <button
-                        className={styles.addVariantButton}
-                        onClick={handleAddVariant}
-                      >
-                        + Add Variant
-                      </button> */}
-                      <button
-                        className={styles.launchButton}
-                        onClick={handleLaunchExperiment}
-                        disabled={experimentData.status !== "pending"}
-                      >
-                        Launch Experiment
-                        <Image
-                          src="/experiment.png"
-                          alt="Launch"
-                          width={24}
-                          height={24}
-                          priority
-                        />
-                      </button>
-                    </div>
-                  </>
-                )
-              )}
-            </div>
+              )
+            )}
           </div>
         </main>
       </div>

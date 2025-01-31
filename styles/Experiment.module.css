@@ -1,4 +1,3 @@
-/* Experiment.module.css */
 .container {
   min-height: 100vh;
   background: #050505;
@@ -8,92 +7,79 @@
   flex-direction: column;
 }
 
-/* Main Layout */
 .mainLayout {
   display: flex;
   flex: 1;
-  /* This pushes the main content down below the Header */
 }
 
-/* Sidebar takes up some space; mainContent fills the rest */
 .mainContent {
   flex: 1;
   display: flex;
   flex-direction: column;
   padding: 24px 32px;
   background: #050505;
-  overflow: hidden; /* So we can control scrolling in the section below */
+  overflow: hidden;
 }
 
-/* Page Title */
 .pageTitle {
   font-size: 20px;
   font-weight: 600;
   margin-bottom: 16px;
 }
 
-/* Tabs container */
 .tabContainer {
   display: flex;
-  gap: 24px;
-  margin-bottom: 8px;
+  flex-direction: column;
+  width: 100%;
 }
 
-/* Individual tab */
+.tabHeader {
+  display: flex;
+  gap: 35px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 24px;
+}
+
 .tab {
   cursor: pointer;
-  padding: 8px 16px;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.7);
+  padding: 12px 0;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.6);
   position: relative;
   transition: color 0.2s ease;
+  background: none;
+  border: none;
 }
 
-/* Active tab: white background & black text */
 .activeTab {
   background: #82FF83;
   color: #000000;
   border-radius: 6px;
-  font-weight: 600;
-  position: relative;
+  padding: 8px 16px;
+  font-weight: 500;
 }
 
-/* White underline that sits below the tabs (entire row) */
-.tabUnderline {
+/* .tabUnderline {
   position: relative;
   height: 2px;
   width: 100%;
   background: rgba(255, 255, 255, 0.2);
   margin-bottom: 16px;
-}
+} */
 
-/* Active tab highlight bars (move these left values to align with each tab) */
-.activeUnderline1 {
+/* .activeUnderline {
   position: absolute;
-  left: 0;
-  width: 10px; /* adjust as needed */
-  height: 3px;
-  background: #82FF83; /* green line under tab */
-  transition: all 0.3s ease;
-}
-
-.activeUnderline2 {
-  position: absolute;
-  left: 128px; /* adjust to match the second tab's position */
-  width: 100px;
   height: 2px;
-  background: #82FF83; /* green line under tab */
+  background: #82FF83;
   transition: all 0.3s ease;
-}
+} */
 
-/* Scrollable area AFTER the underline */
 .scrollableSection {
   flex: 1;
   overflow-y: auto;
-  padding-bottom: 24px; /* add spacing at bottom */
+  padding-bottom: 24px;
 }
 
-/* Glass effect wrapper for ExperimentForm + VariantGroup */
 .glassWrapper {
   background: rgba(28, 28, 28, 0.4);
   border-radius: 12px;
@@ -103,30 +89,20 @@
   position: relative;
 }
 
-/* This creates the "border" effect around the glass container */
 .glassWrapper::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: 12px;
   padding: 1px;
-  background: linear-gradient(
-    -100deg,
-    rgba(255, 255, 255, 0.2),
-    rgba(255, 255, 255, 0.02)
-  );
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
+  background: linear-gradient(-100deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.02));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
 }
 
-/* Button Group */
 .buttonGroup {
   display: flex;
   justify-content: flex-end;
@@ -167,7 +143,38 @@
   background: #98ff98;
 }
 
-/* Responsive Styles */
+.launchButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.loadingWrapper {
+  width: 100%;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+}
+
+.errorWrapper {
+  width: 100%;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error {
+  color: #ff6b6b;
+  font-size: 16px;
+  text-align: center;
+}
+
 @media (max-width: 1280px) {
   .mainContent {
     padding: 20px 24px;
@@ -180,9 +187,6 @@
   }
   .tabContainer {
     gap: 16px;
-  }
-  .activeUnderline2 {
-    left: 100px; /* Adjust as needed on smaller screens */
   }
   .buttonGroup {
     flex-direction: column;
@@ -222,29 +226,14 @@
   }
   .tab {
     font-size: 13px;
+    padding: 6px 12px;
   }
-  .activeUnderline1,
-  .activeUnderline2 {
-    width: 70px; /* narrower underline on small screens */
+  .buttonGroup {
+    gap: 12px;
   }
   .addVariantButton,
   .launchButton {
     padding: 8px 16px;
     font-size: 13px;
   }
-}
-
-
-/* Loading States */
-.loadingWrapper {
-  width: 100%;
-  height: calc(100vh - 200px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.loading {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 16px;
 }
