@@ -8,72 +8,85 @@ export default function ExperimentContent({ userId }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    let isSubscribed = true;
+
     const fetchExperiments = async () => {
       if (!userId) {
-        setError("No user ID provided");
         setLoading(false);
         return;
       }
 
       try {
-        console.log("Fetching experiments for user:", userId);
-        const userExperimentsResponse = await fetch("https://get-user-experiments-q54hzgyghq-uc.a.run.app", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user_id: userId })
-        });
+        const userExperimentsResponse = await fetch(
+          "https://get-user-experiments-q54hzgyghq-uc.a.run.app",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: userId }),
+          }
+        );
+
+        if (!isSubscribed) return;
 
         if (!userExperimentsResponse.ok) {
           throw new Error("Failed to fetch user experiments");
         }
 
         const userExperiments = await userExperimentsResponse.json();
-        console.log("User experiments received:", userExperiments);
+
+        if (!isSubscribed) return;
 
         if (!userExperiments.experiment_ids?.length) {
-          console.log("No experiments found for user");
           setExperimentData([]);
           setLoading(false);
           return;
         }
 
-        const experimentsPromises = userExperiments.experiment_ids.map(async (id) => {
-          const response = await fetch("https://get-experiment-q54hzgyghq-uc.a.run.app", {
+        const experimentsPromises = userExperiments.experiment_ids.map((id) =>
+          fetch("https://get-experiment-q54hzgyghq-uc.a.run.app", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ experiment_id: id })
-          });
-
-          if (!response.ok) {
-            throw new Error(`Failed to fetch experiment ${id}`);
-          }
-
-          return response.json();
-        });
-
-        const experimentsResults = await Promise.all(experimentsPromises);
-        console.log("All experiments data:", experimentsResults);
-
-        // Filter active/complete experiments
-        const validExperiments = experimentsResults
-          .filter(exp => {
-            const status = exp.experiment?.status;
-            return status === "active" || status === "complete";
+            body: JSON.stringify({ experiment_id: id }),
+          }).then((response) => {
+            if (!response.ok) {
+              throw new Error(`Failed to fetch experiment ${id}`);
+            }
+            return response.json();
           })
-          .map(exp => exp.experiment);
+        );
 
-        console.log("Filtered valid experiments:", validExperiments);
+        const experimentsResults = await Promise.allSettled(
+          experimentsPromises
+        );
+
+        if (!isSubscribed) return;
+
+        const validExperiments = experimentsResults
+          .filter((result) => result.status === "fulfilled")
+          .map((result) => result.value.experiment)
+          .filter(
+            (exp) => exp?.status === "active" || exp?.status === "complete"
+          );
+
         setExperimentData(validExperiments);
         setError(null);
       } catch (err) {
-        console.error("Error fetching experiments:", err);
-        setError(err.message);
+        if (isSubscribed) {
+          console.error("Error fetching experiments:", err);
+          setError("Failed to load experiments");
+        }
       } finally {
-        setLoading(false);
+        if (isSubscribed) {
+          setLoading(false);
+        }
       }
     };
 
     fetchExperiments();
+
+    return () => {
+      isSubscribed = false;
+    };
   }, [userId]);
 
   if (loading) {
@@ -95,16 +108,18 @@ export default function ExperimentContent({ userId }) {
   if (experimentData.length === 0) {
     return (
       <div className={styles.emptyContainer}>
-        <div className={styles.emptyMessage}>No active or completed experiments found</div>
+        <div className={styles.emptyMessage}>
+          No active or completed experiments found
+        </div>
       </div>
     );
   }
 
-  // Helper function to render table rows for a group
   const renderGroupRows = (groupName, metrics) => {
+    if (!metrics) return null;
+
     return metrics.map((metric, index) => (
       <tr key={`${groupName}-${index}`}>
-        {/* Only show group name in first row of each group */}
         {index === 0 && (
           <td rowSpan={metrics.length} className={styles.groupCell}>
             {groupName}
@@ -120,16 +135,8 @@ export default function ExperimentContent({ userId }) {
     <div className={styles.experimentSection}>
       {experimentData.map((experiment) => (
         <div key={experiment._id} className={styles.bundleContainer}>
-          {/* Experiment Label as Title */}
           <h2 className={styles.bundleTitle}>{experiment.label}</h2>
 
-          {/* Status and Segment Info */}
-          {/* <div className={styles.experimentInfo}>
-            <span>Status: {experiment.status}</span>
-            <span>Segment: {experiment.segment_id}</span>
-          </div> */}
-
-          {/* Results Table */}
           <div className={styles.tableWrapper}>
             <table className={styles.bundleTable}>
               <thead>
@@ -140,14 +147,10 @@ export default function ExperimentContent({ userId }) {
                 </tr>
               </thead>
               <tbody className={styles.glassEffect}>
-                {/* Control Group Rows */}
-                {experiment.result?.control && 
-                  renderGroupRows('Control', experiment.result.control)
-                }
-                {/* Variant A Rows */}
-                {experiment.result?.A && 
-                  renderGroupRows('Variant A', experiment.result.A)
-                }
+                {experiment.result?.control &&
+                  renderGroupRows("Control", experiment.result.control)}
+                {experiment.result?.A &&
+                  renderGroupRows("Variant A", experiment.result.A)}
               </tbody>
             </table>
           </div>

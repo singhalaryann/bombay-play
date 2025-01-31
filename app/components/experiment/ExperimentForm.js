@@ -1,110 +1,141 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Image from "next/image";
 import styles from "../../../styles/ExperimentForm.module.css";
 
-const ExperimentForm = ({ 
-  experimentData, 
-  segmentData, 
+const ExperimentForm = ({
+  experimentData,
+  segmentData,
   setExperimentData,
-  onSplitChange 
+  onSplitChange,
 }) => {
+  // UPDATED: Better state initialization
   const [startDate, setStartDate] = useState(() => {
     const date = new Date();
-    date.setDate(date.getDate() + 7);
+    date.setDate(date.getDate() + 7); // Default to 7 days from now
     return date;
   });
-    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
-    // ADDED: Set default duration on mount
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [isLabelValid, setIsLabelValid] = useState(true); // NEW: Label validation state
+
+  // UPDATED: Cleanup and better initialization
   useEffect(() => {
-    if (!experimentData?.duration) {
-      // Convert default 7 days to seconds same way as handleDateChange
-      const selectedDay = 7;
-      const durationInSeconds = selectedDay * 24 * 60 * 60;
-      
-      console.log('Default selected days:', selectedDay);
-    console.log('Default duration converted to seconds:', durationInSeconds);
+    let isSubscribed = true;
 
-      setExperimentData(prev => ({
+    if (!experimentData?.duration && isSubscribed) {
+      const selectedDay = 7; // Default 7 days
+      const durationInSeconds = selectedDay * 24 * 60 * 60;
+
+      console.log("Default selected days:", selectedDay);
+      console.log("Default duration converted to seconds:", durationInSeconds);
+
+      setExperimentData((prev) => ({
         ...prev,
         duration: durationInSeconds,
-        split: prev?.split || experimentData?.split || 50
+        split: prev?.split || 50, // Default to 50% split if not set
       }));
     }
+
+    // Cleanup function
+    return () => {
+      isSubscribed = false;
+    };
   }, []);
-  
-  // Debug log for incoming data
+
+  // NEW: Click outside handler for calendar
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isCalendarOpen && !event.target.closest(".react-datepicker")) {
+        setIsCalendarOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isCalendarOpen]);
+
+  // Debug logging
   useEffect(() => {
     console.log("ExperimentForm - Current data:", {
       experimentData,
-      segmentData
+      segmentData,
     });
   }, [experimentData, segmentData]);
 
-  // UPDATED: Simplified date handling to use day directly as seconds
-  const handleDateChange = (date) => {
-    setStartDate(date);
-    setIsCalendarOpen(false);
-    
-    // Get the selected day directly
-    const selectedDay = date.getDate();
-    const durationInSeconds = selectedDay * 24 * 60 * 60;
-    
-    console.log('Selected days:', selectedDay);
-    console.log('Converted to seconds:', durationInSeconds);
-    
-    setExperimentData(prev => ({
-      ...prev,
-      duration: durationInSeconds
-    }));
-  };
+  // UPDATED: Enhanced date handling
+  const handleDateChange = useCallback(
+    (date) => {
+      if (!date) return;
 
-  // Handle experiment label change
-  const handleLabelChange = (e) => {
-    setExperimentData(prev => ({
-      ...prev,
-      label: e.target.value
-    }));
-  };
+      setStartDate(date);
+      setIsCalendarOpen(false);
 
-  // UPDATED: Enhanced traffic split handling with direct group updates
-  const handleSplitChange = (value) => {
-    const splitValue = Number(value);
-    console.log("Traffic split changed to:", splitValue);
-    
-    // Calculate traffic split for both groups based on total users
-    const totalUsers = segmentData?.total_players || 0;
-// Pure frontend calculation without state updates
-const controlUsers = Math.round((splitValue / 100) * totalUsers);
-const variantUsers = totalUsers - controlUsers;
+      const selectedDay = date.getDate();
+      const durationInSeconds = selectedDay * 24 * 60 * 60;
 
-    // Update experiment data with split and calculated users
-    setExperimentData(prev => ({
-      ...prev,
-      split: splitValue,
-      groups: {
-        ...prev.groups,
-        control: {
-          ...prev.groups?.control,
-          traffic_split: controlUsers
-        },
-        A: {
-          ...prev.groups?.A,
-          traffic_split: variantUsers
-        }
+      console.log("Selected days:", selectedDay);
+      console.log("Converted to seconds:", durationInSeconds);
+
+      setExperimentData((prev) => ({
+        ...prev,
+        duration: durationInSeconds,
+      }));
+    },
+    [setExperimentData]
+  );
+
+  // UPDATED: Enhanced label validation and change handler
+  const handleLabelChange = useCallback(
+    (e) => {
+      const value = e.target.value;
+      const isValid = value.length > 0 && value.length <= 100; // Basic validation
+
+      setIsLabelValid(isValid);
+      setExperimentData((prev) => ({
+        ...prev,
+        label: value,
+      }));
+    },
+    [setExperimentData]
+  );
+
+  // UPDATED: Enhanced split handling with validation
+  const handleSplitChange = useCallback(
+    (value) => {
+      const splitValue = Number(value);
+
+      if (isNaN(splitValue) || splitValue < 0 || splitValue > 100) {
+        console.error("Invalid split value:", value);
+        return;
       }
-    }));
-    onSplitChange(splitValue, controlUsers, variantUsers);
-  };
 
-  // Format segment data for display
-  const formatSegmentDisplay = () => {
-    if (!segmentData?.total_players) return "";
-    return `All Users ${segmentData.total_players}`;
-  };
+      console.log("Traffic split changed to:", splitValue);
+
+      // Calculate traffic split for both groups based on total users
+      const totalUsers = segmentData?.total_players || 0;
+      const controlUsers = Math.round((splitValue / 100) * totalUsers);
+      const variantUsers = totalUsers - controlUsers;
+
+      // Update experiment data
+      setExperimentData((prev) => ({
+        ...prev,
+        split: splitValue,
+      }));
+
+      // Notify parent component
+      onSplitChange(splitValue, controlUsers, variantUsers);
+    },
+    [segmentData, setExperimentData, onSplitChange]
+  );
+
+  // UPDATED: Enhanced segment display formatting
+  const formatSegmentDisplay = useCallback(() => {
+    if (!segmentData?.total_players) return "No users available";
+    return `All Users ${segmentData.total_players.toLocaleString()}`;
+  }, [segmentData]);
 
   return (
     <div className={styles.outerWrapper}>
@@ -115,14 +146,20 @@ const variantUsers = totalUsers - controlUsers;
           <label className={styles.label}>Experiment Label</label>
           <input
             type="text"
-            className={styles.input}
+            className={`${styles.input} ${
+              !isLabelValid ? styles.inputError : ""
+            }`}
             value={experimentData?.label || ""}
             onChange={handleLabelChange}
             placeholder="Enter experiment label"
+            maxLength={100}
           />
+          {!isLabelValid && (
+            <span className={styles.errorText}>Please enter a valid label</span>
+          )}
         </div>
 
-        {/* Duration with Calendar - UPDATED display logic */}
+        {/* Duration with Calendar */}
         <div className={styles.formGroup}>
           <label className={styles.label}>Experiment Duration</label>
           <div className={styles.durationWrapper}>
@@ -138,6 +175,7 @@ const variantUsers = totalUsers - controlUsers;
               className={styles.calendarButton}
               onClick={() => setIsCalendarOpen(!isCalendarOpen)}
               type="button"
+              aria-label="Open calendar"
             >
               <Image
                 src="/calender.png"
@@ -164,9 +202,7 @@ const variantUsers = totalUsers - controlUsers;
 
       {/* Segment Information */}
       <div className={styles.formGroup}>
-        <label className={styles.label}>
-          Users 
-        </label>
+        <label className={styles.label}>Users</label>
         <input
           type="text"
           className={styles.input}
@@ -178,16 +214,14 @@ const variantUsers = totalUsers - controlUsers;
 
       {/* Traffic Split Slider */}
       <div className={styles.formGroup}>
-        <label className={styles.label}>
-          Traffic Split 
-        </label>
+        <label className={styles.label}>Traffic Split</label>
         <div className={styles.sliderContainer}>
           <div className={styles.sliderBox}>
             <div className={styles.sliderTrack}>
               <div
                 className={styles.sliderFill}
                 style={{
-                  width: `${experimentData?.split || 0}%`
+                  width: `${experimentData?.split || 0}%`,
                 }}
               />
             </div>
@@ -198,11 +232,12 @@ const variantUsers = totalUsers - controlUsers;
               value={experimentData?.split || 0}
               onChange={(e) => handleSplitChange(e.target.value)}
               className={styles.slider}
+              aria-label="Traffic split percentage"
             />
             <div
               className={styles.sliderBubble}
               style={{
-                left: `calc(${experimentData?.split || 0}% - 15px)`
+                left: `calc(${experimentData?.split || 0}% - 15px)`,
               }}
             >
               {experimentData?.split || 0}%
@@ -217,12 +252,6 @@ const variantUsers = totalUsers - controlUsers;
             <span>100%</span>
           </div>
         </div>
-        {/* Real-time split display */}
-        {/* <div className={styles.splitInfo}>
-          Control Group: {Math.round((experimentData?.split || 0) * (segmentData?.total_players || 0) / 100)} users
-          <br />
-          Variant A: {Math.round((100 - (experimentData?.split || 0)) * (segmentData?.total_players || 0) / 100)} users
-        </div> */}
       </div>
     </div>
   );

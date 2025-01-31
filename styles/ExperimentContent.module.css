@@ -100,7 +100,6 @@
   align-items: center;
   min-height: 200px;
   width: 100%;
-  background: rgba(18, 18, 18, 0.7);
   border-radius: 16px;
   color: #fff;
 }
@@ -135,23 +134,24 @@
   background: rgba(130, 255, 131, 0.05);
 }
 
+/* Responsive Styles */
 @media (max-width: 768px) {
   .experimentSection {
     padding: 16px;
     gap: 16px;
   }
-  
+
   .bundleTitle {
     font-size: 18px;
     padding: 16px;
   }
-  
+
   .headerRow th,
   .glassEffect td {
     padding: 12px 16px;
     font-size: 13px;
   }
-  
+
   .groupCell {
     width: 120px;
   }
@@ -161,11 +161,11 @@
   .experimentSection {
     padding: 12px;
   }
-  
+
   .bundleContainer {
     border-radius: 12px;
   }
-  
+
   .bundleTitle {
     font-size: 16px;
     padding: 14px;

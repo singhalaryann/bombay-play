@@ -17,9 +17,8 @@ export default function ExperimentPage() {
   const idsParam = searchParams.get("ids");
   const experimentIds = idsParam ? idsParam.split(",") : [];
 
-  // State management
   const [activeExperimentId, setActiveExperimentId] = useState(
-    experimentIds[0]
+    experimentIds[0] || null
   );
   const [experimentData, setExperimentData] = useState(null);
   const [segmentData, setSegmentData] = useState(null);
@@ -27,14 +26,19 @@ export default function ExperimentPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch experiment details when active ID changes
   useEffect(() => {
+    let isSubscribed = true;
+    console.log("Starting experiment fetch with ID:", activeExperimentId);
+
     const fetchExperimentDetails = async () => {
-      if (!activeExperimentId) return;
+      if (!activeExperimentId) {
+        setLoading(false);
+        return;
+      }
 
       try {
         setLoading(true);
-        console.log("Fetching details for experiment:", activeExperimentId);
+        setError(null);
 
         const response = await fetch(
           "https://get-experiment-q54hzgyghq-uc.a.run.app",
@@ -45,38 +49,53 @@ export default function ExperimentPage() {
           }
         );
 
-        if (!response.ok) throw new Error("Failed to fetch experiment details");
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch experiment details: ${response.statusText}`
+          );
+        }
 
         const data = await response.json();
-        if (!data.experiment) throw new Error("No experiment data received");
+        if (!data.experiment) {
+          throw new Error("No experiment data received");
+        }
 
-        console.log("Received experiment data:", data.experiment);
-        setExperimentData(data.experiment);
-        setError(null);
+        if (isSubscribed) {
+          console.log("Experiment Status:", data.experiment.status);
+          setExperimentData(data.experiment);
+        }
       } catch (err) {
         console.error("Error fetching experiment details:", err);
-        setError(err.message);
+        if (isSubscribed) {
+          setError(err.message);
+        }
+      } finally {
+        if (isSubscribed) {
+          setLoading(false);
+        }
       }
     };
 
     fetchExperimentDetails();
+    return () => {
+      isSubscribed = false;
+    };
   }, [activeExperimentId]);
 
-  // Fetch all details in parallel
-  // Fetch all details in parallel
   useEffect(() => {
+    let isSubscribed = true;
+
     const fetchAllDetails = async () => {
-      if (!experimentData) return; // <-- Add early return
-      // Only set loading for initial data fetch, not slider updates
-      if (!segmentData || !offerData) {
-        setLoading(true);
-      }
-      console.log("Fetching additional details for experiment");
+      if (!experimentData) return;
 
       try {
+        if (!segmentData || !offerData) {
+          setLoading(true);
+        }
+        setError(null);
+
         const fetchPromises = [];
 
-        // Add segment fetch
         if (experimentData?.segment_id) {
           fetchPromises.push(
             fetch("https://get-segment-q54hzgyghq-uc.a.run.app", {
@@ -87,10 +106,9 @@ export default function ExperimentPage() {
           );
         }
 
-        // Add offer fetches for both groups
-        // CHANGED: now we grab the top-level offer_id instead of inside groups
-        // Now we grab the offer IDs from each group (control, A) instead of the top level
         const controlOfferId = experimentData.groups?.control?.offer_id;
+        const variantOfferId = experimentData.groups?.A?.offer_id;
+
         if (controlOfferId) {
           fetchPromises.push(
             fetch("https://get-offer-q54hzgyghq-uc.a.run.app", {
@@ -101,7 +119,6 @@ export default function ExperimentPage() {
           );
         }
 
-        const variantOfferId = experimentData.groups?.A?.offer_id;
         if (variantOfferId) {
           fetchPromises.push(
             fetch("https://get-offer-q54hzgyghq-uc.a.run.app", {
@@ -118,71 +135,76 @@ export default function ExperimentPage() {
         }
 
         const responses = await Promise.all(fetchPromises);
-
-        responses.forEach((response) => {
-          if (!response.ok) throw new Error("Failed to fetch data");
+        responses.forEach((response, index) => {
+          if (!response.ok) {
+            throw new Error(`Failed to fetch data for request ${index + 1}`);
+          }
         });
 
         const responseData = await Promise.all(responses.map((r) => r.json()));
 
-        // First response is always segment data
-        setSegmentData(responseData[0].segment);
+        if (isSubscribed) {
+          if (responseData[0]?.segment) {
+            setSegmentData(responseData[0].segment);
+          }
 
-        // Next responses are offer data
-        // Next response is the single top-level offer data (using topLevelOfferId)
-        // First item in responseData is the segment data
-        const segmentRes = responseData[0];
-        setSegmentData(segmentRes.segment);
-
-        // Next items (if present) are the control and variant offers
-        if (responseData.length === 3) {
-          const [, controlRes, variantRes] = responseData;
-          setOfferData({
-            control: controlRes.offer,
-            variant: variantRes.offer,
-          });
+          if (responseData.length === 3) {
+            const [, controlRes, variantRes] = responseData;
+            setOfferData({
+              control: {
+                ...controlRes.offer,
+                name: controlRes.offer?.name || "No Bundle Name",
+              },
+              variant: {
+                ...variantRes.offer,
+                name: variantRes.offer?.name || "No Bundle Name",
+              },
+            });
+          }
         }
-
-        setError(null);
       } catch (err) {
         console.error("Error fetching details:", err);
-        setError(err.message);
+        if (isSubscribed) {
+          setError(err.message);
+        }
       } finally {
-        setLoading(false);
+        if (isSubscribed) {
+          setLoading(false);
+        }
       }
     };
 
     fetchAllDetails();
+    return () => {
+      isSubscribed = false;
+    };
   }, [experimentData]);
 
   const handleTabClick = (experimentId) => {
     setActiveExperimentId(experimentId);
   };
 
-  const handleAddVariant = () => {
-    console.log("Add Variant clicked");
-  };
-
   const handleLaunchExperiment = async () => {
     try {
-      console.log("Current experiment status:", experimentData?.status);
-      if (experimentData.status !== "active") {
-        console.log("Cannot launch: Experiment is not active");
-        setError("Cannot launch experiment: Status is not active");
+      if (!experimentData) {
+        setError("Missing experiment data");
         return;
       }
 
-      // Use duration from form (either default 7 days or user selected)
-      const duration = experimentData.duration || 7 * 24 * 60 * 60;
+      // Check for pending status
+      if (experimentData.status !== "pending") {
+        setError("Cannot launch: Experiment must be in pending state");
+        return;
+      }
 
-      // Use split from either user slider change or keep initial API value
-      const split = experimentData.split;
+      if (!experimentData.split || !experimentData.duration) {
+        setError("Missing required split or duration values");
+        return;
+      }
 
-      console.log("Launching experiment with:", {
-        duration,
-        split,
-        experiment_id: activeExperimentId,
-      });
+      setLoading(true);
+      setError(null);
+
       const response = await fetch(
         "https://set-experiment-q54hzgyghq-uc.a.run.app",
         {
@@ -191,42 +213,33 @@ export default function ExperimentPage() {
           body: JSON.stringify({
             experiment_id: activeExperimentId,
             split: experimentData.split,
-            duration: duration,
+            duration: experimentData.duration,
           }),
         }
       );
 
-      if (!response.ok) throw new Error("Failed to launch experiment");
+      if (!response.ok) {
+        throw new Error("Failed to launch experiment");
+      }
 
       const data = await response.json();
-      console.log("Launch experiment response:", data);
+      console.log("Launch response:", data);
 
       if (data.success) {
-        // Simply route to launch page, let it handle the next redirect
         router.push("/experiment-launch");
+      } else {
+        throw new Error("Launch failed: No success confirmation");
       }
     } catch (err) {
-      console.error("Error launching experiment:", err);
+      console.error("Launch error:", err);
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const calculateTrafficSplit = (totalUsers, splitPercentage) => {
-    if (!totalUsers || !splitPercentage) return { control: 0, variant: 0 };
-
-    const controlUsers = Math.round((splitPercentage / 100) * totalUsers);
-    const variantUsers = totalUsers - controlUsers;
-
-    return { control: controlUsers, variant: variantUsers };
   };
 
   const handleSplitUpdate = (splitValue, controlUsers, variantUsers) => {
     if (!segmentData?.total_players) return;
-
-    const { control, variant } = calculateTrafficSplit(
-      segmentData.total_players,
-      splitValue
-    );
 
     setExperimentData((prev) => ({
       ...prev,
@@ -245,7 +258,6 @@ export default function ExperimentPage() {
     }));
   };
 
-  // Error and loading states remain the same
   if (error) {
     return (
       <div className={styles.container}>
@@ -327,7 +339,7 @@ export default function ExperimentPage() {
                       <button
                         className={styles.launchButton}
                         onClick={handleLaunchExperiment}
-                        disabled={experimentData.status !== "active"}
+                        disabled={experimentData.status !== "pending"}
                       >
                         Launch Experiment
                         <Image

@@ -6,14 +6,36 @@ const VariantGroup = ({ experimentData, offerData }) => {
   // Debug logging
   console.log("VariantGroup received props:", {
     experimentData,
-    offerData
+    offerData,
   });
-  // if (!experimentData?.groups) {
-  //   return <div>Loading variant data...</div>;
-  // }
+
+  // Basic validation check
+  if (!experimentData || !experimentData.groups) {
+    return (
+      <div className={styles.variantSection}>
+        <div className={styles.noVariants}>No experiment data available</div>
+      </div>
+    );
+  }
+
   const { control, A } = experimentData.groups;
 
   const renderVariantSection = (groupData, title, isControl = false) => {
+    if (!groupData) {
+      return (
+        <div className={styles.variantGroup}>
+          <div className={styles.variantTitleContainer}>
+            <span className={styles.variantTitle}>{title}</span>
+          </div>
+          <div className={styles.variantContent}>
+            <div className={styles.noData}>
+              No data available for this variant
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     const groupOfferData = isControl ? offerData?.control : offerData?.variant;
     const trafficSplit = groupData?.traffic_split || 0;
 
@@ -23,16 +45,14 @@ const VariantGroup = ({ experimentData, offerData }) => {
         <div className={styles.variantTitleContainer}>
           <span className={styles.variantTitle}>{title}</span>
         </div>
-
         <div className={styles.variantContent}>
           {/* Bundle Name */}
           <div className={styles.inputGroup}>
             <label className={styles.label}>Bundle Name</label>
-            {/* Bundle Name: now using the experiment’s label */}
             <input
               type="text"
               className={styles.input}
-              value={experimentData?.label || ""}
+              value={groupOfferData?.name || "No Bundle Name"}
               readOnly
             />
           </div>
@@ -43,7 +63,7 @@ const VariantGroup = ({ experimentData, offerData }) => {
             <input
               type="text"
               className={styles.input}
-              value={`${trafficSplit} users`}
+              value={`${trafficSplit.toLocaleString()} users`}
               readOnly
             />
           </div>
@@ -51,11 +71,10 @@ const VariantGroup = ({ experimentData, offerData }) => {
           {/* Offer ID */}
           <div className={styles.inputGroup}>
             <label className={styles.label}>Offer ID</label>
-            {/* Offer ID: now using the top-level experimentData.offer_id */}
             <input
               type="text"
               className={styles.input}
-              value={groupData?.offer_id || ""}
+              value={groupData?.offer_id || "No offer ID"}
               readOnly
             />
           </div>
@@ -72,18 +91,24 @@ const VariantGroup = ({ experimentData, offerData }) => {
               <tbody>
                 {groupOfferData?.items?.length > 0 ? (
                   groupOfferData.items.map((item, index) => (
-                    <tr key={`${item.name}-${index}`}>
-                      <td className={styles.tableCell}>{item.name}</td>
+                    <tr
+                      key={`${item.name}-${index}`}
+                      className={styles.tableRow}
+                    >
+                      <td className={styles.tableCell}>{item.name || "N/A"}</td>
                       <td
                         className={`${styles.tableCell} ${styles.quantityCell}`}
                       >
-                        {item.amount}
+                        {item.amount || 0}
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={2} className={styles.tableCell}>
+                    <td
+                      colSpan={2}
+                      className={`${styles.tableCell} ${styles.noItems}`}
+                    >
                       No items available
                     </td>
                   </tr>
@@ -96,20 +121,31 @@ const VariantGroup = ({ experimentData, offerData }) => {
     );
   };
 
-  return (
-    <div className={styles.variantSection}>
-      {/* Render Control Group */}
-      {control && renderVariantSection(control, "Control Group", true)}
+  try {
+    return (
+      <div className={styles.variantSection}>
+        {/* Render Control Group */}
+        {renderVariantSection(control, "Control Group", true)}
 
-      {/* Render Variant A */}
-      {A && renderVariantSection(A, "Variant A", false)}
+        {/* Render Variant A */}
+        {renderVariantSection(A, "Variant A", false)}
 
-      {/* Show message if no variants available */}
-      {!control && !A && (
-        <div className={styles.noVariants}>No variant groups available</div>
-      )}
-    </div>
-  );
+        {/* Show message if no variants available */}
+        {!control && !A && (
+          <div className={styles.noVariants}>No variant groups available</div>
+        )}
+      </div>
+    );
+  } catch (error) {
+    console.error("Error rendering VariantGroup:", error);
+    return (
+      <div className={styles.variantSection}>
+        <div className={styles.error}>
+          Error displaying variant groups. Please try again.
+        </div>
+      </div>
+    );
+  }
 };
 
 export default VariantGroup;
