@@ -1,19 +1,16 @@
-/* Main Layout */
 .outerWrapper {
   display: flex;
   flex-direction: column;
-  /* gap: 24px; */
   width: 100%;
 }
 
-/* Row Layout */
 .rowGroup {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
+  /* margin-bottom: 24px; */
 }
 
-/* Form Group */
 .formGroup {
   margin-bottom: 24px;
 }
@@ -22,7 +19,6 @@
   margin-bottom: 0;
 }
 
-/* Labels */
 .label {
   display: block;
   margin-bottom: 12px;
@@ -31,15 +27,7 @@
   font-weight: 500;
 }
 
-/* Inputs */
-/* Select Wrapper and Input styles */
-.selectWrapper {
-  position: relative;
-  width: 100%;
-}
-
-.input,
-select.input {
+.input {
   width: 100%;
   height: 48px;
   padding: 0 16px;
@@ -49,19 +37,6 @@ select.input {
   color: rgba(255, 255, 255, 0.9);
   font-size: 14px;
   transition: all 0.2s ease;
-  appearance: none;
-  -webkit-appearance: none;
-  cursor: pointer;
-}
-
-.selectArrow {
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: rgba(255, 255, 255, 0.6);
-  pointer-events: none;
-  font-size: 12px;
 }
 
 .input:focus {
@@ -70,7 +45,21 @@ select.input {
   box-shadow: 0 0 0 2px rgba(130, 255, 131, 0.1);
 }
 
-/* Duration Input */
+.input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.inputError {
+  border-color: #ff6b6b;
+}
+
+.errorText {
+  color: #ff6b6b;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
 .durationWrapper {
   position: relative;
 }
@@ -103,7 +92,6 @@ select.input {
   opacity: 1;
 }
 
-/* Calendar */
 .calendarContainer {
   position: absolute;
   top: calc(100% + 8px);
@@ -121,50 +109,7 @@ select.input {
   padding: 20px !important;
 }
 
-/* Calendar Customization */
-.calendar :global(.react-datepicker) {
-  background: transparent !important;
-  border: none !important;
-}
-
-.calendar :global(.react-datepicker__header) {
-  background: transparent !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-  padding-top: 0;
-}
-
-.calendar :global(.react-datepicker__current-month) {
-  color: white !important;
-  font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 12px;
-}
-
-.calendar :global(.react-datepicker__day-name),
-.calendar :global(.react-datepicker__day) {
-  color: rgba(255, 255, 255, 0.9) !important;
-  width: 36px !important;
-  height: 36px !important;
-  line-height: 36px !important;
-  margin: 2px !important;
-  border-radius: 4px !important;
-}
-
-.calendar :global(.react-datepicker__day:hover) {
-  background: rgba(130, 255, 131, 0.2) !important;
-}
-
-.calendar :global(.react-datepicker__day--selected) {
-  background: #82FF83 !important;
-  color: rgba(0, 0, 0, 0.9) !important;
-  font-weight: 500;
-}
-
-.calendar :global(.react-datepicker__day--disabled) {
-  color: rgba(255, 255, 255, 0.3) !important;
-}
-
-/* Slider */
+/* Slider Styles */
 .sliderContainer {
   padding-top: 24px;
 }
@@ -172,7 +117,7 @@ select.input {
 .sliderBox {
   position: relative;
   height: 4px;
-  margin: 8px 0;
+  margin: 8px 0 ;
 }
 
 .sliderTrack {
@@ -183,22 +128,6 @@ select.input {
   height: 4px;
   border-radius: 4px;
   background: rgba(255, 255, 255, 0.1);
-}
-
-.sliderTrack::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 5px;
-  background-image: repeating-linear-gradient(
-    90deg,
-    transparent,
-    transparent 9.5%,
-    rgba(255, 255, 255, 0.1) 9.5%,
-    rgba(255, 255, 255, 0.1) 10%
-  );  /* Changed to 10% intervals for ticks at every 10% */
-  pointer-events: none;
 }
 
 .sliderFill {
@@ -250,7 +179,6 @@ select.input {
   font-weight: 500;
   min-width: 28px;
   text-align: center;
-  z-index: 3;
 }
 
 .sliderLabels {
@@ -258,11 +186,10 @@ select.input {
   justify-content: space-between;
   color: rgba(255, 255, 255, 0.6);
   font-size: 12px;
-  margin-top: 16px;
   padding: 0 2px;
+  
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .rowGroup {
     grid-template-columns: 1fr;
@@ -293,8 +220,76 @@ select.input {
   }
 }
 
-.segmentDescription {
+/* Add this to calendar styles */
+.calendar {
+  background: rgba(39, 46, 36, 0.95) !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+ }
+ 
+ .calendar :global(.react-datepicker__month-container) {
+  background: transparent;
+ }
+ 
+ .calendar :global(.react-datepicker__header) {
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0 0 8px;
+ }
+ 
+ .calendar :global(.react-datepicker__day-names) {
   margin-top: 8px;
+ }
+ 
+ .calendar :global(.react-datepicker__current-month) {
+  color: rgba(255, 255, 255, 0.9);
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+ }
+ 
+ .calendar :global(.react-datepicker__day-name),
+ .calendar :global(.react-datepicker__day) {
+  color: rgba(255, 255, 255, 0.9) !important;
+  width: 32px !important;
+  height: 32px !important;
+  line-height: 32px !important;
+  margin: 2px !important;
+ }
+ 
+ .calendar :global(.react-datepicker__day:hover) {
+  background: rgba(130, 255, 131, 0.2);
+ }
+ 
+ .calendar :global(.react-datepicker__day--selected) {
+  background: #82FF83 !important;
+  color: #000 !important;
+  font-weight: 500;
+ }
+ 
+ /* Add slider ticks */
+ .sliderTrack {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sliderTrack::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 9.5%,
+    rgba(255, 255, 255, 0.1) 9.5%,
+    rgba(255, 255, 255, 0.1) 10%
+  );  /* Changed to 10% intervals for ticks at every 10% */
+  pointer-events: none;
 }

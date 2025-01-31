@@ -41,16 +41,17 @@ export default function AnalysisPage() {
   const [dynamicMetrics, setDynamicMetrics] = useState([]);
   const [dynamicGraphs, setDynamicGraphs] = useState([]);
 
-  // ------------------------------------------------------------------------
+  const [isNavigating, setIsNavigating] = useState(false); // Add this state
+
   // 1) Modified handleContinue to fetch experiment IDs using chatId
   //    and then pass them to /experiment in the URL.
-  // ------------------------------------------------------------------------
-  const handleContinue = async () => {
-    console.log("Continue button clicked – fetching experiment IDs.");
 
+  const handleContinue = async () => {
+    setIsNavigating(true); // Set loading state
     const chatId = searchParams.get("chat");
     if (!chatId) {
       console.error("No chatId found in the URL!");
+      setIsNavigating(false);
       return;
     }
 
@@ -80,11 +81,9 @@ export default function AnalysisPage() {
     } catch (err) {
       console.error("Error fetching experiment IDs:", err);
       setError("Failed to load experiments. Please try again."); // Show error to user
-      setLoading(false);
-      return;
+      setIsNavigating(false);
     }
   };
-  // ------------------------------------------------------------------------
 
   // Handle new metrics coming from the chat interface
   const handleMetricsUpdate = (newMetrics) => {
@@ -251,22 +250,23 @@ export default function AnalysisPage() {
               <div className={styles.rightPanel}>
                 {/* Continue button triggers handleContinue */}
                 <div className={styles.continueButtonContainer}>
-                  <button
-                    className={styles.continueButton}
-                    onClick={handleContinue}
-                  >
-                    <span>Continue</span>
-                    <div className={styles.iconWrapper}>
-                      <Image
-                        src="/Analyse_icon.svg"
-                        alt="Continue"
-                        width={24}
-                        height={24}
-                        className={styles.buttonIcon}
-                        priority
-                      />
-                    </div>
-                  </button>
+                <button
+ className={styles.continueButton}
+ onClick={handleContinue}
+ disabled={isNavigating}
+>
+ <span>{isNavigating ? 'Loading...' : 'Continue'}</span>
+ <div className={styles.iconWrapper}>
+   <Image
+     src="/Analyse_icon.svg"
+     alt="Continue"
+     width={24} 
+     height={24}
+     className={styles.buttonIcon}
+     priority
+   />
+ </div>
+</button>
                 </div>
 
                 {/* Show metrics (filter for single-value "metric" type) */}
