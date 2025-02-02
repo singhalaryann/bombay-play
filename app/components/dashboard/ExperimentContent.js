@@ -57,14 +57,20 @@ export default function ExperimentContent({ userId }) {
 
         const experimentsResults = await Promise.allSettled(experimentsPromises);
 
-        if (!isSubscribed) return;
+if (!isSubscribed) return;
 
-        const validExperiments = experimentsResults
-          .filter((result) => result.status === "fulfilled")
-          .map((result) => result.value.experiment)
-          .filter(
-            (exp) => exp?.status === "active" || exp?.status === "complete"
-          );
+console.log("Raw API Response:", experimentsResults);
+
+const validExperiments = experimentsResults
+  .filter((result) => result.status === "fulfilled")
+  .map((result) => {
+    console.log("Single result value:", result.value);
+    return result.value.experiment;
+  })
+  .filter((exp) => {
+    console.log("After mapping, single experiment:", exp);
+    return exp?.status === "active" || exp?.status === "complete";
+  });
 
         setExperimentData(validExperiments);
         setError(null);
