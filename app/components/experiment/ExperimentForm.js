@@ -24,7 +24,6 @@ const ExperimentForm = ({
   // UPDATED: Cleanup and better initialization
   useEffect(() => {
     let isSubscribed = true;
-
     if (!experimentData?.duration && isSubscribed) {
       const selectedDay = 7; // Default 7 days
       const durationInSeconds = selectedDay * 24 * 60 * 60;
@@ -64,6 +63,16 @@ const ExperimentForm = ({
       segmentData,
     });
   }, [experimentData, segmentData]);
+
+  // ADD NEW EFFECT HERE - After existing useEffects but before handlers
+  useEffect(() => {
+    if (experimentData?.split && segmentData?.total_players && !experimentData.groups?.control?.traffic_split) {
+      const totalUsers = segmentData.total_players;
+      const controlUsers = Math.round((experimentData.split / 100) * totalUsers);
+      const variantUsers = totalUsers - controlUsers;
+      onSplitChange(experimentData.split, controlUsers, variantUsers);
+    }
+  }, [experimentData?.split, segmentData?.total_players, onSplitChange, experimentData.groups]);
 
   // UPDATED: Enhanced date handling
   const handleDateChange = useCallback(

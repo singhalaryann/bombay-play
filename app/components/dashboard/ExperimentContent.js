@@ -55,9 +55,7 @@ export default function ExperimentContent({ userId }) {
           })
         );
 
-        const experimentsResults = await Promise.allSettled(
-          experimentsPromises
-        );
+        const experimentsResults = await Promise.allSettled(experimentsPromises);
 
         if (!isSubscribed) return;
 
@@ -115,47 +113,70 @@ export default function ExperimentContent({ userId }) {
     );
   }
 
-  const renderGroupRows = (groupName, metrics) => {
+  const getUniqueStatNames = (experiment) => {
+    if (!experiment?.result) return [];
+    const allStats = [];
+    if (experiment.result.control) {
+      allStats.push(...experiment.result.control.map(stat => stat.name));
+    }
+    if (experiment.result.A) {
+      allStats.push(...experiment.result.A.map(stat => stat.name));
+    }
+    return [...new Set(allStats)];
+  };
+
+  const renderGroupRow = (groupName, metrics, statNames) => {
     if (!metrics) return null;
 
-    return metrics.map((metric, index) => (
-      <tr key={`${groupName}-${index}`}>
-        {index === 0 && (
-          <td rowSpan={metrics.length} className={styles.groupCell}>
-            {groupName}
-          </td>
-        )}
-        <td className={styles.nameCell}>{metric.name}</td>
-        <td className={styles.valueCell}>{metric.value}</td>
+    return (
+      <tr>
+        <td className={styles.groupCell}>{groupName}</td>
+        {statNames.map(statName => {
+          const stat = metrics.find(m => m.name === statName);
+          return (
+            <td key={statName} className={styles.valueCell}>
+              {stat ? `${stat.value} ${stat.unit}` : '-'}
+            </td>
+          );
+        })}
       </tr>
-    ));
+    );
   };
 
   return (
     <div className={styles.experimentSection}>
-      {experimentData.map((experiment) => (
-        <div key={experiment._id} className={styles.bundleContainer}>
-          <h2 className={styles.bundleTitle}>{experiment.label}</h2>
+      {experimentData.map((experiment) => {
+        const statNames = getUniqueStatNames(experiment);
+        
+        return (
+          <div key={experiment._id} className={styles.bundleContainer}>
+            <h2 className={styles.bundleTitle}>{experiment.label}</h2>
 
-          <div className={styles.tableWrapper}>
-            <table className={styles.bundleTable}>
-              <thead>
-                <tr className={styles.headerRow}>
-                  <th>Test Group</th>
-                  <th>Name</th>
-                  <th>Value</th>
-                </tr>
-              </thead>
-              <tbody className={styles.glassEffect}>
-                {experiment.result?.control &&
-                  renderGroupRows("Control", experiment.result.control)}
-                {experiment.result?.A &&
-                  renderGroupRows("Variant A", experiment.result.A)}
-              </tbody>
-            </table>
+            <div className={styles.tableWrapper}>
+              <table className={styles.bundleTable}>
+                <thead>
+                  <tr className={styles.headerRow}>
+                    <th>Test Group</th>
+                    {statNames.map(statName => (
+                      <th key={statName}>{statName}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className={styles.glassEffect}>
+                  {experiment.result?.control &&
+                    renderGroupRow(
+                      "Control",
+                      experiment.result.control,
+                      statNames
+                    )}
+                  {experiment.result?.A &&
+                    renderGroupRow("Variant A", experiment.result.A, statNames)}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

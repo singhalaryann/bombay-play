@@ -1,9 +1,11 @@
 .experimentSection {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 32px;
   width: 100%;
-  padding: 20px;
+  padding: 32px;
+  /* background: rgb(13, 13, 13);
+  min-height: calc(100vh - 80px); */
 }
 
 .bundleContainer {
@@ -14,6 +16,8 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+              0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .bundleContainer::after {
@@ -23,9 +27,9 @@
   border-radius: 16px;
   padding: 1px;
   background: linear-gradient(
-    -100deg,
-    rgba(255, 255, 255, 0.2),
-    rgba(255, 255, 255, 0.05)
+      -100deg,
+      rgba(255, 255, 255, 0.2),
+      rgba(255, 255, 255, 0.05)
   );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -35,22 +39,25 @@
 }
 
 .bundleTitle {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 500;
   color: #fff;
   margin: 0;
-  padding: 20px;
+  padding: 24px;
   background: rgba(22, 22, 22, 0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .tableWrapper {
   width: 100%;
   overflow-x: auto;
+  padding: 4px;
 }
 
 .bundleTable {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 14px;
   color: #fff;
 }
@@ -60,35 +67,51 @@
 }
 
 .headerRow th {
-  padding: 16px 20px;
-  text-align: left;
+  padding: 16px 24px;
+  text-align: right;
   color: #82FF83;
   font-weight: 500;
   font-size: 14px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  white-space: nowrap;
+  background: rgba(22, 28, 21, 0.95);
+}
+
+.headerRow th:first-child {
+  text-align: left;
+  padding-left: 24px;
+  width: 180px;
 }
 
 .glassEffect td {
-  padding: 16px 20px;
+  padding: 16px 24px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(18, 18, 18, 0.3);
+  transition: background-color 0.2s ease;
+}
+
+.glassEffect tr:last-child td {
+  border-bottom: none;
 }
 
 .groupCell {
   color: #82FF83 !important;
   font-weight: 500;
-  width: 140px;
-  vertical-align: top;
-}
-
-.nameCell {
-  color: rgba(255, 255, 255, 0.9);
-  min-width: 120px;
+  padding-left: 24px !important;
+  text-align: left;
+  width: 180px;
+  white-space: nowrap;
 }
 
 .valueCell {
   color: rgba(255, 255, 255, 0.9);
   text-align: right;
-  width: 100px;
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+  min-width: 140px;
+  white-space: nowrap;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 /* Loading, Error, Empty States */
@@ -101,7 +124,30 @@
   min-height: 200px;
   width: 100%;
   border-radius: 16px;
-  color: #fff;
+  background: rgba(18, 18, 18, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  position: relative;
+}
+
+.loadingContainer::after,
+.errorContainer::after,
+.emptyContainer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  padding: 1px;
+  background: linear-gradient(
+      -100deg,
+      rgba(255, 255, 255, 0.2),
+      rgba(255, 255, 255, 0.05)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 .loading,
@@ -109,6 +155,9 @@
 .emptyMessage {
   font-size: 16px;
   color: rgba(255, 255, 255, 0.9);
+  padding: 24px;
+  text-align: center;
+  z-index: 1;
 }
 
 /* Scrollbar Styles */
@@ -118,11 +167,13 @@
 
 .tableWrapper::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
 }
 
 .tableWrapper::-webkit-scrollbar-thumb {
   background: rgba(130, 255, 131, 0.3);
   border-radius: 3px;
+  transition: background-color 0.2s ease;
 }
 
 .tableWrapper::-webkit-scrollbar-thumb:hover {
@@ -137,37 +188,57 @@
 /* Responsive Styles */
 @media (max-width: 768px) {
   .experimentSection {
-    padding: 16px;
-    gap: 16px;
+      padding: 24px;
+      gap: 24px;
   }
 
   .bundleTitle {
-    font-size: 18px;
-    padding: 16px;
+      padding: 20px;
   }
 
   .headerRow th,
   .glassEffect td {
-    padding: 12px 16px;
-    font-size: 13px;
+      padding: 14px 20px;
   }
 
+  .headerRow th:first-child,
   .groupCell {
-    width: 120px;
+      padding-left: 20px !important;
+      width: 140px;
+  }
+
+  .valueCell {
+      min-width: 120px;
   }
 }
 
 @media (max-width: 480px) {
   .experimentSection {
-    padding: 12px;
+      padding: 16px;
+      gap: 16px;
   }
 
-  .bundleContainer {
-    border-radius: 12px;
+  .bundleContainer,
+  .loadingContainer,
+  .errorContainer,
+  .emptyContainer {
+      border-radius: 12px;
   }
 
   .bundleTitle {
-    font-size: 16px;
-    padding: 14px;
+      padding: 16px;
+      font-size: 16px;
+  }
+
+  .headerRow th,
+  .glassEffect td {
+      padding: 12px 16px;
+      font-size: 13px;
+  }
+
+  .headerRow th:first-child,
+  .groupCell {
+      padding-left: 16px !important;
+      width: 120px;
   }
 }
