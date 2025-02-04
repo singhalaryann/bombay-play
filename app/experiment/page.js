@@ -138,7 +138,7 @@ export default function ExperimentPage() {
               setOfferData({
                 control: {
                   ...controlRes.offer,
-                  name: controlRes.offer?.name || "No Bundle Name",
+                  name: controlRes.offer?.offer_name || "No Bundle Name",
                 },
                 variant: {
                   ...variantRes.offer,

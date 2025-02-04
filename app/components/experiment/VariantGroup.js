@@ -52,7 +52,7 @@ const VariantGroup = ({ experimentData, offerData }) => {
             <input
               type="text"
               className={styles.input}
-              value={groupOfferData?.name || "No Bundle Name"}
+              value={groupOfferData?.offer_name || "No Bundle Name"}
               readOnly
             />
           </div>
