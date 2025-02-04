@@ -7,7 +7,7 @@ import styles from "../../../styles/ExperimentForm.module.css";
 
 const ExperimentForm = ({
   experimentData,
-  segmentData,
+  totalPlayers,  // Changed from segmentData
   setExperimentData,
   onSplitChange,
 }) => {
@@ -60,19 +60,18 @@ const ExperimentForm = ({
   useEffect(() => {
     console.log("ExperimentForm - Current data:", {
       experimentData,
-      segmentData,
-    });
-  }, [experimentData, segmentData]);
+      totalPlayers,    // Changed to totalPlayers
+      });
+  }, [experimentData, totalPlayers]);
 
   // ADD NEW EFFECT HERE - After existing useEffects but before handlers
-  useEffect(() => {
-    if (experimentData?.split && segmentData?.total_players && !experimentData.groups?.control?.traffic_split) {
-      const totalUsers = segmentData.total_players;
-      const controlUsers = Math.round((experimentData.split / 100) * totalUsers);
-      const variantUsers = totalUsers - controlUsers;
-      onSplitChange(experimentData.split, controlUsers, variantUsers);
-    }
-  }, [experimentData?.split, segmentData?.total_players, onSplitChange, experimentData.groups]);
+    useEffect(() => {
+      if (experimentData?.split && totalPlayers && !experimentData.groups?.control?.traffic_split) {
+        const controlUsers = Math.round((experimentData.split / 100) * totalPlayers);
+        const variantUsers = totalPlayers - controlUsers;
+        onSplitChange(experimentData.split, controlUsers, variantUsers);
+      }
+    }, [experimentData?.split, totalPlayers, onSplitChange, experimentData.groups]);
 
   // UPDATED: Enhanced date handling
   const handleDateChange = useCallback(
@@ -115,36 +114,32 @@ const ExperimentForm = ({
   const handleSplitChange = useCallback(
     (value) => {
       const splitValue = Number(value);
-
       if (isNaN(splitValue) || splitValue < 0 || splitValue > 100) {
         console.error("Invalid split value:", value);
         return;
       }
-
+  
       console.log("Traffic split changed to:", splitValue);
+  
+      // FIXED: Using totalPlayers prop instead of experimentData.total_players
+    const controlUsers = Math.round((splitValue / 100) * totalPlayers);
+    const variantUsers = totalPlayers - controlUsers;
 
-      // Calculate traffic split for both groups based on total users
-      const totalUsers = segmentData?.total_players || 0;
-      const controlUsers = Math.round((splitValue / 100) * totalUsers);
-      const variantUsers = totalUsers - controlUsers;
+    setExperimentData((prev) => ({
+      ...prev,
+      split: splitValue,
+    }));
 
-      // Update experiment data
-      setExperimentData((prev) => ({
-        ...prev,
-        split: splitValue,
-      }));
+    onSplitChange(splitValue, controlUsers, variantUsers);
+  },
+  [totalPlayers, setExperimentData, onSplitChange] // FIXED: Updated dependency array
+);
 
-      // Notify parent component
-      onSplitChange(splitValue, controlUsers, variantUsers);
-    },
-    [segmentData, setExperimentData, onSplitChange]
-  );
-
-  // UPDATED: Enhanced segment display formatting
+  // Update formatSegmentDisplay function
   const formatSegmentDisplay = useCallback(() => {
-    if (!segmentData?.total_players) return "No users available";
-    return `All Users ${segmentData.total_players.toLocaleString()}`;
-  }, [segmentData]);
+    if (!totalPlayers) return "No users available";
+    return `All Users ${totalPlayers.toLocaleString()}`;
+  }, [totalPlayers]);
 
   return (
     <div className={styles.outerWrapper}>

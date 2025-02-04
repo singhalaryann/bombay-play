@@ -21,24 +21,19 @@ export default function ExperimentPage() {
     experimentIds[0] || null
   );
   const [experimentData, setExperimentData] = useState(null);
-  const [segmentData, setSegmentData] = useState(null);
   const [offerData, setOfferData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // CHANGED: We removed the original two separate useEffect calls and combined them here.
-  //          Now we only set `loading` once at the start, and turn it off at the end.
   useEffect(() => {
     let isSubscribed = true;
 
-    // CHANGED: Single async function to handle both experiment fetch & subsequent segment/offer fetch
     const fetchAllData = async () => {
-      setLoading(true); // CHANGED: Only set loading once
+      setLoading(true);
       setError(null);
 
       try {
         if (!activeExperimentId) {
-          // If there's no active experiment, we can't fetch
           setLoading(false);
           return;
         }
@@ -71,24 +66,12 @@ export default function ExperimentPage() {
           setExperimentData(expData.experiment);
         }
 
-        // 2) Prepare to fetch segment/offers in parallel if needed
+        // 2) Prepare to fetch offers
         const fetchPromises = [];
-
-        if (expData.experiment?.segment_id) {
-          fetchPromises.push(
-            fetch("https://get-segment-q54hzgyghq-uc.a.run.app", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                segment_id: expData.experiment.segment_id,
-              }),
-            })
-          );
-        }
-
         const controlOfferId = expData.experiment.groups?.control?.offer_id;
         const variantOfferId = expData.experiment.groups?.A?.offer_id;
 
+        // CHANGED: Simplified offer fetching logic
         if (controlOfferId) {
           fetchPromises.push(
             fetch("https://get-offer-q54hzgyghq-uc.a.run.app", {
@@ -109,7 +92,7 @@ export default function ExperimentPage() {
           );
         }
 
-        // 3) Fetch those in parallel (if there are any)
+        // 3) Fetch offers in parallel
         if (fetchPromises.length > 0) {
           const responses = await Promise.all(fetchPromises);
           responses.forEach((response, index) => {
@@ -122,31 +105,19 @@ export default function ExperimentPage() {
             responses.map((r) => r.json())
           );
 
-          // 4) Map responses to the correct data sets
-          //    The first successful fetch might be segment if present,
-          //    followed by up to two offer fetches, depending on the order you pushed them.
-
-          if (isSubscribed) {
-            // If the first fetchPromises was segment, it's responseData[0] if present
-            if (responseData[0]?.segment) {
-              setSegmentData(responseData[0].segment);
-            }
-
-            // If we have three fetches, that means segment + 2 offers
-            if (responseData.length === 3) {
-              const [, controlRes, variantRes] = responseData;
-              setOfferData({
-                control: {
-                  ...controlRes.offer,
-                  name: controlRes.offer?.offer_name || "No Bundle Name",
-                },
-                variant: {
-                  ...variantRes.offer,
-                  name: variantRes.offer?.name || "No Bundle Name",
-                },
-              });
-            }
-            // NOTE: If you have a different array order or fewer fetches, adjust accordingly
+          // CHANGED: Simplified offer data mapping
+          if (isSubscribed && responseData.length === 2) {
+            const [controlRes, variantRes] = responseData;
+            setOfferData({
+              control: {
+                ...controlRes.offer,
+                name: controlRes.offer?.offer_name || "No Bundle Name", // CHANGED: Using offer_name
+              },
+              variant: {
+                ...variantRes.offer,
+                name: variantRes.offer?.offer_name || "No Bundle Name", // CHANGED: Using offer_name
+              },
+            });
           }
         }
       } catch (err) {
@@ -155,7 +126,6 @@ export default function ExperimentPage() {
           setError(err.message);
         }
       } finally {
-        // CHANGED: Only clear loading once at the very end of the combined fetch
         if (isSubscribed) {
           setLoading(false);
         }
@@ -167,7 +137,7 @@ export default function ExperimentPage() {
     return () => {
       isSubscribed = false;
     };
-  }, [activeExperimentId]); // CHANGED: No second effect here
+  }, [activeExperimentId]);
 
   // CHANGED: Removed the second useEffect altogether
   const handleTabClick = (experimentId) => {
@@ -229,7 +199,7 @@ export default function ExperimentPage() {
   };
 
   const handleSplitUpdate = (splitValue, controlUsers, variantUsers) => {
-    if (!segmentData?.total_players) return;
+    if (!experimentData?.total_players) return;
 
     setExperimentData((prev) => ({
       ...prev,
@@ -316,7 +286,7 @@ export default function ExperimentPage() {
                 <div className={styles.glassWrapper}>
                   <ExperimentForm
                     experimentData={experimentData}
-                    segmentData={segmentData}
+                    totalPlayers={experimentData?.total_players || 0}  // Changed: Pass total_players directly
                     setExperimentData={setExperimentData}
                     onSplitChange={handleSplitUpdate}
                   />
