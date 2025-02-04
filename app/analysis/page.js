@@ -62,7 +62,11 @@ export default function AnalysisPage() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ chat_id: chatId }),
+          body: JSON.stringify({
+            user_id: userId,  // Added user_id
+            chat_id: chatId,
+            segment_ids: ["1", "2"]  // Added segment_ids array
+             }),
         }
       );
 

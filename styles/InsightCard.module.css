@@ -1,98 +1,84 @@
-/* InsightCard.module.css */
 .card {
-  width: 100%;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.card:last-child {
-  border-bottom: none;
-}
-
-.content {
-  padding: 0px;
+  margin-bottom: 16px;
+ }
+ 
+ .content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 24px;
-}
-
-.messageWrapper {
+  padding: 8px;
+  /* background: rgba(28, 28, 28, 0.4); */
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  position: relative;
+ }
+ 
+ /* .content::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  padding: 1px;
+  background: linear-gradient(-100deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.02));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+ }
+  */
+ .messageWrapper {
   flex: 1;
-  min-width: 0;
-}
-
-.description {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 14px;
-  line-height: 1.4;
-}
-
-.bullet {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 16px;
-}
-
-.investigateButton {
+  margin-right: 16px;
+ }
+ 
+ .description {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 16px;
-  background: rgba(22, 163, 74, 0.15);
-  border: 1px solid #194D1A;
-  border-radius: 8px;
-  color: #82FF83;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 14px;
-  font-weight: 500;
+ }
+ 
+ .bullet {
+  color: #82FF83;
+  font-size: 24px;
+  line-height: 0;
+ }
+ 
+ .investigateButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(130, 255, 131, 0.1);
+  border: 1px solid #82FF83;
+  border-radius: 6px;
+  color: #82FF83;
+  font-size: 13px;
   cursor: pointer;
   transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.investigateButton:hover {
-  background: rgba(22, 163, 74, 0.25);
-}
-
-/* InsightCard.module.css */
-/* Previous styles remain unchanged, add these media queries */
-
-@media (max-width: 768px) {
+ }
+ 
+ .investigateButton:hover {
+  background: rgba(130, 255, 131, 0.2);
+ }
+ 
+ @media (max-width: 768px) {
   .content {
-    padding: 14px 0;
+    padding: 12px;
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
- 
+  
   .messageWrapper {
-    width: 100%;
+    margin-right: 0;
   }
- 
+  
   .investigateButton {
     width: 100%;
     justify-content: center;
-  }
- }
- 
- @media (max-width: 480px) {
-  .content {
-    padding: 12px 0;
-    gap: 10px;
-  }
- 
-  .description {
-    font-size: 13px;
-    gap: 8px;
-  }
- 
-  .bullet {
-    font-size: 14px;
-  }
- 
-  .investigateButton {
-    padding: 8px 12px;
-    font-size: 13px;
   }
  }

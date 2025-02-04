@@ -270,6 +270,7 @@ export default function ExperimentPage() {
       <div className={styles.mainLayout}>
         <Sidebar />
         <main className={styles.mainContent}>
+        <div className={styles.pageHeader}>
           <h2 className={styles.pageTitle}>Setting up Experiments</h2>
 
           <div className={styles.tabContainer}>
@@ -286,6 +287,7 @@ export default function ExperimentPage() {
                 </button>
               ))}
             </div>
+          </div>
           </div>
 
           <div className={styles.tabUnderline}>

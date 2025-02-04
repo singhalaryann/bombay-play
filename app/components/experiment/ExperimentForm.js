@@ -25,7 +25,7 @@ const ExperimentForm = ({
   useEffect(() => {
     let isSubscribed = true;
     if (!experimentData?.duration && isSubscribed) {
-      const selectedDay = 7; // Default 7 days
+      const selectedDay = startDate.getDate(); // Get actual selected days
       const durationInSeconds = selectedDay * 24 * 60 * 60;
 
       console.log("Default selected days:", selectedDay);

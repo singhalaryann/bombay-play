@@ -19,6 +19,14 @@
   padding: 24px 32px;
   background: #050505;
   overflow: hidden;
+  height: 100vh;  
+}
+.pageHeader {
+  position: sticky;
+  top: 0;
+  background: #050505;
+  z-index: 10;
+  padding-bottom: 16px;
 }
 
 .pageTitle {
@@ -78,6 +86,7 @@
   flex: 1;
   overflow-y: auto;
   padding-bottom: 24px;
+  margin-top: 8px;  
 }
 
 .glassWrapper {
