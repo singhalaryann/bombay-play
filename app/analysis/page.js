@@ -58,7 +58,7 @@ export default function AnalysisPage() {
     try {
       // Call the get-experiments API with chatId
       const response = await fetch(
-        "https://get-experiments-q54hzgyghq-uc.a.run.app",
+        "https://create-experiment-flnr5jia5q-uc.a.run.app",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
