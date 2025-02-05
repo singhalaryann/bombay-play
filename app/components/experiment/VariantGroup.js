@@ -18,7 +18,7 @@ const VariantGroup = ({ experimentData, offerData }) => {
     );
   }
 
-  const { control, A } = experimentData.groups;
+  const { control, variant } = experimentData.groups;
 
   const renderVariantSection = (groupData, title, isControl = false) => {
     if (!groupData) {
@@ -128,10 +128,10 @@ const VariantGroup = ({ experimentData, offerData }) => {
         {renderVariantSection(control, "Control Group", true)}
 
         {/* Render Variant A */}
-        {renderVariantSection(A, "Variant A", false)}
+        {renderVariantSection(variant, "Variant A", false)}
 
         {/* Show message if no variants available */}
-        {!control && !A && (
+        {!control && !variant && (
           <div className={styles.noVariants}>No variant groups available</div>
         )}
       </div>

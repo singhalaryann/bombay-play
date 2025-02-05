@@ -69,7 +69,7 @@ export default function ExperimentPage() {
         // 2) Prepare to fetch offers
         const fetchPromises = [];
         const controlOfferId = expData.experiment.groups?.control?.offer_id;
-        const variantOfferId = expData.experiment.groups?.A?.offer_id;
+        const variantOfferId = expData.experiment.groups?.variant?.offer_id;
 
         // CHANGED: Simplified offer fetching logic
         if (controlOfferId) {
@@ -106,19 +106,34 @@ export default function ExperimentPage() {
           );
 
           // CHANGED: Simplified offer data mapping
-          if (isSubscribed && responseData.length === 2) {
-            const [controlRes, variantRes] = responseData;
-            setOfferData({
-              control: {
-                ...controlRes.offer,
-                name: controlRes.offer?.offer_name || "No Bundle Name", // CHANGED: Using offer_name
-              },
-              variant: {
-                ...variantRes.offer,
-                name: variantRes.offer?.offer_name || "No Bundle Name", // CHANGED: Using offer_name
-              },
-            });
-          }
+        // CHANGED: Simplified offer data mapping
+if (isSubscribed) {
+  const newOfferData = {};
+
+  // If controlOfferId is present, assume the first fetch promise corresponds to it
+  if (controlOfferId) {
+    const controlRes = responseData[0];
+    newOfferData.control = {
+      ...controlRes.offer,
+      name: controlRes.offer?.offer_name || "No Bundle Name",
+    };
+  }
+
+  // If variantOfferId is present, figure out which response index to use
+  // (index 1 if both control and variant exist, otherwise index 0)
+  if (variantOfferId) {
+    const variantIndex = controlOfferId ? 1 : 0;
+    const variantRes = responseData[variantIndex];
+    newOfferData.variant = {
+      ...variantRes.offer,
+      name: variantRes.offer?.offer_name || "No Bundle Name",
+    };
+  }
+
+  // Updated part: now handles cases where only one offer_id exists
+  setOfferData(newOfferData);
+}
+
         }
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -200,7 +215,7 @@ export default function ExperimentPage() {
 
   const handleSplitUpdate = (splitValue, controlUsers, variantUsers) => {
     if (!experimentData?.total_players) return;
-
+  
     setExperimentData((prev) => ({
       ...prev,
       split: splitValue,
@@ -210,14 +225,15 @@ export default function ExperimentPage() {
           ...prev.groups?.control,
           traffic_split: controlUsers,
         },
-        A: {
-          ...prev.groups?.A,
+        // Updated part: replaced "A" with "variant" to match the real group name
+        variant: {
+          ...prev.groups?.variant,
           traffic_split: variantUsers,
         },
       },
     }));
   };
-
+  
   if (error) {
     return (
       <div className={styles.container}>

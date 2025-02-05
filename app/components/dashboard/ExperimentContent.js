@@ -125,8 +125,8 @@ const validExperiments = experimentsResults
     if (experiment.result.control) {
       allStats.push(...experiment.result.control.map(stat => stat.name));
     }
-    if (experiment.result.A) {
-      allStats.push(...experiment.result.A.map(stat => stat.name));
+    if (experiment.result.variant) {
+      allStats.push(...experiment.result.variant.map(stat => stat.name));
     }
     return [...new Set(allStats)];
   };
@@ -175,8 +175,8 @@ const validExperiments = experimentsResults
                       experiment.result.control,
                       statNames
                     )}
-                  {experiment.result?.A &&
-                    renderGroupRow("Variant A", experiment.result.A, statNames)}
+                  {experiment.result?.variant &&
+                    renderGroupRow("Variant A", experiment.result.variant, statNames)}
                 </tbody>
               </table>
             </div>
