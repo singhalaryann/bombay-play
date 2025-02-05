@@ -106,34 +106,33 @@ export default function ExperimentPage() {
           );
 
           // CHANGED: Simplified offer data mapping
-        // CHANGED: Simplified offer data mapping
-if (isSubscribed) {
-  const newOfferData = {};
+          // CHANGED: Simplified offer data mapping
+          if (isSubscribed) {
+            const newOfferData = {};
 
-  // If controlOfferId is present, assume the first fetch promise corresponds to it
-  if (controlOfferId) {
-    const controlRes = responseData[0];
-    newOfferData.control = {
-      ...controlRes.offer,
-      name: controlRes.offer?.offer_name || "No Bundle Name",
-    };
-  }
+            // If controlOfferId is present, assume the first fetch promise corresponds to it
+            if (controlOfferId) {
+              const controlRes = responseData[0];
+              newOfferData.control = {
+                ...controlRes.offer,
+                name: controlRes.offer?.offer_name || "No Bundle Name",
+              };
+            }
 
-  // If variantOfferId is present, figure out which response index to use
-  // (index 1 if both control and variant exist, otherwise index 0)
-  if (variantOfferId) {
-    const variantIndex = controlOfferId ? 1 : 0;
-    const variantRes = responseData[variantIndex];
-    newOfferData.variant = {
-      ...variantRes.offer,
-      name: variantRes.offer?.offer_name || "No Bundle Name",
-    };
-  }
+            // If variantOfferId is present, figure out which response index to use
+            // (index 1 if both control and variant exist, otherwise index 0)
+            if (variantOfferId) {
+              const variantIndex = controlOfferId ? 1 : 0;
+              const variantRes = responseData[variantIndex];
+              newOfferData.variant = {
+                ...variantRes.offer,
+                name: variantRes.offer?.offer_name || "No Bundle Name",
+              };
+            }
 
-  // Updated part: now handles cases where only one offer_id exists
-  setOfferData(newOfferData);
-}
-
+            // Updated part: now handles cases where only one offer_id exists
+            setOfferData(newOfferData);
+          }
         }
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -161,6 +160,8 @@ if (isSubscribed) {
 
   const handleLaunchExperiment = async () => {
     try {
+      console.log("Starting launch for experiments:", experimentIds);
+
       if (!experimentData) {
         setError("Missing experiment data");
         return;
@@ -180,30 +181,34 @@ if (isSubscribed) {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(
-        "https://set-experiment-q54hzgyghq-uc.a.run.app",
-        {
+      // NEW: Launch all experiments in parallel
+      const launchPromises = experimentIds.map((id) => {
+        console.log(
+          `Attempting to launch ID: ${id} with split:${experimentData.split}, duration:${experimentData.duration}`
+        );
+        return fetch("https://set-experiment-q54hzgyghq-uc.a.run.app", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            experiment_id: activeExperimentId,
+            experiment_id: id,
             split: experimentData.split,
             duration: experimentData.duration,
           }),
-        }
-      );
+        });
+      });
 
-      if (!response.ok) {
-        throw new Error("Failed to launch experiment");
-      }
+      // NEW: Wait for all launches to complete
+      const responses = await Promise.all(launchPromises);
+      const results = await Promise.all(responses.map((r) => r.json()));
+      console.log("Launch results:", results);
 
-      const data = await response.json();
-      console.log("Launch response:", data);
+      // NEW: Check if all experiments launched successfully
+      const allSuccessful = results.every((data) => data.success);
 
-      if (data.success) {
+      if (allSuccessful) {
         router.push("/experiment-launch");
       } else {
-        throw new Error("Launch failed: No success confirmation");
+        throw new Error("One or more experiments failed to launch");
       }
     } catch (err) {
       console.error("Launch error:", err);
@@ -212,10 +217,9 @@ if (isSubscribed) {
       setLoading(false);
     }
   };
-
   const handleSplitUpdate = (splitValue, controlUsers, variantUsers) => {
     if (!experimentData?.total_players) return;
-  
+
     setExperimentData((prev) => ({
       ...prev,
       split: splitValue,
@@ -233,7 +237,7 @@ if (isSubscribed) {
       },
     }));
   };
-  
+
   if (error) {
     return (
       <div className={styles.container}>
@@ -256,24 +260,24 @@ if (isSubscribed) {
       <div className={styles.mainLayout}>
         <Sidebar />
         <main className={styles.mainContent}>
-        <div className={styles.pageHeader}>
-          <h2 className={styles.pageTitle}>Setting up Experiments</h2>
+          <div className={styles.pageHeader}>
+            <h2 className={styles.pageTitle}>Setting up Experiments</h2>
 
-          <div className={styles.tabContainer}>
-            <div className={styles.tabHeader}>
-              {experimentIds.map((expId, index) => (
-                <button
-                  key={expId}
-                  className={`${styles.tab} ${
-                    activeExperimentId === expId ? styles.activeTab : ""
-                  }`}
-                  onClick={() => handleTabClick(expId)}
-                >
-                  Experiment {index + 1}
-                </button>
-              ))}
+            <div className={styles.tabContainer}>
+              <div className={styles.tabHeader}>
+                {experimentIds.map((expId, index) => (
+                  <button
+                    key={expId}
+                    className={`${styles.tab} ${
+                      activeExperimentId === expId ? styles.activeTab : ""
+                    }`}
+                    onClick={() => handleTabClick(expId)}
+                  >
+                    Experiment {index + 1}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
           </div>
 
           <div className={styles.tabUnderline}>
@@ -302,7 +306,7 @@ if (isSubscribed) {
                 <div className={styles.glassWrapper}>
                   <ExperimentForm
                     experimentData={experimentData}
-                    totalPlayers={experimentData?.total_players || 0}  // Changed: Pass total_players directly
+                    totalPlayers={experimentData?.total_players || 0} // Changed: Pass total_players directly
                     setExperimentData={setExperimentData}
                     onSplitChange={handleSplitUpdate}
                   />
