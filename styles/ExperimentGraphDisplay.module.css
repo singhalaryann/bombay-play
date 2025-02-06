@@ -1,0 +1,145 @@
+/* ExperimentGraphDisplay.module.css */
+.analyticsContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 16px;
+ }
+ 
+ .section {
+  background: rgba(22, 28, 21, 0.95);
+  border-radius: 16px;
+  padding: 24px;
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+ }
+ 
+ .section::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  padding: 1px;
+  background: linear-gradient(-100deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));  /* White gradient */
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+ }
+ 
+ .glassEffect {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: rgba(22, 28, 21, 0.8);
+  padding: 16px;
+  border-radius: 12px;
+ }
+ 
+ .chartTitle {
+  font-size: 18px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+ }
+ 
+ .customTooltip {
+  background: rgba(22, 28, 21, 0.98);
+  border: 1px solid rgba(130, 255, 131, 0.2);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(8px);
+ }
+ 
+ /* Legend styles */
+ .section :global(.recharts-default-legend) {
+  margin-top: 16px !important;
+  padding: 0 !important;
+ }
+ 
+ .section :global(.recharts-legend-item) {
+  padding: 0 12px !important;
+ }
+ 
+ .section :global(.recharts-legend-item-text) {
+  color: rgba(255, 255, 255, 0.9) !important;
+  margin-left: 8px !important;
+ }
+ 
+ /* Graph background */
+ .section :global(.recharts-surface) {
+  background: rgba(22, 28, 21, 0.95);
+  border-radius: 8px;
+ }
+ 
+ /* Responsive */
+ @media (max-width: 1280px) {
+  .analyticsContainer {
+    padding: 12px;
+  }
+  
+  .section {
+    padding: 20px;
+    min-height: 380px;
+  }
+  
+  .chartTitle {
+    font-size: 16px;
+  }
+ }
+ 
+ @media (max-width: 768px) {
+  .analyticsContainer {
+    padding: 8px;
+    gap: 16px;
+  }
+  
+  .section {
+    padding: 16px;
+    min-height: 340px;
+  }
+  
+  .chartTitle {
+    font-size: 15px;
+  }
+  
+  .customTooltip {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+ }
+ 
+ @media (max-width: 480px) {
+  .analyticsContainer {
+    padding: 4px;
+    gap: 12px;
+  }
+  
+  .section {
+    padding: 12px;
+    min-height: 300px;
+    border-radius: 12px;
+  }
+  
+  .chartTitle {
+    font-size: 14px;
+  }
+  
+  .customTooltip {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+ }
+
+ 
