@@ -38,7 +38,7 @@
   pointer-events: none;
 }
 
-.bundleTitle {
+/* .bundleTitle {
   font-size: 18px;
   font-weight: 500;
   color: #fff;
@@ -46,7 +46,7 @@
   padding: 24px;
   background: rgba(22, 22, 22, 0.7);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
+} */
 
 .tableWrapper {
   width: 100%;
@@ -168,74 +168,127 @@
   background: rgba(130, 255, 131, 0.05);
 }
 
-/* Responsive Styles */
-@media (max-width: 768px) {
-  .experimentSection {
-      padding: 24px;
-      gap: 24px;
-  }
-
+@media (max-width: 1200px) {
   .bundleTitle {
-      padding: 20px;
+    gap: 10px;
   }
-
-  .headerRow th,
-  .glassEffect td {
-      padding: 14px 20px;
-  }
-
-  .headerRow th:first-child,
-  .groupCell {
-      padding-left: 20px !important;
-      width: 140px;
-  }
-
-  .valueCell {
-      min-width: 120px;
-  }
-
   .graphsContainer {
     padding: 20px;
   }
-}
-
-@media (max-width: 480px) {
-  .experimentSection {
-      padding: 16px;
-      gap: 16px;
-  }
-
-  .bundleContainer,
-  .loadingContainer,
-  .errorContainer,
-  .emptyContainer {
-      border-radius: 12px;
-  }
-
+ }
+ 
+ @media (max-width: 768px) {
   .bundleTitle {
-      padding: 16px;
-      font-size: 16px;
+    padding: 20px;
+    font-size: 16px;
+    gap: 8px;
   }
-
-  .headerRow th,
-  .glassEffect td {
-      padding: 12px 16px;
-      font-size: 13px;
+  .clickIndicator {
+    font-size: 13px;
   }
-
-  .headerRow th:first-child,
-  .groupCell {
-      padding-left: 16px !important;
-      width: 120px;
+  .graphIcon {
+    width: 14px;
+    height: 14px;
   }
-
   .graphsContainer {
     padding: 16px;
   }
-}
-
+  .chartTitle {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+ }
+ 
+ @media (max-width: 480px) {
+  .bundleTitle {
+    padding: 16px;
+    font-size: 14px;
+    gap: 6px;
+  }
+  .clickIndicator {
+    font-size: 12px;
+  }
+  .graphIcon {
+    width: 12px;
+    height: 12px;
+  }
+  .graphsContainer {
+    padding: 12px;
+  }
+  .chartTitle {
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+ }
+ 
+ @media (max-width: 360px) {
+  .bundleTitle {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .titleWrapper {
+    margin-bottom: 4px;
+  }
+  .graphsContainer {
+    padding: 10px;
+  }
+  .chartTitle {
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+ }
+ 
 .graphsContainer {
   padding: 24px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.bundleTitle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 500;
+  color: #fff;
+  margin: 0;
+  padding: 24px;
+  background: rgba(22, 22, 22, 0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 12px;
+}
+
+.titleWrapper {
+  flex: 1;
+  min-width: 0;
+  margin-right: 12px;
+}
+
+.titleText {
+  font-size: inherit;
+  font-weight: 500;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.clickIndicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.graphIcon {
+  opacity: 0.6;
+}
+
+.bundleContainer {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bundleContainer:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(130, 255, 131, 0.1);
+}
