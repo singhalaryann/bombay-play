@@ -1,13 +1,14 @@
-/* ExperimentGraphDisplay.module.css */
+/* Main container styles */
 .analyticsContainer {
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 24px;
-  padding: 16px;
- }
- 
- .section {
+  padding: 0;
+}
+
+/* Section styles */
+.section {
   background: rgba(22, 28, 21, 0.95);
   border-radius: 16px;
   padding: 24px;
@@ -16,43 +17,50 @@
   flex-direction: column;
   position: relative;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
- }
- 
- .section::after {
+}
+
+/* Glass border effect */
+.section::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: 16px;
   padding: 1px;
-  background: linear-gradient(-100deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));  /* White gradient */
+  background: linear-gradient(-100deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
- }
- 
- .glassEffect {
+}
+
+/* Glass effect container */
+.glassEffect {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 20px;
   background: rgba(22, 28, 21, 0.8);
-  padding: 16px;
+  padding: 24px;
   border-radius: 12px;
- }
- 
- .chartTitle {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Chart title */
+.chartTitle {
   font-size: 18px;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.95);
   margin: 0;
-  padding-bottom: 12px;
+  padding-bottom: 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
- }
- 
- .customTooltip {
-  background: rgba(22, 28, 21, 0.98);
+  letter-spacing: 0.2px;
+}
+
+/* Tooltip styles */
+.customTooltip {
+  background: rgba(18, 18, 18, 0.98);
   border: 1px solid rgba(130, 255, 131, 0.2);
   border-radius: 8px;
   padding: 12px 16px;
@@ -60,86 +68,119 @@
   font-size: 14px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(8px);
- }
- 
- /* Legend styles */
- .section :global(.recharts-default-legend) {
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.customTooltip p {
+  margin: 4px 0;
+}
+
+.customTooltip p:first-child {
+  color: rgba(255, 255, 255, 0.9);
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.customTooltip p:nth-child(2) {
+  color: #82FF83;
+}
+
+.customTooltip p:nth-child(3) {
+  color: #FF33F1;
+}
+
+/* Recharts overrides */
+.section :global(.recharts-default-legend) {
   margin-top: 16px !important;
   padding: 0 !important;
- }
- 
- .section :global(.recharts-legend-item) {
+}
+
+.section :global(.recharts-legend-item) {
   padding: 0 12px !important;
- }
- 
- .section :global(.recharts-legend-item-text) {
+}
+
+.section :global(.recharts-legend-item-text) {
   color: rgba(255, 255, 255, 0.9) !important;
   margin-left: 8px !important;
- }
- 
- /* Graph background */
- .section :global(.recharts-surface) {
-  background: rgba(22, 28, 21, 0.95);
-  border-radius: 8px;
- }
- 
- /* Responsive */
- @media (max-width: 1280px) {
-  .analyticsContainer {
-    padding: 12px;
-  }
-  
+  font-size: 14px !important;
+}
+
+/* Graph styling */
+.section :global(.recharts-cartesian-axis-line) {
+  stroke: rgba(255, 255, 255, 0.1) !important;
+}
+
+.section :global(.recharts-cartesian-grid-horizontal line) {
+  stroke: rgba(255, 255, 255, 0.05) !important;
+}
+
+.section :global(.recharts-cartesian-grid-vertical line) {
+  stroke: rgba(255, 255, 255, 0.05) !important;
+}
+
+.section :global(.recharts-text) {
+  fill: rgba(255, 255, 255, 0.6) !important;
+  font-size: 12px !important;
+}
+
+.section :global(.recharts-label) {
+  fill: rgba(255, 255, 255, 0.6) !important;
+  font-size: 12px !important;
+}
+
+/* Responsive styles */
+@media (max-width: 1280px) {
   .section {
     padding: 20px;
     min-height: 380px;
   }
-  
+  .glassEffect {
+    padding: 20px;
+  }
   .chartTitle {
     font-size: 16px;
   }
- }
- 
- @media (max-width: 768px) {
-  .analyticsContainer {
-    padding: 8px;
-    gap: 16px;
-  }
-  
+}
+
+@media (max-width: 768px) {
   .section {
     padding: 16px;
     min-height: 340px;
   }
-  
+  .glassEffect {
+    padding: 16px;
+    gap: 16px;
+  }
   .chartTitle {
     font-size: 15px;
   }
-  
   .customTooltip {
     padding: 10px 14px;
     font-size: 13px;
   }
- }
- 
- @media (max-width: 480px) {
-  .analyticsContainer {
-    padding: 4px;
-    gap: 12px;
+  .section :global(.recharts-legend-item-text) {
+    font-size: 13px !important;
   }
-  
+}
+
+@media (max-width: 480px) {
   .section {
     padding: 12px;
     min-height: 300px;
     border-radius: 12px;
   }
-  
+  .glassEffect {
+    padding: 12px;
+    gap: 12px;
+  }
   .chartTitle {
     font-size: 14px;
   }
-  
   .customTooltip {
     padding: 8px 12px;
     font-size: 12px;
   }
- }
-
- 
+  .section :global(.recharts-legend-item-text) {
+    font-size: 12px !important;
+  }
+}
