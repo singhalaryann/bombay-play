@@ -7,7 +7,7 @@ import styles from "../../../styles/ExperimentForm.module.css";
 
 const ExperimentForm = ({
   experimentData,
-  totalPlayers,  // Changed from segmentData
+  totalPlayers, // Changed from segmentData
   setExperimentData,
   onSplitChange,
 }) => {
@@ -60,18 +60,29 @@ const ExperimentForm = ({
   useEffect(() => {
     console.log("ExperimentForm - Current data:", {
       experimentData,
-      totalPlayers,    // Changed to totalPlayers
-      });
+      totalPlayers, // Changed to totalPlayers
+    });
   }, [experimentData, totalPlayers]);
 
   // ADD NEW EFFECT HERE - After existing useEffects but before handlers
-    useEffect(() => {
-      if (experimentData?.split && totalPlayers && !experimentData.groups?.control?.traffic_split) {
-        const controlUsers = Math.round((experimentData.split / 100) * totalPlayers);
-        const variantUsers = totalPlayers - controlUsers;
-        onSplitChange(experimentData.split, controlUsers, variantUsers);
-      }
-    }, [experimentData?.split, totalPlayers, onSplitChange, experimentData.groups]);
+  useEffect(() => {
+    if (
+      experimentData?.split &&
+      totalPlayers &&
+      !experimentData.groups?.control?.traffic_split
+    ) {
+      const controlUsers = Math.round(
+        (experimentData.split / 100) * totalPlayers
+      );
+      const variantUsers = totalPlayers - controlUsers;
+      onSplitChange(experimentData.split, controlUsers, variantUsers);
+    }
+  }, [
+    experimentData?.split,
+    totalPlayers,
+    onSplitChange,
+    experimentData.groups,
+  ]);
 
   // UPDATED: Enhanced date handling
   const handleDateChange = useCallback(
@@ -118,22 +129,22 @@ const ExperimentForm = ({
         console.error("Invalid split value:", value);
         return;
       }
-  
+
       console.log("Traffic split changed to:", splitValue);
-  
+
       // FIXED: Using totalPlayers prop instead of experimentData.total_players
-    const controlUsers = Math.round((splitValue / 100) * totalPlayers);
-    const variantUsers = totalPlayers - controlUsers;
+      const controlUsers = Math.round((splitValue / 100) * totalPlayers);
+      const variantUsers = totalPlayers - controlUsers;
 
-    setExperimentData((prev) => ({
-      ...prev,
-      split: splitValue,
-    }));
+      setExperimentData((prev) => ({
+        ...prev,
+        split: splitValue,
+      }));
 
-    onSplitChange(splitValue, controlUsers, variantUsers);
-  },
-  [totalPlayers, setExperimentData, onSplitChange] // FIXED: Updated dependency array
-);
+      onSplitChange(splitValue, controlUsers, variantUsers);
+    },
+    [totalPlayers, setExperimentData, onSplitChange] // FIXED: Updated dependency array
+  );
 
   // Update formatSegmentDisplay function
   const formatSegmentDisplay = useCallback(() => {
@@ -170,7 +181,13 @@ const ExperimentForm = ({
             <input
               type="text"
               className={`${styles.input} ${styles.durationInput}`}
-              value={startDate ? `${startDate.getDate()} days` : ""}
+              value={
+                startDate
+                  ? `${Math.ceil(
+                      (startDate - new Date()) / (1000 * 60 * 60 * 24)
+                    )} days`
+                  : ""
+              }
               placeholder="Select duration"
               onClick={() => setIsCalendarOpen(!isCalendarOpen)}
               readOnly

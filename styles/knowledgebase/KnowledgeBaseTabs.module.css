@@ -1,0 +1,108 @@
+/* styles/knowledgebase/KnowledgeBaseTabs.module.css */
+.tabHeader {
+    display: flex;
+    align-items: center;
+    gap: 35px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 8px;
+    margin-bottom: 24px;
+   }
+   
+   .tabButton {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 0;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s ease;
+   }
+   
+   .tabButton svg {
+    color: rgba(255, 255, 255, 0.6);
+    transition: color 0.2s ease;
+   }
+   
+   .tabButton:hover {
+    color: rgba(255, 255, 255, 0.9);
+   }
+   
+   .tabButton:hover svg {
+    color: rgba(255, 255, 255, 0.9);
+   }
+   
+   .tabButton.active {
+    color: rgba(255, 255, 255, 0.9);
+   }
+   
+   .tabButton.active svg {
+    color: #82FF83;
+   }
+   
+   .tabButton.active::after {
+    content: '';
+    position: absolute;
+    bottom: -9px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40%;
+    height: 2px;
+    background-color: #82FF83;
+    border-radius: 1px;
+   }
+   
+   /* Responsive Styles */
+   @media (max-width: 768px) {
+    .tabHeader {
+      gap: 24px;
+      padding-bottom: 6px;
+      margin-bottom: 20px;
+    }
+   
+    .tabButton {
+      padding: 10px 0;
+      font-size: 14px;
+    }
+   }
+   
+   @media (max-width: 480px) {
+    .tabHeader {
+      gap: 16px;
+      padding-bottom: 4px;
+      margin-bottom: 16px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+    }
+   
+    .tabButton {
+      padding: 8px 0;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+   
+    .tabButton svg {
+      width: 18px;
+      height: 18px;
+    }
+   }
+   
+   /* For very small screens */
+   @media (max-width: 360px) {
+    .tabHeader {
+      gap: 12px;
+    }
+   
+    .tabButton {
+      font-size: 12px;
+    }
+   
+    .tabButton svg {
+      width: 16px;
+      height: 16px;
+    }
+   }

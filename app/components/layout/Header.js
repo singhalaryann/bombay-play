@@ -2,7 +2,7 @@
 import React from "react";
 import styles from "../../../styles/Header.module.css";
 import Image from "next/image";
-import { LogOut, User, Plus } from "lucide-react";
+import { LogOut, User, Plus, Database } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 
@@ -17,6 +17,9 @@ const Header = () => {
 
   const handleAIChat = () => {
     router.push("/ideationchat");
+  };
+  const handleKnowledgebase = () => {      // Add this new handler
+    router.push("/knowledgebase");
   };
 
   return (
@@ -36,11 +39,13 @@ const Header = () => {
       <div className={styles.rightSection}>
         {/* + AI Chat button */}
         <button onClick={handleAIChat} className={styles.aiChatButton}>
-          <Plus size={20} color="#82FF83" />
-          <span>AI Chat</span>
-        </button>
-
-        {/* User block with logout button */}
+  <Plus size={20} />
+  <span>AI Chat</span>
+</button>
+<button onClick={handleKnowledgebase} className={styles.knowledgebaseButton}>
+  <Database size={20} />
+  <span>Knowledgebase</span>
+</button>        {/* User block with logout button */}
         <div className={styles.userBlock}>
           <User size={20} className={styles.userIcon} />
           <span className={styles.userId}>{userId || "Guest"}</span>

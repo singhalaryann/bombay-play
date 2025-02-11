@@ -33,7 +33,7 @@
   gap: 1rem;
  }
  
- .aiChatButton {
+ .aiChatButton, .knowledgebaseButton {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -42,13 +42,20 @@
   border-radius: 0;
   padding: 0.625rem;
   cursor: pointer;
-  color: #82FF83;
+  color: #E5E7EB;  /* Starting with neutral color */
   transition: all 0.2s ease;
- }
- 
- .aiChatButton:hover {
-  color: #ffffff;
- }
+}
+
+.aiChatButton:hover, .aiChatButton:active,
+.knowledgebaseButton:hover, .knowledgebaseButton:active {
+  color: #82FF83;  /* Turn green on hover/click */
+}
+
+/* Optional: Add active state for more emphasis when clicked */
+.aiChatButton:active,
+.knowledgebaseButton:active {
+  transform: scale(0.98);
+}
  
  .userBlock {
   display: flex;
