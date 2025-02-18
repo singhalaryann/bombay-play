@@ -1,0 +1,193 @@
+.container {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #050505;
+  }
+  
+  .mainLayout {
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .mainContent {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+    height: 100%;
+  }
+    
+  .glassBox {
+    width: 100%;
+    background: rgba(18, 18, 18, 0.4);
+    border-radius: 12px;
+    padding: 24px;
+    position: relative;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Outer glow border */
+  .glassBox::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    padding: 1px;
+    background: linear-gradient(
+      -100deg,
+      rgba(255, 255, 255, 0.4),
+      rgba(255, 255, 255, 0.03)
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  
+  /* Top gradient line */
+  .glassBox::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.08),
+      transparent
+    );
+  }
+  
+  .tableTitle {
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+  
+  .marginTop {
+    margin-top: 24px;
+  }
+  
+  .tableWrapper {
+    width: 100%;
+    overflow: auto;
+    border-radius: 8px;
+    position: relative;
+  }
+  
+  .glassTable {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: transparent;
+  }
+  
+  .glassTable th {
+    position: sticky;
+    top: 0;
+    background: rgba(18, 18, 18, 0.95);
+    padding: 12px 16px;
+    text-align: left;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 400;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    white-space: nowrap;
+    z-index: 1;
+  }
+  
+  .glassTable tr {
+    transition: background-color 0.2s ease;
+  }
+  
+  .glassTable tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+  
+  .glassTable td {
+    padding: 12px 16px;
+    color: rgba(255, 255, 255, 0.9);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  
+  /* Loading and Error States */
+.loading {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+  }
+  
+  .errorState {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 32px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .mainContent {
+      padding: 20px;
+    }
+    .glassBox {
+      padding: 20px;
+    }
+    .tableTitle {
+      font-size: 18px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .mainContent {
+      padding: 16px;
+    }
+    .glassBox {
+      padding: 16px;
+    }
+    .tableTitle {
+      font-size: 16px;
+    }
+    .marginTop {
+      margin-top: 16px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .mainContent {
+      padding: 12px;
+    }
+    .glassBox {
+      padding: 12px;
+    }
+    .tableWrapper {
+      margin: -12px;
+      width: calc(100% + 24px);
+    }
+    .marginTop {
+      margin-top: 12px;
+    }
+  }

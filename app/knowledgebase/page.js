@@ -4,12 +4,14 @@ import React, { useState } from "react";
 import Header from "../components/layout/Header";
 import Sidebar from "../components/layout/Sidebar";
 import KnowledgeBaseTabs from "../components/knowledgebase/KnowledgeBaseTabs";
+import SocialMedia from "../components/knowledgebase/SocialMedia";
 import { Database, MoreVertical } from "lucide-react";
 import styles from "../../styles/knowledgebase/KnowledgeBase.module.css";
+import CompetitiveAnalysis from "../components/knowledgebase/CompetitiveAnalysis";
 
 const KnowledgeBase = () => {
   const [activeTab, setActiveTab] = useState("knowledge");
-  
+
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   };
@@ -20,10 +22,13 @@ const KnowledgeBase = () => {
       <div className={styles.mainContainer}>
         <Sidebar />
         <div className={styles.content}>
-          <KnowledgeBaseTabs activeTab={activeTab} onTabChange={handleTabChange} />
+          <KnowledgeBaseTabs
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+          />
           <div className={styles.contentContainer}>
             {activeTab === "social" && (
-              <div>Social Media Content</div>
+              <SocialMedia /> // New social media component
             )}
             {activeTab === "knowledge" && (
               <div className={styles.dataSourcesContainer}>
@@ -90,9 +95,7 @@ const KnowledgeBase = () => {
                 </div>
               </div>
             )}
-            {activeTab === "competitive" && (
-              <div>Competitive Analysis Content</div>
-            )}
+            {activeTab === "competitive" && <CompetitiveAnalysis />}
           </div>
         </div>
       </div>

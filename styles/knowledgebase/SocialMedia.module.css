@@ -1,0 +1,168 @@
+/* SocialMedia.module.css */
+.container {
+  width: 100%;
+}
+
+.header {
+  font-size: 24px;
+  font-weight: 600;
+  color: #FFFFFF;
+  margin-bottom: 24px;
+}
+
+.feedContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.card {
+  padding: 20px;
+  border-radius: 8px;
+  background: rgba(23, 23, 23, 0.95);
+  transition: transform 0.2s ease;
+}
+
+/* Platform-specific cards */
+.reddit {
+  background: rgba(44, 23, 14, 0.95);
+}
+
+.discord {
+  background: rgba(32, 34, 47, 0.95);
+}
+
+.instagram {
+  background: rgba(48, 25, 52, 0.95);
+}
+
+.cardHeader {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.platformIcon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+/* Platform-specific icons */
+.reddit .platformIcon {
+  background: rgba(255, 69, 0, 0.1);
+}
+
+.discord .platformIcon {
+  background: rgba(88, 101, 242, 0.1);
+}
+
+.instagram .platformIcon {
+  background: rgba(228, 64, 95, 0.1);
+}
+
+.platformIcon img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.content {
+  color: #FFFFFF;
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.dateContainer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.date {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+}
+
+.loading,
+.error {
+  color: #FFFFFF;
+  text-align: center;
+  padding: 20px;
+  font-size: 15px;
+}
+
+.error {
+  color: #FF4444;
+}
+
+/* Hover effect */
+.card:hover {
+  transform: translateY(-1px);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .header {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .content {
+    font-size: 14px;
+  }
+
+  .platformIcon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .platformIcon img {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+
+  .card {
+    padding: 14px;
+  }
+
+  .cardHeader {
+    gap: 10px;
+  }
+
+  .content {
+    font-size: 13px;
+  }
+
+  .platformIcon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .platformIcon img {
+    width: 16px;
+    height: 16px;
+  }
+
+  .date {
+    font-size: 12px;
+  }
+}
