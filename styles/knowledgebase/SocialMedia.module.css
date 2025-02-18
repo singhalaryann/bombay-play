@@ -1,6 +1,9 @@
 /* SocialMedia.module.css */
 .container {
   width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
 .header {
@@ -13,28 +16,22 @@
 .feedContainer {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   width: 100%;
 }
 
 .card {
   padding: 20px;
   border-radius: 8px;
-  background: rgba(23, 23, 23, 0.95);
-  transition: transform 0.2s ease;
-}
-
-/* Platform-specific cards */
-.reddit {
   background: rgba(44, 23, 14, 0.95);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.discord {
-  background: rgba(32, 34, 47, 0.95);
-}
-
-.instagram {
-  background: rgba(48, 25, 52, 0.95);
+.card:hover {
+  transform: translateY(-2px);
+  background: rgba(44, 23, 14, 0.98);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .cardHeader {
@@ -51,19 +48,7 @@
   justify-content: center;
   border-radius: 6px;
   flex-shrink: 0;
-}
-
-/* Platform-specific icons */
-.reddit .platformIcon {
-  background: rgba(255, 69, 0, 0.1);
-}
-
-.discord .platformIcon {
-  background: rgba(88, 101, 242, 0.1);
-}
-
-.instagram .platformIcon {
-  background: rgba(228, 64, 95, 0.1);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .platformIcon img {
@@ -74,21 +59,31 @@
 
 .content {
   color: #FFFFFF;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.5;
   margin: 0;
   flex-grow: 1;
+  overflow: hidden;
+  transition: max-height 0.5s ease;
+  max-height: 42px;
+  cursor: pointer;
+}
+
+.content:hover {
+  max-height: 1000px; /* Large enough to fit any content */
 }
 
 .dateContainer {
   display: flex;
   justify-content: flex-end;
-  margin-top: 12px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .date {
   color: rgba(255, 255, 255, 0.6);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .loading,
@@ -96,20 +91,19 @@
   color: #FFFFFF;
   text-align: center;
   padding: 20px;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .error {
   color: #FF4444;
 }
 
-/* Hover effect */
-.card:hover {
-  transform: translateY(-1px);
-}
-
 /* Responsive styles */
 @media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+  }
+
   .header {
     font-size: 20px;
     margin-bottom: 20px;
@@ -120,24 +114,13 @@
   }
 
   .content {
-    font-size: 14px;
-  }
-
-  .platformIcon {
-    width: 28px;
-    height: 28px;
-  }
-
-  .platformIcon img {
-    width: 18px;
-    height: 18px;
+    font-size: 13px;
   }
 }
 
 @media (max-width: 480px) {
-  .header {
-    font-size: 18px;
-    margin-bottom: 16px;
+  .container {
+    padding: 0 12px;
   }
 
   .card {
@@ -148,13 +131,9 @@
     gap: 10px;
   }
 
-  .content {
-    font-size: 13px;
-  }
-
   .platformIcon {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
   }
 
   .platformIcon img {
@@ -162,7 +141,11 @@
     height: 16px;
   }
 
-  .date {
+  .content {
     font-size: 12px;
+  }
+
+  .date {
+    font-size: 11px;
   }
 }
