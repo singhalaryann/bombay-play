@@ -4,6 +4,8 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
+  height: 100%; /* Add this */
+  /* overflow-y: auto; Add this */
 }
 
 .header {
@@ -64,13 +66,16 @@
   margin: 0;
   flex-grow: 1;
   overflow: hidden;
-  transition: max-height 0.5s ease;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth easing */
   max-height: 42px;
+  opacity: 0.9; /* Slightly faded initially */
   cursor: pointer;
 }
-
 .content:hover {
-  max-height: 1000px; /* Large enough to fit any content */
+  max-height: 1000px;
+  opacity: 1;
+  background: rgba(44, 23, 14, 0.98); /* Subtle background change */
+  transform: translateY(-1px); /* Slight lift effect */
 }
 
 .dateContainer {

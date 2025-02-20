@@ -1,26 +1,22 @@
-/* styles/Insight.module.css */
 .container {
-  min-height: 100vh;
-  background: #050505;
-  color: white;
+  height: 100vh;
   display: flex;
   flex-direction: column;
+  background: #050505;
+  overflow: hidden;
 }
 
 .mainLayout {
-  display: flex;
-  flex: 1;
-  min-height: calc(100vh - 64px);
+  display: flex; /* Makes it a flex container */
+  height: calc(100vh - 64px); /* Exact height minus header */
+  width: 100%; /* Full width */
 }
 
 .mainContent {
-  flex: 1;
-  padding: 32px;
-  overflow-y: auto;
-  background: #050505;
-  max-width: 1600px;
-  margin: 0 auto;
-  width: 100%;
+  flex: 1; /* Takes available space */
+  height: 100%; /* Match parent height */
+  overflow-y: auto; /* Enables scrolling */
+  padding: 24px;
 }
 
 .contentLoading {
