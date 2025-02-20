@@ -1,21 +1,22 @@
-/* Base Container */
 .container {
-  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
   background: #050505;
-  color: white;
-  width: 100%;
+  overflow: hidden;
 }
 
-/* Main Layout Structure */
 .mainLayout {
-  display: flex;
-  min-height: calc(100vh - 64px);
+  display: flex; /* Makes it a flex container */
+  height: calc(100vh - 64px); /* Exact height minus header */
+  width: 100%; /* Full width */
 }
 
 .mainContent {
-  flex: 1;
-  padding: 24px 32px;
-  background: #050505;
+  flex: 1; /* Takes available space */
+  height: 100%; /* Match parent height */
+  overflow-y: auto; /* Enables scrolling */
+  padding: 24px;
 }
 
 /* Content Wrapper */
