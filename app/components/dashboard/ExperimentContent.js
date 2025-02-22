@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import styles from "../../../styles/ExperimentContent.module.css";
 import ExperimentGraphDisplay from "../experiment/ExperimentGraphDisplay";
+import LoadingAnimation from "../common/LoadingAnimation";
+import { BarChart3, ChevronDown, ChevronUp } from 'lucide-react';  // Add this import at the top
 
 export default function ExperimentContent({ userId }) {
   const [experimentData, setExperimentData] = useState([]);
@@ -10,6 +12,7 @@ export default function ExperimentContent({ userId }) {
   // New states for graph handling
   const [selectedGraphs, setSelectedGraphs] = useState(null);
   const [selectedExperimentId, setSelectedExperimentId] = useState(null);
+  const [loadingGraphs, setLoadingGraphs] = useState(false);  // Add this state at the top with other states
 
   // Existing useEffect for initial data fetch
   useEffect(() => {
@@ -103,12 +106,15 @@ export default function ExperimentContent({ userId }) {
   const handleExperimentClick = async (experimentId) => {
     console.log("Experiment clicked:", experimentId);
 
-    // Toggle graphs if clicking same experiment
-    if (selectedExperimentId === experimentId) {
-      setSelectedGraphs(null);
-      setSelectedExperimentId(null);
-      return;
-    }
+   // Toggle graphs if clicking same experiment
+  if (selectedExperimentId === experimentId) {
+    setSelectedGraphs(null);
+    setSelectedExperimentId(null);
+    return;
+  }
+
+  setLoadingGraphs(true);  // Start loading animation
+  setSelectedExperimentId(experimentId);
 
     try {
       const response = await fetch(
@@ -124,19 +130,16 @@ export default function ExperimentContent({ userId }) {
       console.log("Graph data received:", data.experiment.graphs);
 
       setSelectedGraphs(data.experiment.graphs);
-      setSelectedExperimentId(experimentId);
     } catch (err) {
       console.error("Error fetching experiment graphs:", err);
+    } finally {
+      setLoadingGraphs(false);  // Stop loading whether success or error
     }
   };
 
   // Existing loading/error handlers
   if (loading)
-    return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.loading}>Loading experiments...</div>
-      </div>
-    );
+    return <LoadingAnimation />
   if (error)
     return (
       <div className={styles.errorContainer}>
@@ -202,21 +205,17 @@ export default function ExperimentContent({ userId }) {
               <div className={styles.titleWrapper}>
                 <span className={styles.titleText}>{experiment.label}</span>
               </div>
-              <div className={styles.clickIndicator}>
-                <span>Click to view graphs</span>
-                <svg
-                  className={styles.graphIcon}
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    fill="currentColor"
-                    d="M3,22V8H7V22H3M10,22V2H14V22H10M17,22V14H21V22H17Z"
-                  />
-                </svg>
-              </div>
-            </div>
+          {/* Modified click indicator with reordered icons and state-based arrow */}
+        {/* Updated click indicator with consistent opacity and sizing */}
+<div className={styles.clickIndicator}>
+  <BarChart3 size={16} className="text-white opacity-60" /> {/* Added opacity-60 */}
+  <span>Click to view graphs</span>
+  {selectedExperimentId === experiment._id ? (
+    <ChevronUp size={16} className="text-white opacity-100" /> 
+  ) : (
+    <ChevronDown size={16} className="text-white opacity-100" /> 
+  )}
+</div>          </div>
             <div className={styles.tableWrapper}>
               <table className={styles.bundleTable}>
                 <thead>
@@ -245,11 +244,19 @@ export default function ExperimentContent({ userId }) {
             </div>
 
             {/* New graph section */}
-            {selectedExperimentId === experiment._id && selectedGraphs && (
-              <div className={styles.graphsContainer}>
-                <ExperimentGraphDisplay graphs={selectedGraphs} />
-              </div>
-            )}
+            {selectedExperimentId === experiment._id && (
+  <div className={styles.graphsContainer}>
+    {/* Show graph container immediately when clicked */}
+    <div className={styles.graphContent}>
+      {/* Show loading animation while fetching or graphs when loaded */}
+      {loadingGraphs || !selectedGraphs ? (
+        <LoadingAnimation />
+      ) : (
+        <ExperimentGraphDisplay graphs={selectedGraphs} />
+      )}
+    </div>
+  </div>
+)}
           </div>
         );
       })}

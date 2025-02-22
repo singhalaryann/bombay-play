@@ -12,6 +12,7 @@ import { useAuth } from "../context/AuthContext";
 
 // Import your separate ExperimentContent component
 import ExperimentContent from "../components/dashboard/ExperimentContent";
+import LoadingAnimation from "../components/common/LoadingAnimation";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -110,7 +111,7 @@ export default function Dashboard() {
       )}
       <div className={styles.metricsGrid}>
         {loading ? (
-          <div className={styles.loading}>Loading...</div>
+           <LoadingAnimation />
         ) : metrics.length > 0 ? (
           metrics.map((metric, index) => (
             <MetricCard key={`${metric.name}-${index}`} {...metric} />

@@ -1,11 +1,12 @@
-// Frontend (SocialMedia.js)
 "use client";
 import React, { useState, useEffect } from "react";
 import styles from "../../../styles/knowledgebase/SocialMedia.module.css";
 import { MessageSquare } from "lucide-react";
+import LoadingAnimation from "../common/LoadingAnimation";
 
 const SocialMedia = () => {
-  // Added state for hover functionality
+    // Added state for hover functionality
+
   const [hoveredId, setHoveredId] = useState(null);
   const [socialData, setSocialData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,32 +52,39 @@ const SocialMedia = () => {
     fetchSocialData();
   }, []);
 
-  if (loading) return <div className={styles.loading}>Loading...</div>;
+  if (loading)
+    return (
+      <main className={styles.mainContent}>
+        <LoadingAnimation />
+      </main>
+    );
   if (error) return <div className={styles.error}>{error}</div>;
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.header}>Data Sources</h2>
+      {/* Removed Data Sources header */}
       <div className={styles.feedContainer}>
         {socialData.map((item, index) => (
           <div
             key={`${item.post_id || index}`}
-            className={`${styles.card} ${styles[item.source || 'reddit']}`}
+            className={`${styles.card} ${styles[item.source || "reddit"]}`}
           >
-            <div className={styles.cardHeader}>
-              <div className={styles.platformIcon}>
-                {getPlatformIcon(item.source || 'reddit')}
+            {/* Updated card layout to single line */}
+            <div className={styles.cardContent}>
+              <div className={styles.leftSection}>
+                <div className={styles.platformIcon}>
+                  {getPlatformIcon(item.source || "reddit")}
+                </div>
+                <p
+                  className={styles.content}
+                  onMouseEnter={() => setHoveredId(item.post_id)}
+                  onMouseLeave={() => setHoveredId(null)}
+                >
+                  {hoveredId === item.post_id
+                    ? item.fullContent
+                    : item.truncatedSummary}
+                </p>
               </div>
-              {/* Updated content display with hover functionality */}
-              <p 
-                className={styles.content}
-                onMouseEnter={() => setHoveredId(item.post_id)}
-                onMouseLeave={() => setHoveredId(null)}
-              >
-                {hoveredId === item.post_id ? item.fullContent : item.truncatedSummary}
-              </p>
-            </div>
-            <div className={styles.dateContainer}>
               <span className={styles.date}>{item.date}</span>
             </div>
           </div>

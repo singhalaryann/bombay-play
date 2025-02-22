@@ -4,7 +4,7 @@
   flex-direction: column;
   gap: 32px;
   width: 100%;
-  padding: 32px; /* Adjusted for better spacing on all devices */
+  padding: 20px; /* Adjusted for better spacing on all devices */
 }
 
 /* Bundle container styles with glass effect */
@@ -81,14 +81,23 @@
   line-height: 1.4; /* Added for better readability */
 }
 
-/* MODIFIED: Click indicator with improved layout */
+/* Updated clickIndicator with white theme and consistent spacing */
 .clickIndicator {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.6);
-  white-space: nowrap; /* Keep text on one line */
+  gap: 8px;  /* Increased from 5px for consistent spacing */
+  padding: 8px 16px;
+  background: rgba(130, 255, 131, 0.1);
+  border: 1px solid #82FF83;
+  border-radius: 6px;
+  color: white;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clickIndicator:hover {
+  background: rgba(130, 255, 131, 0.2);
 }
 
 /* Graph icon styles */
@@ -243,8 +252,9 @@
     min-width: 150px; /* Adjusted minimum width */
   }
   .clickIndicator {
-    font-size: 13px;
-  }
+    width: 100%;
+    justify-content: center;
+    }
   .graphIcon {
     width: 14px;
     height: 14px;
@@ -278,16 +288,21 @@
     white-space: normal; /* Allow text to wrap */
   }
   .clickIndicator {
-    font-size: 12px;
     width: 100%;
-    justify-content: flex-start;
+    justify-content: center;
   }
   .graphIcon {
     width: 12px;
     height: 12px;
   }
 }
-
+.graphContent {
+  width: 100%;
+  min-height: 300px; /* Ensures consistent height during loading */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 /* MODIFIED: Small mobile device optimizations */
 @media (max-width: 360px) {
   .experimentSection {

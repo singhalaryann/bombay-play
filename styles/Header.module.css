@@ -30,20 +30,40 @@
 .rightSection {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 8px; /* Reduced from 1rem to match Figma */
 }
 
 .aiChatButton, .knowledgebaseButton {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 8px; /* Consistent 8px gap */
   background: none;
   border: none;
-  border-radius: 0;
-  padding: 0.625rem;
+  border-radius: 8px; /* Added border radius */
+  padding: 8px 12px; /* Adjusted padding */
+  height: 40px; /* Fixed height */
   cursor: pointer;
   color: #E5E7EB;
   transition: all 0.2s ease;
+}
+
+.userBlock {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Consistent 8px gap */
+  background: rgba(22, 28, 21, 0.95); /* Updated to match dark theme */
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  height: 40px;
+  flex: 1;
+  max-width: 300px;
+}
+
+/* Also add this to ensure consistent icon sizes */
+.userIcon, .logoutButton svg {
+  width: 24px;
+  height: 24px;
 }
 
 .aiChatButton:hover, .aiChatButton:active,
@@ -54,23 +74,6 @@
 .aiChatButton:active,
 .knowledgebaseButton:active {
   transform: scale(0.98);
-}
-
-.userBlock {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  background: #191c17;
-  border: 1px solid #262626;
-  border-radius: 8px;
-  padding: 0.5rem 0.75rem;
-  flex: 1;
-  max-width: 300px;
-}
-
-.userIcon {
-  color: #E5E7EB;
-  flex-shrink: 0;
 }
 
 .userId {

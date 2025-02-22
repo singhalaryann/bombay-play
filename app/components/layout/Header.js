@@ -18,7 +18,8 @@ const Header = () => {
   const handleAIChat = () => {
     router.push("/ideationchat");
   };
-  const handleKnowledgebase = () => {      // Add this new handler
+  const handleKnowledgebase = () => {
+    // Add this new handler
     router.push("/knowledgebase");
   };
 
@@ -39,20 +40,31 @@ const Header = () => {
       <div className={styles.rightSection}>
         {/* + AI Chat button */}
         <button onClick={handleAIChat} className={styles.aiChatButton}>
-  <Plus size={20} />
-  <span>AI Chat</span>
-</button>
-<button onClick={handleKnowledgebase} className={styles.knowledgebaseButton}>
-  <Database size={20} />
-  <span>Knowledgebase</span>
-</button>        {/* User block with logout button */}
+          <Plus size={20} />
+          <span>AI Chat</span>
+        </button>
+        <button
+          onClick={handleKnowledgebase}
+          className={styles.knowledgebaseButton}
+        >
+          <Database size={20} />
+          <span>Knowledgebase</span>
+        </button>{" "}
+        {/* User block with logout button */}
         <div className={styles.userBlock}>
-          <User size={20} className={styles.userIcon} />
-          <span className={styles.userId}>{userId || "Guest"}</span>
-          <button onClick={handleLogout} className={styles.logoutButton}>
-            <LogOut size={20} />
-          </button>
-        </div>
+  {/* Using Image component for user_icon.svg */}
+  <Image 
+    src="/user_icon.svg"
+    alt="User"
+    width={24}
+    height={24}
+    className={styles.userIcon}
+  />
+  <span className={styles.userId}>{userId || "Guest"}</span>
+  <button onClick={handleLogout} className={styles.logoutButton}>
+    <LogOut size={20} />
+  </button>
+</div>
       </div>
     </header>
   );

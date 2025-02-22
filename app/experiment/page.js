@@ -8,6 +8,7 @@ import VariantGroup from "../components/experiment/VariantGroup";
 import Image from "next/image";
 import styles from "../../styles/Experiment.module.css";
 import { useRouter } from "next/navigation";
+import LoadingAnimation from "../components/common/LoadingAnimation";
 
 export default function ExperimentPage() {
   const searchParams = useSearchParams();
@@ -297,9 +298,9 @@ export default function ExperimentPage() {
           <div className={styles.scrollableSection}>
             {loading ? (
               // Loading state without glass effect
-              <div className={styles.loadingWrapper}>
-                <div className={styles.loading}>Loading...</div>
-              </div>
+              <main className={styles.mainContent}>
+              <LoadingAnimation />
+              </main>
             ) : (
               // Main content with glass effect
               experimentData && (

@@ -8,6 +8,7 @@ import Sidebar from '../components/layout/Sidebar';
 import IdeaCard from '../components/ideas/IdeaCard';
 import styles from '../../styles/Ideas.module.css';
 import { HelpCircle } from 'lucide-react';
+import LoadingAnimation from '../components/common/LoadingAnimation';
 
 export default function IdeasPage() {
   const router = useRouter();
@@ -81,9 +82,9 @@ export default function IdeasPage() {
         <Sidebar />
         <main className={styles.mainContent}>
           {loading ? (
-            <div className={styles.loadingWrapper}>
-              <div className={styles.loading}>Loading...</div>
-            </div>
+             <main className={styles.mainContent}>
+             <LoadingAnimation />
+         </main>
           ) : (
             <div className={styles.content}>
               <section className={styles.problemSection}>

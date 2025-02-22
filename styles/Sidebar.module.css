@@ -1,19 +1,19 @@
 /* styles/Sidebar.module.css */
 .sidebar {
   width: 260px;
-  min-height: calc(100vh - 88px); 
+  min-height: calc(100vh - 88px);
   margin: 12px;
   position: relative;
   z-index: 1;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: #191C17;
   border-radius: 3%;
-}
-
-.glassEffect {
+ }
+ 
+ .glassEffect {
   width: 100%;
   height: 100%;
-  background: rgba(18, 18, 18, 0.4);
+  background: rgba(22, 28, 21, 0.95);
   border-radius: 12px;
   padding: 16px;
   overflow: hidden;
@@ -22,33 +22,33 @@
   -webkit-backdrop-filter: blur(20px);
   display: flex;
   flex-direction: column;
-}
-
-/* Outer glow border */
-.glassEffect::after {
+ }
+ 
+ /* Outer glow border */
+ .glassEffect::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: 12px;
   padding: 1px;
   background: linear-gradient(
-      -100deg,
-      rgba(255, 255, 255, 0.4),
-      rgba(255, 255, 255, 0.03)
+    -100deg,
+    rgba(255, 255, 255, 0.4),
+    rgba(255, 255, 255, 0.03)
   );
   -webkit-mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
-}
-
-/* Top gradient line */
-.glassEffect::before {
+ }
+ 
+ /* Top gradient line */
+ .glassEffect::before {
   content: '';
   position: absolute;
   top: 0;
@@ -56,19 +56,19 @@
   right: 0;
   height: 1px;
   background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.08),
-      transparent
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.08),
+    transparent
   );
-}
-
-.menuItem {
+ }
+ 
+ .menuItem {
   padding: 4px;
   position: relative;
-}
-
-.menuLink {
+ }
+ 
+ .menuLink {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -76,161 +76,156 @@
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: rgba(28, 28, 28, 0.6);
+  background: transparent;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-}
-
-.menuLink:hover {
-  background: rgba(130, 255, 131, 0.08);
-}
-
-.menuLink:focus-visible {
+ }
+ 
+ .menuLink:hover {
+  background: rgba(255, 255, 255, 0.05);
+ }
+ 
+ .menuLink:focus-visible {
   outline: 2px solid rgba(130, 255, 131, 0.3);
   outline-offset: 2px;
-}
-
-.menuLink.active {
-  background: rgba(130, 255, 131, 0.1);
-}
-
-.menuLink.active .menuIcon {
-  background: rgba(130, 255, 131, 0.15);
-}
-
-.menuLink.active .menuText {
-  color: #82FF83;
-}
-
-.menuIcon {
+ }
+ 
+ .menuLink.active {
+  background: transparent;
+ }
+ 
+ .menuLink.active .menuText {
+  color: #FFFFFF;
+ }
+ 
+ .menuIcon {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 36px;
   height: 36px;
-  background: rgba(130, 255, 131, 0.1);
   border-radius: 8px;
   transition: all 0.3s ease;
   flex-shrink: 0;
+ }
+ 
+ /* Updated icon styling for SVGs */
+ .iconContainer {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+
+.iconBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0.1;
+  filter: hue-rotate(-30deg); /* For red tint */
 }
 
 .icon {
-  width: 20px;
-  height: 20px;
-  color: #82FF83;
-  filter: brightness(1.2);
-  transition: transform 0.2s ease;
+  position: relative;
+  z-index: 1;
 }
 
-.menuLink:hover .icon {
-  transform: scale(1.1);
+.activeIcon {
+  filter: brightness(0) saturate(10%) invert(95%) sepia(24%) saturate(1857%) hue-rotate(48deg) brightness(99%) contrast(80%);
+  opacity: 1;
 }
 
-.menuText {
-  color: rgba(255, 255, 255, 0.9);
+ .menuText {
+  color: rgba(255, 255, 255, 0.6);
   font-size: 15px;
   font-weight: 500;
   transition: all 0.3s ease;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-/* Responsive Styles */
-@media (max-width: 1280px) {
+ }
+ 
+ /* Responsive Styles */
+ @media (max-width: 1280px) {
   .sidebar {
-      width: 240px;
-      margin: 10px;
+    width: 240px;
+    margin: 10px;
   }
-
   .menuIcon {
-      width: 34px;
-      height: 34px;
+    width: 34px;
+    height: 34px;
   }
-}
-
-@media (max-width: 1024px) {
+ }
+ 
+ @media (max-width: 1024px) {
   .sidebar {
-      width: 220px;
-      margin: 8px;
+    width: 220px;
+    margin: 8px;
   }
-
   .glassEffect {
-      padding: 14px;
+    padding: 14px;
   }
-
   .menuIcon {
-      width: 32px;
-      height: 32px;
+    width: 32px;
+    height: 32px;
   }
-}
-
-@media (max-width: 768px) {
+ }
+ 
+ @media (max-width: 768px) {
   .sidebar {
-      width: 80px;
-      margin: 8px;
-      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 80px;
+    margin: 8px;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-
   .glassEffect {
-      padding: 12px;
+    padding: 12px;
   }
-
   .menuLink {
-      padding: 10px;
-      justify-content: center;
+    padding: 10px;
+    justify-content: center;
   }
-
   .menuIcon {
-      width: 32px;
-      height: 32px;
+    width: 32px;
+    height: 32px;
   }
-
   .menuText {
-      display: none;
-      opacity: 0;
-      transition: opacity 0.2s ease;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
   }
-}
-
-@media (max-width: 480px) {
+ }
+ 
+ @media (max-width: 480px) {
   .sidebar {
-      width: 70px;
-      margin: 6px;
-      border-radius: 8px; /* Added border radius for small screens */
+    width: 70px;
+    margin: 6px;
+    border-radius: 8px;
   }
-
   .glassEffect {
-      padding: 8px;
-      border-radius: 8px; /* Added border radius for glass effect */
+    padding: 8px;
+    border-radius: 8px;
   }
-
   .menuLink {
-      padding: 8px;
+    padding: 8px;
   }
-
   .menuIcon {
-      width: 30px;
-      height: 30px;
+    width: 36px;  /* Increased from 30px */
+    height: 36px; /* Increased from 30px */
   }
-
   .icon {
-      width: 18px;
-      height: 18px;
+    width: 32px;  /* Increased from 18px */
+    height: 32px; /* Increased from 18px */
   }
-
   .menuItem {
-      padding: 3px;
+    padding: 3px;
   }
-}
-
-/* Touch Device Optimizations */
-@media (hover: none) {
+ }
+ 
+ /* Touch Device Optimizations */
+ @media (hover: none) {
   .menuLink:hover {
-      background: rgba(28, 28, 28, 0.6);
+    background: transparent;
   }
-
   .menuLink:active {
-      background: rgba(130, 255, 131, 0.08);
+    background: rgba(255, 255, 255, 0.05);
   }
-}
+ }

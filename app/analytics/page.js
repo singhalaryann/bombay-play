@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Header from "../components/layout/Header";
 import Sidebar from "../components/layout/Sidebar";
 import styles from "../../styles/Analytics.module.css";
+import LoadingAnimation from '../components/common/LoadingAnimation';
 
 export default function AnalyticsPage() {
     const [data, setData] = useState({});
@@ -123,9 +124,9 @@ export default function AnalyticsPage() {
             <div className={styles.mainLayout}>
                 <Sidebar />
                 {isLoading ? (
-                    <main className={styles.mainContent}>
-                        <div className={styles.loading}>Loading...</div>
-                    </main>
+    <main className={styles.mainContent}>
+        <LoadingAnimation />
+    </main>
                 ) : error ? (
                     <main className={styles.mainContent}>
                         <div className={styles.errorState}>{error}</div>
@@ -144,4 +145,3 @@ export default function AnalyticsPage() {
         </div>
     );
 }
-//

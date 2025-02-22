@@ -9,6 +9,7 @@ import MetricsDisplay from '../components/analysis/MetricsDisplay';
 import GraphDisplay from '../components/analysis/GraphDisplay';
 import Image from 'next/image';
 import styles from '../../styles/Insight.module.css';
+import LoadingAnimation from '../components/common/LoadingAnimation';
 
 // Helper function to transform line/bar/pie metrics into GraphDisplay format
 function convertMetricsToGraphs(metrics) {
@@ -105,7 +106,7 @@ export default function InsightPage() {
         <div className={styles.mainLayout}>
           <Sidebar />
           <main className={styles.mainContent}>
-            <div className={styles.contentLoading}>Loading...</div>
+          <LoadingAnimation />
           </main>
         </div>
       </div>

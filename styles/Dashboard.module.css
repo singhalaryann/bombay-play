@@ -16,7 +16,7 @@
   flex: 1; /* Takes available space */
   height: 100%; /* Match parent height */
   overflow-y: auto; /* Enables scrolling */
-  padding: 24px;
+  padding: 20px;
 }
 
 /* Filter Section */

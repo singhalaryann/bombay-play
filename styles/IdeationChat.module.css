@@ -110,8 +110,8 @@
 }
 
 .userMessage {
-  background: rgba(130, 255, 131, 0.1);
-  color: #82FF83;
+  background: #0F110F;
+  color: #B3B3B3;
   align-self: flex-end;
 }
 

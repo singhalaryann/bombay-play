@@ -10,6 +10,7 @@ import GraphDisplay from "../components/analysis/GraphDisplay";
 import styles from "../../styles/Analysis.module.css";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import LoadingAnimation from "../components/common/LoadingAnimation";
 
 // Helper function to transform the API metrics into the shape GraphDisplay expects
 function convertMetricsToGraphs(metrics) {
@@ -171,9 +172,7 @@ export default function AnalysisPage() {
         <div className={styles.mainLayout}>
           <Sidebar />
           <main className={styles.mainContent}>
-            <div className={styles.loadingWrapper}>
-              <div className={styles.loading}>Loading...</div>
-            </div>
+          <LoadingAnimation />
           </main>
         </div>
       </div>
