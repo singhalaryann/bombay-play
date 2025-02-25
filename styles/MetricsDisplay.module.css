@@ -1,12 +1,18 @@
 .glassEffect {
   width: 100%;
   background: transparent;
-  padding: 16px;
+  /* padding: 16px; */
+}
+
+/* Added for full width card */
+.fullWidthCard {
+  width: 100%;
+  margin-bottom: 24px;
 }
 
 .metricsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
   width: 100%;
 }
@@ -192,7 +198,7 @@
 
 @media (max-width: 768px) {
   .glassEffect {
-    padding: 12px;
+    /* padding: 8px; */
   }
 
   .metricsGrid {
@@ -235,7 +241,7 @@
 
 @media (max-width: 480px) {
   .glassEffect {
-    padding: 8px;
+    /* padding: 8px; */
   }
 
   .metricsGrid {

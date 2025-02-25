@@ -95,6 +95,7 @@
  }
  
  .menuLink.active .menuText {
+  font-weight: 500;
   color: #FFFFFF;
  }
  
@@ -134,15 +135,16 @@
   opacity: 1;
 }
 
- .menuText {
+.menuText {
   color: rgba(255, 255, 255, 0.6);
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 400;  /* Lighter weight for better readability */
+  letter-spacing: 0.2px;  /* Slight letter spacing for clarity */
   transition: all 0.3s ease;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
- }
+}
  
  /* Responsive Styles */
  @media (max-width: 1280px) {
@@ -153,6 +155,9 @@
   .menuIcon {
     width: 34px;
     height: 34px;
+  }
+  .menuText {
+    font-size: 14px; /* Slightly reduced for smaller screens */
   }
  }
  
@@ -167,6 +172,9 @@
   .menuIcon {
     width: 32px;
     height: 32px;
+  }
+  .menuText {
+    font-size: 14px; /* Keep consistent with previous breakpoint */
   }
  }
  

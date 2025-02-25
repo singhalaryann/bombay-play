@@ -1,97 +1,194 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import styles from "../../../styles/knowledgebase/SocialMedia.module.css";
-import { MessageSquare } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import LoadingAnimation from "../common/LoadingAnimation";
 
 const SocialMedia = () => {
-    // Added state for hover functionality
+    // State management
+    const [hoveredId, setHoveredId] = useState(null);
+    const [socialData, setSocialData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [selectedTag, setSelectedTag] = useState(null);
+    const [showSortMenu, setShowSortMenu] = useState(false);
+    const [availableTags, setAvailableTags] = useState([]);
 
-  const [hoveredId, setHoveredId] = useState(null);
-  const [socialData, setSocialData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+    // API URL
+    const BASE_URL = process.env.NEXT_PUBLIC_FIREBASE_API_URL || "https://fetchminecraftposts-w5guhfrcya-uc.a.run.app";
 
-  const getPlatformIcon = (platform) => {
-    switch (platform) {
-      case "reddit":
-        return <img src="/reddit.png" alt="Reddit" width={20} height={20} />;
-      case "instagram":
-        return <img src="/instagram.png" alt="Instagram" width={20} height={20} />;
-      case "discord":
-        return <img src="/discord.png" alt="Discord" width={20} height={20} />;
-      default:
-        return <img src="/default.png" alt="Default" width={20} height={20} />;
+    // Initial data fetch
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                console.log("Fetching initial data...");
+
+                const response = await fetch(BASE_URL);
+                const result = await response.json();
+                
+                if (result.success) {
+                    console.log("Posts received:", result.data);
+                    console.log("Available tags:", result.availableTags);
+                    
+                    setSocialData(result.data);
+                    setAvailableTags(result.availableTags);
+                    
+                    if (result.availableTags?.length > 0) {
+                        setSelectedTag(result.availableTags[0]);
+                    }
+                } else {
+                    throw new Error("Failed to fetch data");
+                }
+            } catch (err) {
+                console.error("Error fetching data:", err);
+                setError("Failed to load data");
+                setSocialData([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    // Fetch filtered posts when tag changes
+    useEffect(() => {
+        const fetchFilteredPosts = async () => {
+            if (!selectedTag) return;
+
+            try {
+                setLoading(true);
+                console.log("Fetching posts for tag:", selectedTag);
+
+                const response = await fetch(`${BASE_URL}?tag=${encodeURIComponent(selectedTag)}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    console.log("Filtered posts:", result.data);
+                    setSocialData(result.data);
+                } else {
+                    throw new Error("Failed to fetch filtered posts");
+                }
+            } catch (err) {
+                console.error("Error fetching filtered posts:", err);
+                setError("Failed to load filtered posts");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFilteredPosts();
+    }, [selectedTag]);
+
+    // Close sort menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (showSortMenu && !event.target.closest(`.${styles.sortContainer}`)) {
+                setShowSortMenu(false);
+            }
+        };
+
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+    }, [showSortMenu]);
+
+    // Loading state
+    if (loading) {
+        return (
+            <main className={styles.mainContent}>
+                <LoadingAnimation />
+            </main>
+        );
     }
-  };
 
-  useEffect(() => {
-    const fetchSocialData = async () => {
-      try {
-        setLoading(true);
-        console.log("Fetching social media data...");
+    // Error state
+    if (error) {
+        return <div className={styles.error}>{error}</div>;
+    }
 
-        const response = await fetch("https://fetchminecraftposts-w5guhfrcya-uc.a.run.app");
-        const result = await response.json();
-        console.log("API Response:", result);
+    // Data validation
+    if (!Array.isArray(socialData)) {
+        console.error("Invalid data format:", socialData);
+        return <div className={styles.error}>Invalid data format</div>;
+    }
 
-        if (result.success) {
-          setSocialData(result.data);
-          console.log("Processed social data:", result.data);
-
-        } else {
-          throw new Error("Failed to fetch data");
-        }
-      } catch (err) {
-        console.error("Error fetching social data:", err);
-        setError("Failed to load social media data");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchSocialData();
-  }, []);
-
-  if (loading)
-    return (
-      <main className={styles.mainContent}>
-        <LoadingAnimation />
-      </main>
-    );
-  if (error) return <div className={styles.error}>{error}</div>;
-
-  return (
-    <div className={styles.container}>
-      {/* Removed Data Sources header */}
-      <div className={styles.feedContainer}>
-        {socialData.map((item, index) => (
-          <div
-            key={`${item.post_id || index}`}
-            className={`${styles.card} ${styles[item.source || "reddit"]}`}
-          >
-            {/* Updated card layout to single line */}
-            <div className={styles.cardContent}>
-              <div className={styles.leftSection}>
-                <div className={styles.platformIcon}>
-                  {getPlatformIcon(item.source || "reddit")}
-                </div>
-                <p
-                  className={styles.content}
-                  onMouseEnter={() => setHoveredId(item.post_id)}
-                  onMouseLeave={() => setHoveredId(null)}
-                >
-                  {hoveredId === item.post_id
-                    ? item.fullContent
-                    : item.truncatedSummary}
-                </p>
-              </div>
-              <span className={styles.date}>{item.date}</span>
+    // Empty state
+    if (socialData.length === 0) {
+        return (
+            <div className={styles.emptyState}>
+                No posts found {selectedTag ? `for tag: ${selectedTag}` : ''}
             </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+        );
+    }
+
+    return (
+        <div className={styles.container}>
+            {/* Sort dropdown */}
+            <div className={styles.sortContainer}>
+            <button 
+    className={styles.sortButton}
+    onClick={() => setShowSortMenu(!showSortMenu)}
+>
+    <span>Sort by: {selectedTag || "Select Tag"}</span>
+    <ChevronDown className={showSortMenu ? styles.rotated : ""} />
+</button>
+                
+                {showSortMenu && (
+                    <div className={styles.sortMenu}>
+                        {availableTags.map((tag) => (
+                            <button
+                                key={tag}
+                                className={styles.sortOption}
+                                onClick={() => {
+                                    console.log("Selected tag:", tag);
+                                    setSelectedTag(tag);
+                                    setShowSortMenu(false);
+                                }}
+                            >
+                                {tag}
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {/* Posts list */}
+            <div className={styles.feedContainer}>
+                {socialData.map((item, index) => (
+                    <div
+                        key={item.post_id || `post-${index}`}
+                        className={`${styles.card} ${styles.reddit}`}
+                        onMouseEnter={() => setHoveredId(item.post_id)}
+                        onMouseLeave={() => setHoveredId(null)}
+
+                    >
+                        <div className={styles.cardContent}>
+                            <div className={styles.leftSection}>
+                                <div className={styles.platformIcon}>
+                                    <img src="/reddit.png" alt="Reddit" width={20} height={20} />
+                                </div>
+                                <div className={styles.contentWrapper}>
+                                <p className={styles.content}>
+                                  {hoveredId === item.post_id ? item.fullContent : item.truncatedSummary}
+                                    </p>
+                                    <div className={styles.tagContainer}>
+                                        {item.tags?.map((tag, tagIndex) => (
+                                            <span key={tagIndex} className={styles.tag}>
+                                                {tag}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                            <span className={styles.date}>{item.date}</span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
 };
 
 export default SocialMedia;

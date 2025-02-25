@@ -53,7 +53,7 @@
 .rightPanel {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
   height: 100%; /* UPDATED: Match parent height */
   overflow-y: auto;
   position: relative;
@@ -144,7 +144,7 @@
   }
   
   .mainContent {
-    padding: 20px 24px;
+    /* padding: 20px 24px; */
   }
 }
 
@@ -162,7 +162,7 @@
   }
 
   .mainContent {
-    padding: 20px;
+    /* padding: 20px; */
   }
   .continueButtonContainer {
     margin-bottom: 12px;
@@ -190,7 +190,7 @@
   /* ADDED: Adjust padding for mobile */
   .leftPanel,
   .rightPanel {
-    padding: 12px;
+    /* padding: 12px; */
   }
 
   .continueButton {
@@ -216,7 +216,7 @@
   /* ADDED: Minimal padding for small screens */
   .leftPanel,
   .rightPanel {
-    padding: 8px;
+    /* padding: 8px; */
   }
 
   .continueButton {
@@ -251,8 +251,10 @@
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  /* Added to maintain consistent button width when icon is hidden */
+  min-width: 120px;
+  justify-content: center;
 }
-
 .continueButton:hover {
   background: #98FF98;
 }

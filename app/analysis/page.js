@@ -258,19 +258,20 @@ export default function AnalysisPage() {
  onClick={handleContinue}
  disabled={isNavigating}
 >
- <span>{isNavigating ? 'Loading...' : 'Continue'}</span>
- <div className={styles.iconWrapper}>
-   <Image
-     src="/Analyse_icon.svg"
-     alt="Continue"
-     width={24} 
-     height={24}
-     className={styles.buttonIcon}
-     priority
-   />
- </div>
-</button>
-                </div>
+<span>{isNavigating ? 'Loading...' : 'Continue'}</span>
+ {!isNavigating && (
+   <div className={styles.iconWrapper}>
+     <Image
+       src="/Analyse_icon.svg"
+       alt="Continue"
+       width={24} 
+       height={24}
+       className={styles.buttonIcon}
+       priority
+     />
+   </div>
+ )}
+</button>                </div>
 
                 {/* Show metrics (filter for single-value "metric" type) */}
                 <MetricsDisplay

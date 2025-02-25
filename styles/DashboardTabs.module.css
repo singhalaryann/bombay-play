@@ -1,86 +1,126 @@
+/* Main container - unchanged */
 .tabContainer {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Updated header styling to match */
+.tabHeader {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  position: relative;
+  padding: 0;
+}
+
+/* Updated button styling to match */
+.tabButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 0;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+/* Updated icon styling */
+.tabIcon {
+  width: 20px;
+  height: 20px;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+/* Updated hover effects */
+.tabButton:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.tabButton:hover .tabIcon {
+  opacity: 0.9;
+}
+
+/* Updated active states */
+.tabButton.active {
+  color: #FFFFFF;
+}
+
+.tabButton.active .tabIcon {
+  opacity: 1;
+}
+
+/* Updated active indicator line to match */
+.tabButton.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 40%; /* Half of the text width */
+  transform: translateX(-50%); /* Center the line */
+  height: 4px;
+  background-color: #82FF83;
+  border-radius: 2px;
+}
+
+/* Make sure text is properly contained */
+.tabButton span {
+  position: relative;
+  display: inline-block;
+  width: fit-content; /* Ensure span only takes up needed space */
+}
+
+/* Content container - unchanged */
+.tabContent {
+  width: 100%;
+}
+
+/* Updated active states */
+.tabButton.active {
+  color: #82FF83; /* Changed to match the green line */
+}
+
+.tabButton.active .tabIcon {
+  opacity: 1;
+  filter: brightness(0) saturate(100%) invert(86%) sepia(18%) saturate(1075%) hue-rotate(67deg) brightness(103%) contrast(98%); /* Added to make icon green */
+}
+
+/* Updated responsive styles */
+@media (max-width: 768px) {
   .tabHeader {
-    display: flex;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    gap: 35px; /* Adjust as needed */
+      gap: 24px;
   }
-  
+
   .tabButton {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 0;
-    color: rgba(255, 255, 255, 0.6); /* Default text color */
-    border: none;
-    background: none;
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: 500;
-    position: relative;
-    transition: color 0.2s ease;
+      padding: 14px 0;
+      font-size: 14px;
   }
-  
-  /* Default icon color */
-  .tabButton svg {
-    color: rgba(255, 255, 255, 0.6);
-    transition: color 0.2s ease, background 0.2s ease;
-  }
-  
-  /* Active tab text color */
-  .tabButton.active {
-    color: rgba(255, 255, 255, 0.9);
-  }
-  
-  /* Active tab icon: green background with a dark icon color */
-  .tabButton.active svg {
-    color: #82ff83;  /* Green background */
-  }
-  
-  /* Short, thick underline for active tab */
+
   .tabButton.active::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40%;            /* Shorter width: 40% of the button text width */
-    height: 2px;          /* Thick line */
-    background-color: #82FF83;
-    border-radius: 1px;
+    width: 40%;
   }
-  
-  .tabButton:hover {
-    color: rgba(255, 255, 255, 0.9);
+}
+
+@media (max-width: 480px) {
+  .tabHeader {
+      gap: 24px;
   }
-  
-  /* Tab content container */
-  .tabContent {
-    width: 100%;
-    /* Add margin-top here if you want spacing above the tab content */
-  }
-  
-  /* Responsive styles */
-  @media (max-width: 768px) {
-    .tabHeader {
-      gap: 16px;
-    }
-    .tabButton {
-      padding: 10px 0;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .tabHeader {
-      gap: 12px;
-    }
-    .tabButton {
-      padding: 8px 0;
+
+  .tabButton {
+      padding: 12px 0;
       font-size: 13px;
-    }
+      white-space: nowrap;
   }
-  
+
+  .tabButton.active::after {
+    width: 40%;
+    height: 4px;
+  }
+}

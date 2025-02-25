@@ -2,7 +2,7 @@
 import React from "react";
 import styles from "../../../styles/Header.module.css";
 import Image from "next/image";
-import { LogOut, User, Plus, Database } from "lucide-react";
+import { LogOut, User} from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 
@@ -40,16 +40,28 @@ const Header = () => {
       <div className={styles.rightSection}>
         {/* + AI Chat button */}
         <button onClick={handleAIChat} className={styles.aiChatButton}>
-          <Plus size={20} />
-          <span>AI Chat</span>
-        </button>
+  <Image 
+    src="/ai_chat.svg"
+    alt="AI Chat"
+    width={20}
+    height={20}
+    className={styles.aiIcon}
+  />
+  <span>AI Chat</span>
+</button>
         <button
-          onClick={handleKnowledgebase}
-          className={styles.knowledgebaseButton}
-        >
-          <Database size={20} />
-          <span>Knowledgebase</span>
-        </button>{" "}
+  onClick={handleKnowledgebase}
+  className={styles.knowledgebaseButton}
+>
+  <Image 
+    src="/kb_icon.svg"
+    alt="Knowledgebase"
+    width={20}
+    height={20}
+    className={styles.kbIcon}
+  />
+  <span>Knowledgebase</span>
+</button>{" "}
         {/* User block with logout button */}
         <div className={styles.userBlock}>
   {/* Using Image component for user_icon.svg */}

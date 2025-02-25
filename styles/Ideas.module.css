@@ -55,7 +55,7 @@
   top: 0;
   background: #050505;
   z-index: 10;
-  padding: 20px 0;
+  /* padding: 20px 0; */
 }
 
 .problemStatement {
@@ -141,7 +141,7 @@
 
 @media (max-width: 1280px) {
   .mainContent {
-    padding: 28px;
+    /* padding: 28px; */
   }
 
   .sectionTitle {
@@ -153,13 +153,13 @@
   }
 
   .problemStatement {
-    padding: 18px 22px;
+    /* padding: 18px 22px; */
   }
 }
 
 @media (max-width: 1024px) {
   .mainContent {
-    padding: 24px;
+    /* padding: 24px; */
   }
 
   .content {
@@ -173,7 +173,7 @@
 
 @media (max-width: 768px) {
   .mainContent {
-    padding: 20px;
+    /* padding: 20px; */
   }
 
   .sectionTitle {
@@ -182,7 +182,7 @@
   }
 
   .problemStatement {
-    padding: 16px;
+    /* padding: 16px; */
     font-size: 14px;
   }
 
@@ -217,7 +217,7 @@
 
   .problemSection {
     margin-bottom: 32px;
-    padding: 16px 0;
+    /* padding: 16px 0; */
   }
 
   .problemStatement {

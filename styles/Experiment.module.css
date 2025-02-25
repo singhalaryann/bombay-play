@@ -7,24 +7,22 @@
 }
 
 .mainLayout {
-  display: flex; /* Makes it a flex container */
-  height: calc(100vh - 64px); /* Exact height minus header */
-  width: 100%; /* Full width */
+  display: flex;
+  height: calc(100vh - 64px);
+  width: 100%;
 }
 
 .mainContent {
-  flex: 1; /* Takes available space */
-  height: 100%; /* Match parent height */
-  overflow-y: auto; /* Enables scrolling */
+  flex: 1;
   padding: 20px;
-  
 }
+
 .pageHeader {
-  /* position: sticky; */
+  position: sticky;
   top: 0;
   background: #050505;
   z-index: 10;
-  padding-bottom: 16px;
+  /* padding-bottom: 16px; */
 }
 
 .pageTitle {
@@ -65,26 +63,12 @@
   font-weight: 500;
 }
 
-/* .tabUnderline {
-  position: relative;
-  height: 2px;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.2);
-  margin-bottom: 16px;
-} */
-
-/* .activeUnderline {
-  position: absolute;
-  height: 2px;
-  background: #82FF83;
-  transition: all 0.3s ease;
-} */
-
 .scrollableSection {
   flex: 1;
   overflow-y: auto;
+  max-height: calc(100vh - 200px);
   padding-bottom: 24px;
-  margin-top: 8px;  
+  margin-top: 8px;
 }
 
 .glassWrapper {

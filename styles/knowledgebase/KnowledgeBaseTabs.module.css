@@ -1,108 +1,124 @@
-/* styles/knowledgebase/KnowledgeBaseTabs.module.css */
+/* Main tab container */
 .tabHeader {
-    display: flex;
-    align-items: center;
-    gap: 35px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 8px;
-    margin-bottom: 24px;
-   }
-   
-   .tabButton {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 0;
-    background: none;
-    border: none;
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    position: relative;
-    transition: color 0.2s ease;
-   }
-   
-   .tabButton svg {
-    color: rgba(255, 255, 255, 0.6);
-    transition: color 0.2s ease;
-   }
-   
-   .tabButton:hover {
-    color: rgba(255, 255, 255, 0.9);
-   }
-   
-   .tabButton:hover svg {
-    color: rgba(255, 255, 255, 0.9);
-   }
-   
-   .tabButton.active {
-    color: rgba(255, 255, 255, 0.9);
-   }
-   
-   .tabButton.active svg {
-    color: #82FF83;
-   }
-   
-   .tabButton.active::after {
-    content: '';
-    position: absolute;
-    bottom: -9px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40%;
-    height: 2px;
-    background-color: #82FF83;
-    border-radius: 1px;
-   }
-   
-   /* Responsive Styles */
-   @media (max-width: 768px) {
-    .tabHeader {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 24px;
+  position: relative;
+  padding: 0;
+}
+
+/* Individual tab button styling */
+.tabButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 0;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+/* Tab icon default state */
+.tabIcon {
+  width: 20px;
+  height: 20px;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+/* Hover effects */
+.tabButton:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.tabButton:hover .tabIcon {
+  opacity: 0.9;
+}
+
+/* Active tab styling */
+.tabButton.active {
+  color: #FFFFFF;
+}
+
+.tabButton.active .tabIcon {
+  opacity: 1;
+}
+
+/* Active indicator line with percentage width */
+.tabButton.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40%;
+  height: 4px;
+  background-color: #82FF83;
+  border-radius: 2px;
+}
+
+/* Container span for text centering */
+.tabButton span {
+  position: relative;
+  display: inline-block;
+  width: fit-content;
+}
+
+/* Content container */
+.tabContent {
+  width: 100%;
+}
+
+/* Active tab styling */
+.tabButton.active {
+  color: #82FF83; /* Changed from #FFFFFF to match the green line */
+}
+
+.tabButton.active .tabIcon {
+  opacity: 1;
+  filter: brightness(0) saturate(100%) invert(86%) sepia(18%) saturate(1075%) hue-rotate(67deg) brightness(103%) contrast(98%); /* Added back to make icon green */
+}
+/* Responsive styles */
+@media (max-width: 768px) {
+  .tabHeader {
       gap: 24px;
-      padding-bottom: 6px;
-      margin-bottom: 20px;
-    }
-   
-    .tabButton {
-      padding: 10px 0;
+  }
+
+  .tabButton {
+      padding: 14px 0;
       font-size: 14px;
-    }
-   }
-   
-   @media (max-width: 480px) {
-    .tabHeader {
-      gap: 16px;
-      padding-bottom: 4px;
-      margin-bottom: 16px;
-      overflow-x: auto;
-      padding-bottom: 12px;
-    }
-   
-    .tabButton {
-      padding: 8px 0;
+  }
+  
+  .tabButton.active::after {
+      width: 40%;
+  }
+}
+
+@media (max-width: 480px) {
+  .tabHeader {
+      gap: 24px;
+  }
+
+  /* Hide scrollbar for Chrome/Safari/Opera */
+  .tabHeader::-webkit-scrollbar {
+      display: none;
+  }
+
+  .tabButton {
+      padding: 12px 0;
       font-size: 13px;
       white-space: nowrap;
-    }
-   
-    .tabButton svg {
-      width: 18px;
-      height: 18px;
-    }
-   }
-   
-   /* For very small screens */
-   @media (max-width: 360px) {
-    .tabHeader {
-      gap: 12px;
-    }
-   
-    .tabButton {
-      font-size: 12px;
-    }
-   
-    .tabButton svg {
-      width: 16px;
-      height: 16px;
-    }
-   }
+  }
+
+  .tabButton.active::after {
+      width: 40%;
+      height: 4px;
+  }
+}
