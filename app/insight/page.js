@@ -26,7 +26,7 @@ function convertMetricsToGraphs(metrics) {
     };
   });
 }
-
+//
 export default function InsightPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
