@@ -20,7 +20,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 16px 0;
+  padding: 16px 8px;
   background: none;
   border: none;
   color: rgba(255, 255, 255, 0.6);
@@ -95,14 +95,12 @@
 /* Updated responsive styles */
 @media (max-width: 768px) {
   .tabHeader {
-      gap: 24px;
+    gap: 24px;
   }
-
   .tabButton {
-      padding: 14px 0;
-      font-size: 14px;
+    padding: 14px 0;
+    font-size: 14px;
   }
-
   .tabButton.active::after {
     width: 40%;
   }
@@ -110,15 +108,13 @@
 
 @media (max-width: 480px) {
   .tabHeader {
-      gap: 24px;
+    gap: 24px;
   }
-
   .tabButton {
-      padding: 12px 0;
-      font-size: 13px;
-      white-space: nowrap;
+    padding: 12px 0;
+    font-size: 13px;
+    white-space: nowrap;
   }
-
   .tabButton.active::after {
     width: 40%;
     height: 4px;

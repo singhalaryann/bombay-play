@@ -1,6 +1,6 @@
 /* styles/Sidebar.module.css */
 .sidebar {
-  width: 260px;
+  width: 240px;
   min-height: calc(100vh - 88px);
   margin: 12px;
   position: relative;
@@ -8,9 +8,9 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: #191C17;
   border-radius: 3%;
- }
- 
- .glassEffect {
+}
+
+.glassEffect {
   width: 100%;
   height: 100%;
   background: rgba(22, 28, 21, 0.95);
@@ -22,10 +22,10 @@
   -webkit-backdrop-filter: blur(20px);
   display: flex;
   flex-direction: column;
- }
- 
- /* Outer glow border */
- .glassEffect::after {
+}
+
+/* Outer glow border */
+.glassEffect::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -45,10 +45,10 @@
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
- }
- 
- /* Top gradient line */
- .glassEffect::before {
+}
+
+/* Top gradient line */
+.glassEffect::before {
   content: '';
   position: absolute;
   top: 0;
@@ -61,14 +61,15 @@
     rgba(255, 255, 255, 0.08),
     transparent
   );
- }
- 
- .menuItem {
+}
+
+.menuItem {
   padding: 4px;
   position: relative;
- }
- 
- .menuLink {
+  margin-bottom: 8px;
+}
+
+.menuLink {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -79,27 +80,28 @@
   background: transparent;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
- }
- 
- .menuLink:hover {
+}
+
+.menuLink:hover {
   background: rgba(255, 255, 255, 0.05);
- }
- 
- .menuLink:focus-visible {
+}
+
+.menuLink:focus-visible {
   outline: 2px solid rgba(130, 255, 131, 0.3);
   outline-offset: 2px;
- }
- 
- .menuLink.active {
+}
+
+.menuLink.active {
   background: transparent;
- }
- 
- .menuLink.active .menuText {
+  position: relative;
+}
+
+.menuLink.active .menuText {
   font-weight: 500;
-  color: #FFFFFF;
- }
- 
- .menuIcon {
+  color: #82FF83;
+}
+
+.menuIcon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -108,46 +110,31 @@
   border-radius: 8px;
   transition: all 0.3s ease;
   flex-shrink: 0;
- }
- 
- /* Updated icon styling for SVGs */
- .iconContainer {
-  position: relative;
-  width: 20px;
-  height: 20px;
-}
-
-.iconBackground {
-  position: absolute;
-  top: 0;
-  left: 0;
-  opacity: 0.1;
-  filter: hue-rotate(-30deg); /* For red tint */
 }
 
 .icon {
-  position: relative;
-  z-index: 1;
+  opacity: 0.7;
+  transition: all 0.2s ease;
 }
 
 .activeIcon {
-  filter: brightness(0) saturate(10%) invert(95%) sepia(24%) saturate(1857%) hue-rotate(48deg) brightness(99%) contrast(80%);
+  filter: brightness(0) saturate(100%) invert(95%) sepia(24%) saturate(1857%) hue-rotate(48deg) brightness(99%) contrast(80%);
   opacity: 1;
 }
 
 .menuText {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 15px;
-  font-weight: 400;  /* Lighter weight for better readability */
-  letter-spacing: 0.2px;  /* Slight letter spacing for clarity */
+  font-weight: 400;
+  letter-spacing: 0.2px;
   transition: all 0.3s ease;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
- 
- /* Responsive Styles */
- @media (max-width: 1280px) {
+
+/* Responsive Styles */
+@media (max-width: 1280px) {
   .sidebar {
     width: 240px;
     margin: 10px;
@@ -157,11 +144,11 @@
     height: 34px;
   }
   .menuText {
-    font-size: 14px; /* Slightly reduced for smaller screens */
+    font-size: 14px;
   }
- }
- 
- @media (max-width: 1024px) {
+}
+
+@media (max-width: 1024px) {
   .sidebar {
     width: 220px;
     margin: 8px;
@@ -174,11 +161,11 @@
     height: 32px;
   }
   .menuText {
-    font-size: 14px; /* Keep consistent with previous breakpoint */
+    font-size: 14px; 
   }
- }
- 
- @media (max-width: 768px) {
+}
+
+@media (max-width: 768px) {
   .sidebar {
     width: 80px;
     margin: 8px;
@@ -200,9 +187,9 @@
     opacity: 0;
     transition: opacity 0.2s ease;
   }
- }
- 
- @media (max-width: 480px) {
+}
+
+@media (max-width: 480px) {
   .sidebar {
     width: 70px;
     margin: 6px;
@@ -216,24 +203,24 @@
     padding: 8px;
   }
   .menuIcon {
-    width: 36px;  /* Increased from 30px */
-    height: 36px; /* Increased from 30px */
+    width: 36px;
+    height: 36px;
   }
   .icon {
-    width: 32px;  /* Increased from 18px */
-    height: 32px; /* Increased from 18px */
+    width: 30px;
+    height: 30px;
   }
   .menuItem {
     padding: 3px;
   }
- }
- 
- /* Touch Device Optimizations */
- @media (hover: none) {
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) {
   .menuLink:hover {
     background: transparent;
   }
   .menuLink:active {
     background: rgba(255, 255, 255, 0.05);
   }
- }
+}

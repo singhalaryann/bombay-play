@@ -331,51 +331,71 @@
   margin: 16px 0;
 }
 
-/* Insight Grid */
+/* Insight Grid - UPDATED */
 .insightGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  padding: 24px;
-  margin-top: 100px;
+  padding: 20px; /* CHANGED: Reduced padding */
+  margin-top: 40px; /* CHANGED: Reduced top margin */
   width: 100%;
 }
 
+/* CHANGED: Completely redesigned insight blocks to match dashboard style */
 .insightBlock {
-  background: #191C17;
+  background: rgba(18, 18, 18, 0.4); /* CHANGED: Darker background to match cards */
   border-radius: 12px;
-  padding: 20px;
+  padding: 18px; /* CHANGED: Adjusted padding */
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  /* CHANGED: Added glass effect styling similar to metric cards */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  /* ADDED: Subtle shadow for depth */
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
+/* ADDED: Hover effect similar to dashboard elements */
 .insightBlock:hover {
-  background: rgba(25, 28, 23, 0.4);
+  background: rgba(25, 28, 23, 0.6);
+  border-color: rgba(130, 255, 131, 0.2);
 }
 
+/* ADDED: Active/clicked state */
+.insightBlock:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* CHANGED: Better alignment and spacing */
 .insightContent {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
+/* CHANGED: Better icon styling */
 .insightIcon {
-  width: 16px;
-  height: 16px;
+  width: 18px; /* CHANGED: Slightly larger */
+  height: 18px;
+  opacity: 0.9; /* ADDED: Better visibility */
+  filter: brightness(0) saturate(100%) invert(95%) sepia(24%) saturate(1857%) hue-rotate(48deg) brightness(99%) contrast(80%); /* ADDED: Match green theme */
 }
 
+/* CHANGED: Better text styling */
 .insightContent span {
   color: rgba(255, 255, 255, 0.9);
-  font-size: 14px;
+  font-size: 15px; /* CHANGED: Slightly larger */
   line-height: 1.5;
+  font-weight: 500; /* ADDED: More prominent */
 }
 
 /* Responsive Breakpoints */
 @media (max-width: 1200px) {
   .insightGrid {
-    margin-top: 80px;
+    margin-top: 40px; /* CHANGED: Consistent margin */
   }
 }
 
@@ -398,18 +418,23 @@
   .insightGrid {
     grid-template-columns: 1fr;
     padding: 16px;
-    margin-top: 60px;
+    margin-top: 30px; /* CHANGED: Reduced more for mobile */
     gap: 16px;
   }
 
   .insightBlock {
     padding: 16px;
   }
+  
+  /* ADDED: Better mobile touch target */
+  .insightContent {
+    min-height: 24px;
+  }
 }
 
 @media (max-width: 480px) {
   .mainContent {
-    padding: 8px;
+    padding: 12px; /* CHANGED: Slightly increased from 8px */
     margin: 0 8px;
   }
 
@@ -419,7 +444,7 @@
 
   .insightGrid {
     padding: 12px;
-    margin-top: 40px;
+    margin-top: 20px; /* CHANGED: Even less margin on small screens */
     gap: 12px;
   }
 
@@ -429,15 +454,20 @@
   }
 
   .insightBlock {
-    padding: 12px;
+    padding: 14px; /* CHANGED: Slightly increased */
   }
 
   .insightContent {
-    gap: 8px;
+    gap: 10px; /* CHANGED: Better spacing on small screens */
   }
 
   .insightIcon {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
+  }
+  
+  /* CHANGED: Slightly larger text on small screens */
+  .insightContent span {
+    font-size: 14px;
   }
 }

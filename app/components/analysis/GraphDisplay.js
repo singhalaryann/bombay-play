@@ -94,48 +94,6 @@ const GraphDisplay = ({ graphs }) => {
    };
 
    switch (metric_type) {
-    //  case 'bar': {
-    //    const data = values.map(([cat, val]) => ({
-    //      name: cat,
-    //      value: parseFloat(val)
-    //    }));
-    //    const yDomain = calculateDomain(data, 'value');
-
-    //    return (
-    //      <ResponsiveContainer width="100%" height={300}>
-    //        <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-    //          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
-    //          <XAxis
-    //            dataKey="name"
-    //            stroke="rgba(255,255,255,0.6)"
-    //            tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
-    //            label={{
-    //              value: x_label,
-    //              position: 'bottom',
-    //              fill: 'rgba(255,255,255,0.6)',
-    //              fontSize: 12
-    //            }}
-    //          />
-    //          <YAxis
-    //            stroke="rgba(255,255,255,0.6)"
-    //            tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
-    //            label={{
-    //              value: y_label,
-    //              angle: -90,
-    //              position: 'left',
-    //              fill: 'rgba(255,255,255,0.6)',
-    //              fontSize: 12
-    //            }}
-    //            domain={yDomain}
-    //            scale="linear"
-    //          />
-    //          <Tooltip content={(props) => <CustomTooltip {...props} valueUnit={value_unit} />} />
-    //          <Bar dataKey="value" fill="#82FF83" radius={[4, 4, 0, 0]} />
-    //        </BarChart>
-    //      </ResponsiveContainer>
-    //    );
-    //  }
-
      case 'pie': {
        const data = values.map(([cat, val]) => ({
          name: cat,

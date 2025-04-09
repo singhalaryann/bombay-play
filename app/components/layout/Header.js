@@ -18,10 +18,10 @@ const Header = () => {
   const handleAIChat = () => {
     router.push("/ideationchat");
   };
-  const handleKnowledgebase = () => {
-    // Add this new handler
-    router.push("/knowledgebase");
-  };
+  // const handleKnowledgebase = () => {
+  //   // Add this new handler
+  //   router.push("/knowledgebase");
+  // };
 
   return (
     <header className={styles.header}>
@@ -49,7 +49,7 @@ const Header = () => {
   />
   <span>AI Chat</span>
 </button>
-        <button
+        {/* <button
   onClick={handleKnowledgebase}
   className={styles.knowledgebaseButton}
 >
@@ -61,7 +61,7 @@ const Header = () => {
     className={styles.kbIcon}
   />
   <span>Knowledgebase</span>
-</button>{" "}
+</button>{" "} */}
         {/* User block with logout button */}
         <div className={styles.userBlock}>
   {/* Using Image component for user_icon.svg */}

@@ -130,17 +130,20 @@ export default function Dashboard() {
       <div className={styles.mainLayout}>
         <Sidebar />
         <main className={styles.mainContent}>
-          <div className={styles.filterSection}>
-            <TabFilter selected={selectedTime} onChange={handleTimeChange} />
-          </div>
-
-          <DashboardTabs
-            activeTab={activeTab}
-            onTabChange={handleTabChange} // Use new handler
-            experimentContent={<ExperimentContent userId={userId} />}
-          >
-            {renderInsightsContent()}
-          </DashboardTabs>
+        <div className={styles.filterSection}>
+  <div className={styles.tabsContainer}>
+    <DashboardTabs
+      activeTab={activeTab}
+      onTabChange={handleTabChange}
+      experimentContent={<ExperimentContent userId={userId} />}
+    >
+      {renderInsightsContent()}
+    </DashboardTabs>
+  </div>
+  <div className={styles.filterContainer}>
+    <TabFilter selected={selectedTime} onChange={handleTimeChange} />
+  </div>
+</div>
         </main>
       </div>
     </div>

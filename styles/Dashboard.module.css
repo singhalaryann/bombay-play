@@ -22,12 +22,20 @@
 /* Filter Section */
 .filterSection {
   width: 100%;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  /* position: sticky; */
-  top: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
   z-index: 10;
+}
+
+.tabsContainer {
+  width: 100%;
+}
+
+.filterContainer {
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 .filterSection::-webkit-scrollbar {
@@ -70,7 +78,7 @@
 .insightsSection {
   margin-bottom: 80px;
   width: 100%;
-  /* margin-top: -16px; */
+  margin-top: 14px;
   border-radius: 12px;
   
 }
@@ -120,9 +128,9 @@
 .insightsList {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
   width: 100%;
-  margin-top: 10px;
+  /* margin-top: 10px; */
 }
 
 /* Custom Scrollbar (for mainContent) */
@@ -192,8 +200,8 @@
     gap: 16px;
   }
   .insightsSection {
-    padding: 16px;
-    margin-bottom: 40px;
+    padding: 12px;
+    margin-bottom: 32px;
   }
   .insightsHeader {
     flex-wrap: wrap;
@@ -204,6 +212,17 @@
   }
   .experimentHeader {
     margin-bottom: 16px;
+  }
+  .filterContainer {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+  }
+  
+  .filterSection {
+    flex-direction: column-reverse;
   }
 }
 
@@ -230,5 +249,8 @@
   .experimentPlaceholder {
     padding: 16px;
     font-size: 13px;
+  }
+  .filterContainer {
+    margin-bottom: 12px;
   }
 }
