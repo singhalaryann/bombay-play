@@ -1,3 +1,4 @@
+/* Container Styles */
 .container {
   height: 100vh;
   display: flex;
@@ -28,6 +29,7 @@
   font-size: 16px;
 }
 
+/* Glass Box Styles */
 .glassBox {
   background: #191C17;
   border-radius: 12px;
@@ -48,21 +50,22 @@
   border-radius: 12px;
   padding: 1px;
   background: linear-gradient(
-      -100deg,
-      rgba(255, 255, 255, 0.3),
-      rgba(255, 255, 255, 0.03)
+    -100deg,
+    rgba(255, 255, 255, 0.3),
+    rgba(255, 255, 255, 0.03)
   );
   -webkit-mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
 }
 
+/* Action Row Styles */
 .actionRow {
   display: flex;
   align-items: center;
@@ -145,77 +148,227 @@
   font-weight: 500;
 }
 
+/* ADDED: Skeleton loading animation */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* ADDED: Base skeleton element style */
+.skeletonText,
+.skeletonSubText,
+.skeletonButtonText,
+.skeletonMetricTitle,
+.skeletonMetricValue,
+.skeletonGraphTitle,
+.skeletonGraphContent,
+.skeletonIcon {
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.05) 8%, rgba(255, 255, 255, 0.1) 18%, rgba(255, 255, 255, 0.05) 33%);
+  background-size: 2000px 100%;
+  animation: shimmer 2s infinite linear;
+  border-radius: 4px;
+}
+
+/* ADDED: Skeleton glass box */
+.skeletonGlassBox {
+  background: rgba(25, 28, 23, 0.5);
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ADDED: Skeleton text lines */
+.skeletonGlassBox .skeletonText {
+  height: 16px;
+  width: 100%;
+}
+
+.skeletonGlassBox .skeletonText:last-child {
+  width: 70%;
+}
+
+/* ADDED: Skeleton sub text */
+.skeletonSubText {
+  height: 18px;
+  width: 80%;
+}
+
+/* ADDED: Skeleton button */
+.skeletonButton {
+  background: rgba(130, 255, 131, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+}
+
+/* ADDED: Skeleton button text */
+.skeletonButtonText {
+  height: 14px;
+  width: 80px;
+}
+
+/* ADDED: Skeleton icon */
+.skeletonIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+/* ADDED: Skeleton metric card */
+.skeletonMetricCard {
+  background: rgba(25, 28, 23, 0.5);
+  border-radius: 12px;
+  padding: 24px;
+  height: 140px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+
+.skeletonMetricCard::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  padding: 1px;
+  background: linear-gradient(-100deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ADDED: Skeleton metric title */
+.skeletonMetricTitle {
+  height: 18px;
+  width: 60%;
+}
+
+/* ADDED: Skeleton metric value */
+.skeletonMetricValue {
+  height: 36px;
+  width: 50%;
+}
+
+/* ADDED: Skeleton graph card */
+.skeletonGraphCard {
+  background: rgba(25, 28, 23, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ADDED: Skeleton graph title */
+.skeletonGraphTitle {
+  height: 22px;
+  width: 40%;
+}
+
+/* ADDED: Skeleton graph content */
+.skeletonGraphContent {
+  height: 300px;
+  width: 100%;
+  border-radius: 8px;
+}
+
 /* Responsive Design */
 @media (max-width: 1280px) {
   .mainContent {
-      padding: 24px;
+    padding: 24px;
   }
-  
   .graphsGrid {
-      gap: 20px;
+    gap: 20px;
   }
 }
 
 @media (max-width: 1024px) {
   .graphsGrid {
-      grid-template-columns: 1fr;
+    grid-template-columns: 1fr;
   }
-
   .actionRow {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 16px;
-      margin: 24px 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    margin: 24px 0;
   }
-
   .analyseButton {
-      width: 100%;
-      justify-content: center;
+    width: 100%;
+    justify-content: center;
+  }
+  /* ADDED: Skeleton responsive adjustments */
+  .skeletonGraphContent {
+    height: 250px;
   }
 }
 
 @media (max-width: 768px) {
   .mainContent {
-      padding: 16px;
+    padding: 16px;
   }
-
   .glassBox {
-      padding: 16px;
-      font-size: 14px;
-      margin-bottom: 24px;
+    padding: 16px;
+    font-size: 14px;
+    margin-bottom: 24px;
   }
-
   .subText {
-      font-size: 14px;
+    font-size: 14px;
   }
-
   .graphCard {
-      padding: 16px;
-      min-height: 350px;
+    padding: 16px;
+    min-height: 350px;
   }
-
   .graphTitle {
-      font-size: 16px;
+    font-size: 16px;
+  }
+  /* ADDED: Skeleton responsive adjustments */
+  .skeletonMetricCard {
+    padding: 16px;
+    height: 120px;
+  }
+  .skeletonGraphTitle {
+    height: 18px;
+  }
+  .skeletonGraphContent {
+    height: 220px;
   }
 }
 
 @media (max-width: 480px) {
   .mainContent {
-      padding: 12px;
+    padding: 12px;
   }
-
   .glassBox {
-      padding: 14px;
-      margin-bottom: 20px;
+    padding: 14px;
+    margin-bottom: 20px;
   }
-
   .analyseButton {
-      padding: 10px 16px;
-      font-size: 13px;
+    padding: 10px 16px;
+    font-size: 13px;
   }
-
   .graphCard {
-      padding: 14px;
-      min-height: 300px;
+    padding: 14px;
+    min-height: 300px;
+  }
+  /* ADDED: Skeleton responsive adjustments */
+  .skeletonMetricCard {
+    padding: 14px;
+    height: 100px;
+  }
+  .skeletonMetricTitle {
+    height: 16px;
+  }
+  .skeletonMetricValue {
+    height: 30px;
+  }
+  .skeletonGraphContent {
+    height: 180px;
   }
 }

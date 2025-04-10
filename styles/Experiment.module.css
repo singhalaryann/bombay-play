@@ -166,6 +166,129 @@
   text-align: center;
 }
 
+/* ADDED: Skeleton loading animation */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* ADDED: Base skeleton element style */
+.skeletonFormTitle,
+.skeletonFormLabel,
+.skeletonFormInput,
+.skeletonFormRange,
+.skeletonVariantTitle,
+.skeletonVariantBadge,
+.skeletonVariantItem,
+.skeletonButton {
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.05) 8%, rgba(255, 255, 255, 0.1) 18%, rgba(255, 255, 255, 0.05) 33%);
+  background-size: 2000px 100%;
+  animation: shimmer 2s infinite linear;
+  border-radius: 4px;
+}
+
+/* ADDED: Skeleton glass modifier */
+.skeletonGlass {
+  background: rgba(28, 28, 28, 0.2);
+}
+
+/* ADDED: Skeleton form section */
+.skeletonForm {
+  margin-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ADDED: Skeleton form title */
+.skeletonFormTitle {
+  height: 24px;
+  width: 200px;
+  margin-bottom: 16px;
+}
+
+/* ADDED: Skeleton form row */
+.skeletonFormRow {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+/* ADDED: Skeleton form label */
+.skeletonFormLabel {
+  height: 16px;
+  width: 120px;
+  flex-shrink: 0;
+}
+
+/* ADDED: Skeleton form input */
+.skeletonFormInput {
+  height: 40px;
+  width: 200px;
+  border-radius: 8px;
+}
+
+/* ADDED: Skeleton form range */
+.skeletonFormRange {
+  height: 8px;
+  flex: 1;
+  border-radius: 8px;
+}
+
+/* ADDED: Skeleton variant section */
+.skeletonVariant {
+  margin-bottom: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+/* ADDED: Skeleton variant header */
+.skeletonVariantHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+/* ADDED: Skeleton variant title */
+.skeletonVariantTitle {
+  height: 20px;
+  width: 150px;
+}
+
+/* ADDED: Skeleton variant badge */
+.skeletonVariantBadge {
+  height: 24px;
+  width: 80px;
+  border-radius: 12px;
+}
+
+/* ADDED: Skeleton variant content */
+.skeletonVariantContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ADDED: Skeleton variant item */
+.skeletonVariantItem {
+  height: 20px;
+  width: 100%;
+}
+
+/* ADDED: Skeleton button */
+.skeletonButton {
+  height: 40px;
+  width: 180px;
+  border-radius: 8px;
+  background: rgba(130, 255, 131, 0.1);
+}
+
 @media (max-width: 1280px) {
   .mainContent {
     padding: 20px 24px;
@@ -176,16 +299,29 @@
   .mainContent {
     padding: 16px 20px;
   }
+  
   .tabContainer {
     gap: 16px;
   }
+  
   .buttonGroup {
     flex-direction: column;
   }
+  
   .addVariantButton,
   .launchButton {
     width: 100%;
     justify-content: center;
+  }
+  
+  /* ADDED: Responsive skeleton adjustments */
+  .skeletonButton {
+    width: 100%;
+  }
+  
+  .skeletonFormInput,
+  .skeletonFormRange {
+    width: 100%;
   }
 }
 
@@ -193,18 +329,35 @@
   .mainContent {
     padding: 12px 16px;
   }
+  
   .tabContainer {
     gap: 12px;
   }
+  
   .scrollableSection {
     padding-bottom: 20px;
   }
+  
   .buttonGroup {
     padding-top: 20px;
   }
+  
   .addVariantButton,
   .launchButton {
     font-size: 13px;
+  }
+  
+  /* ADDED: Responsive skeleton adjustments */
+  .skeletonForm {
+    gap: 16px;
+  }
+  
+  .skeletonFormRow {
+    gap: 16px;
+  }
+  
+  .skeletonVariant {
+    padding: 16px;
   }
 }
 
@@ -212,19 +365,42 @@
   .mainContent {
     padding: 12px;
   }
+  
   .pageTitle {
     font-size: 18px;
   }
+  
   .tab {
     font-size: 13px;
     padding: 6px 12px;
   }
+  
   .buttonGroup {
     gap: 12px;
   }
+  
   .addVariantButton,
   .launchButton {
     padding: 8px 16px;
     font-size: 13px;
+  }
+  
+  /* ADDED: Responsive skeleton adjustments */
+  .skeletonForm {
+    gap: 12px;
+  }
+  
+  .skeletonFormRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .skeletonFormLabel {
+    width: 100px;
+  }
+  
+  .skeletonVariant {
+    padding: 12px;
   }
 }

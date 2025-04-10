@@ -42,11 +42,13 @@ export default function AnalysisPage() {
   const [dynamicMetrics, setDynamicMetrics] = useState([]);
   const [dynamicGraphs, setDynamicGraphs] = useState([]);
 
-  const [isNavigating, setIsNavigating] = useState(false); // Add this state
+  const [isNavigating, setIsNavigating] = useState(false);
+  
+  // ADDED: New state for tracking initial render
+  const [isInitialRender, setIsInitialRender] = useState(true);
 
   // 1) Modified handleContinue to fetch experiment IDs using chatId
   //    and then pass them to /experiment in the URL.
-
   const handleContinue = async () => {
     setIsNavigating(true); // Set loading state
     const chatId = searchParams.get("chat");
@@ -67,7 +69,7 @@ export default function AnalysisPage() {
             user_id: userId,  // Added user_id
             chat_id: chatId,
             segment_ids: ["1", "2"]  // Added segment_ids array
-             }),
+          }),
         }
       );
 
@@ -126,6 +128,9 @@ export default function AnalysisPage() {
       try {
         const chatId = searchParams.get("chat");
         console.log("Fetching chat data with:", { userId, chatId });
+        
+        // ADDED: Mark initial render as completed
+        setIsInitialRender(false);
 
         if (!userId || !chatId) {
           throw new Error("Missing required parameters");
@@ -164,15 +169,77 @@ export default function AnalysisPage() {
     }
   }, [userId, searchParams]);
 
-  // Loading state
-  if (loading) {
+  // ADDED: Render skeleton content function
+  const renderSkeletonContent = () => {
+    return (
+      <div className={styles.content}>
+        <div className={styles.contentLayout}>
+          <div className={styles.leftPanel}>
+            <div className={styles.chatSection}>
+              {/* Skeleton Chat Interface */}
+              <div className={styles.skeletonChatContainer}>
+                {/* Skeleton Message Bubbles */}
+                <div className={styles.skeletonMessageUser}>
+                  <div className={styles.skeletonMessageContent}></div>
+                </div>
+                <div className={styles.skeletonMessageAi}>
+                  <div className={styles.skeletonMessageContent}></div>
+                  <div className={styles.skeletonMessageContent} style={{ width: '80%' }}></div>
+                </div>
+                <div className={styles.skeletonMessageUser}>
+                  <div className={styles.skeletonMessageContent} style={{ width: '60%' }}></div>
+                </div>
+                <div className={styles.skeletonMessageAi}>
+                  <div className={styles.skeletonMessageContent}></div>
+                  <div className={styles.skeletonMessageContent} style={{ width: '70%' }}></div>
+                  <div className={styles.skeletonMessageContent} style={{ width: '60%' }}></div>
+                </div>
+                {/* Skeleton Input Area */}
+                <div className={styles.skeletonInputArea}></div>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.rightPanel}>
+            {/* Skeleton Continue Button */}
+            <div className={styles.continueButtonContainer}>
+              <div className={styles.skeletonContinueButton}></div>
+            </div>
+
+            {/* Skeleton Metrics */}
+            <div className={styles.skeletonMetricsGrid}>
+              {[1, 2, 3, 4].map((index) => (
+                <div key={index} className={styles.skeletonMetricCard}>
+                  <div className={styles.skeletonMetricTitle}></div>
+                  <div className={styles.skeletonMetricValue}></div>
+                </div>
+              ))}
+            </div>
+
+            {/* Skeleton Graphs */}
+            <div className={styles.skeletonGraphsContainer}>
+              {[1, 2].map((index) => (
+                <div key={index} className={styles.skeletonGraphCard}>
+                  <div className={styles.skeletonGraphTitle}></div>
+                  <div className={styles.skeletonGraphContent}></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // UPDATED: Modified loading handler to use skeleton content
+  if (isInitialRender || loading) {
     return (
       <div className={styles.container}>
         <Header />
         <div className={styles.mainLayout}>
           <Sidebar />
           <main className={styles.mainContent}>
-          <LoadingAnimation />
+            {renderSkeletonContent()}
           </main>
         </div>
       </div>
@@ -253,25 +320,26 @@ export default function AnalysisPage() {
               <div className={styles.rightPanel}>
                 {/* Continue button triggers handleContinue */}
                 <div className={styles.continueButtonContainer}>
-                <button
- className={styles.continueButton}
- onClick={handleContinue}
- disabled={isNavigating}
->
-<span>{isNavigating ? 'Loading...' : 'Continue'}</span>
- {!isNavigating && (
-   <div className={styles.iconWrapper}>
-     <Image
-       src="/Analyse_icon.svg"
-       alt="Continue"
-       width={24} 
-       height={24}
-       className={styles.buttonIcon}
-       priority
-     />
-   </div>
- )}
-</button>                </div>
+                  <button
+                    className={styles.continueButton}
+                    onClick={handleContinue}
+                    disabled={isNavigating}
+                  >
+                    <span>{isNavigating ? 'Loading...' : 'Continue'}</span>
+                    {!isNavigating && (
+                      <div className={styles.iconWrapper}>
+                        <Image
+                          src="/Analyse_icon.svg"
+                          alt="Continue"
+                          width={24} 
+                          height={24}
+                          className={styles.buttonIcon}
+                          priority
+                        />
+                      </div>
+                    )}
+                  </button>                
+                </div>
 
                 {/* Show metrics (filter for single-value "metric" type) */}
                 <MetricsDisplay

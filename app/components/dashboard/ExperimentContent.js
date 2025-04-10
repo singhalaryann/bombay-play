@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import styles from "../../../styles/ExperimentContent.module.css";
 import ExperimentGraphDisplay from "../experiment/ExperimentGraphDisplay";
 import LoadingAnimation from "../common/LoadingAnimation";
-import { BarChart3, ChevronDown, ChevronUp } from 'lucide-react';  // Add this import at the top
+import { BarChart3, ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function ExperimentContent({ userId }) {
   const [experimentData, setExperimentData] = useState([]);
@@ -12,7 +12,10 @@ export default function ExperimentContent({ userId }) {
   // New states for graph handling
   const [selectedGraphs, setSelectedGraphs] = useState(null);
   const [selectedExperimentId, setSelectedExperimentId] = useState(null);
-  const [loadingGraphs, setLoadingGraphs] = useState(false);  // Add this state at the top with other states
+  const [loadingGraphs, setLoadingGraphs] = useState(false);
+  
+  // ADDED: New state for skeleton loading
+  const [isInitialRender, setIsInitialRender] = useState(true);
 
   // Existing useEffect for initial data fetch
   useEffect(() => {
@@ -24,6 +27,9 @@ export default function ExperimentContent({ userId }) {
       }
 
       try {
+        // ADDED: Make sure we show skeleton content first
+        setIsInitialRender(false);
+        
         const userExperimentsResponse = await fetch(
           "https://get-user-experiments-q54hzgyghq-uc.a.run.app",
           {
@@ -106,15 +112,15 @@ export default function ExperimentContent({ userId }) {
   const handleExperimentClick = async (experimentId) => {
     console.log("Experiment clicked:", experimentId);
 
-   // Toggle graphs if clicking same experiment
-  if (selectedExperimentId === experimentId) {
-    setSelectedGraphs(null);
-    setSelectedExperimentId(null);
-    return;
-  }
+    // Toggle graphs if clicking same experiment
+    if (selectedExperimentId === experimentId) {
+      setSelectedGraphs(null);
+      setSelectedExperimentId(null);
+      return;
+    }
 
-  setLoadingGraphs(true);  // Start loading animation
-  setSelectedExperimentId(experimentId);
+    setLoadingGraphs(true);  // Start loading animation
+    setSelectedExperimentId(experimentId);
 
     try {
       const response = await fetch(
@@ -137,9 +143,60 @@ export default function ExperimentContent({ userId }) {
     }
   };
 
-  // Existing loading/error handlers
-  if (loading)
-    return <LoadingAnimation />
+  // ADDED: Render skeleton placeholders while loading
+  const renderSkeletonContent = () => {
+    return (
+      <div className={styles.experimentSection}>
+        {[1, 2, 3].map((index) => (
+          <div key={index} className={`${styles.bundleContainer} ${styles.skeletonContainer}`}>
+            <div className={styles.bundleTitle}>
+              <div className={styles.titleWrapper}>
+                <div className={`${styles.skeletonText} ${styles.skeletonTitle}`}></div>
+              </div>
+              <div className={`${styles.clickIndicator} ${styles.skeletonButton}`}>
+                <BarChart3 size={16} className="text-white opacity-30" />
+                <div className={styles.skeletonButtonText}></div>
+                <ChevronDown size={16} className="text-white opacity-30" />
+              </div>
+            </div>
+            <div className={styles.tableWrapper}>
+              <table className={styles.bundleTable}>
+                <thead>
+                  <tr className={styles.headerRow}>
+                    <th>Test Group</th>
+                    <th className={styles.skeletonHeader}></th>
+                    <th className={styles.skeletonHeader}></th>
+                  </tr>
+                </thead>
+                <tbody className={styles.glassEffect}>
+                  <tr>
+                    <td className={styles.groupCell}>Control</td>
+                    <td className={`${styles.valueCell} ${styles.skeletonCell}`}></td>
+                    <td className={`${styles.valueCell} ${styles.skeletonCell}`}></td>
+                  </tr>
+                  <tr>
+                    <td className={styles.groupCell}>Variant A</td>
+                    <td className={`${styles.valueCell} ${styles.skeletonCell}`}></td>
+                    <td className={`${styles.valueCell} ${styles.skeletonCell}`}></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  // UPDATED: Modified loading handler to show skeleton content
+  if (isInitialRender) {
+    return renderSkeletonContent();
+  }
+
+  if (loading) {
+    return renderSkeletonContent();
+  }
+
   if (error)
     return (
       <div className={styles.errorContainer}>
@@ -195,27 +252,23 @@ export default function ExperimentContent({ userId }) {
           <div
             key={experiment._id}
             className={styles.bundleContainer}
-            onClick={() => handleExperimentClick(experiment._id)} // Added click handler
-            style={{ cursor: "pointer" }} // Added cursor style
+            onClick={() => handleExperimentClick(experiment._id)}
+            style={{ cursor: "pointer" }}
           >
-            {/* <h2 className={styles.bundleTitle}>{experiment.label}</h2> */}
-
-            {/* // After: Title with indicator */}
             <div className={styles.bundleTitle}>
               <div className={styles.titleWrapper}>
                 <span className={styles.titleText}>{experiment.label}</span>
               </div>
-          {/* Modified click indicator with reordered icons and state-based arrow */}
-        {/* Updated click indicator with consistent opacity and sizing */}
-<div className={styles.clickIndicator}>
-  <BarChart3 size={16} className="text-white opacity-60" /> {/* Added opacity-60 */}
-  <span>Click to view graphs</span>
-  {selectedExperimentId === experiment._id ? (
-    <ChevronUp size={16} className="text-white opacity-100" /> 
-  ) : (
-    <ChevronDown size={16} className="text-white opacity-100" /> 
-  )}
-</div>          </div>
+              <div className={styles.clickIndicator}>
+                <BarChart3 size={16} className="text-white opacity-60" />
+                <span>Click to view graphs</span>
+                {selectedExperimentId === experiment._id ? (
+                  <ChevronUp size={16} className="text-white opacity-100" /> 
+                ) : (
+                  <ChevronDown size={16} className="text-white opacity-100" /> 
+                )}
+              </div>
+            </div>
             <div className={styles.tableWrapper}>
               <table className={styles.bundleTable}>
                 <thead>
@@ -243,20 +296,18 @@ export default function ExperimentContent({ userId }) {
               </table>
             </div>
 
-            {/* New graph section */}
+            {/* Graph section */}
             {selectedExperimentId === experiment._id && (
-  <div className={styles.graphsContainer}>
-    {/* Show graph container immediately when clicked */}
-    <div className={styles.graphContent}>
-      {/* Show loading animation while fetching or graphs when loaded */}
-      {loadingGraphs || !selectedGraphs ? (
-        <LoadingAnimation />
-      ) : (
-        <ExperimentGraphDisplay graphs={selectedGraphs} />
-      )}
-    </div>
-  </div>
-)}
+              <div className={styles.graphsContainer}>
+                <div className={styles.graphContent}>
+                  {loadingGraphs || !selectedGraphs ? (
+                    <LoadingAnimation />
+                  ) : (
+                    <ExperimentGraphDisplay graphs={selectedGraphs} />
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         );
       })}

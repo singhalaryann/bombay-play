@@ -130,106 +130,7 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Responsive Breakpoints */
-@media (min-width: 1441px) {
-  .content {
-    max-width: 1600px;
-  }
-}
-
-@media (max-width: 1280px) {
-  .contentLayout {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    height: calc(100vh - 100px);
-  }
-  
-  .mainContent {
-    /* padding: 20px 24px; */
-  }
-}
-
-@media (max-width: 1024px) {
-  .contentLayout {
-    grid-template-columns: 1fr;
-    height: auto;
-    gap: 24px;
-  }
-
-  .leftPanel,
-  .rightPanel {
-    height: 600px; /* UPDATED: Fixed height for tablets */
-    position: relative;
-  }
-
-  .mainContent {
-    /* padding: 20px; */
-  }
-  .continueButtonContainer {
-    margin-bottom: 12px;
-  }
-  .continueButton {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-@media (max-width: 768px) {
-  .mainContent {
-    padding: 16px;
-  }
-
-  .contentLayout {
-    gap: 20px;
-  }
-
-  .leftPanel,
-  .rightPanel {
-    height: 500px; /* UPDATED: Shorter height for mobile */
-  }
-
-  /* ADDED: Adjust padding for mobile */
-  .leftPanel,
-  .rightPanel {
-    /* padding: 12px; */
-  }
-
-  .continueButton {
-    padding: 10px 18px;
-    font-size: 14px;
-  }
-}
-
-@media (max-width: 480px) {
-  .mainContent {
-    padding: 12px;
-  }
-
-  .contentLayout {
-    gap: 16px;
-  }
-
-  .leftPanel,
-  .rightPanel {
-    height: 400px; /* UPDATED: Even shorter for small mobile */
-  }
-
-  /* ADDED: Minimal padding for small screens */
-  .leftPanel,
-  .rightPanel {
-    /* padding: 8px; */
-  }
-
-  .continueButton {
-    padding: 10px 16px;
-    font-size: 13px;
-  }
-  .iconWrapper {
-    width: 20px;
-    height: 20px;
-  }
-}
-
-/* New styles added */
+/* Continue Button Styles */
 .continueButtonContainer {
   display: flex;
   justify-content: flex-end;
@@ -276,4 +177,316 @@
   opacity: 0.5;
   cursor: not-allowed;
   pointer-events: none;
+}
+
+/* ADDED: Skeleton loading animation */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* ADDED: Base skeleton element style */
+.skeletonMessageContent,
+.skeletonMetricTitle,
+.skeletonMetricValue,
+.skeletonGraphTitle,
+.skeletonGraphContent,
+.skeletonInputArea {
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.05) 8%, rgba(255, 255, 255, 0.1) 18%, rgba(255, 255, 255, 0.05) 33%);
+  background-size: 2000px 100%;
+  animation: shimmer 2s infinite linear;
+  border-radius: 4px;
+}
+
+/* ADDED: Skeleton chat container */
+.skeletonChatContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  height: 100%;
+  padding: 16px;
+  background: rgba(18, 18, 18, 0.3);
+  border-radius: 12px;
+  overflow-y: auto;
+}
+
+/* ADDED: Skeleton message styles */
+.skeletonMessageUser, 
+.skeletonMessageAi {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 80%;
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.skeletonMessageUser {
+  align-self: flex-end;
+  background: rgba(130, 255, 131, 0.1);
+  border: 1px solid rgba(130, 255, 131, 0.1);
+}
+
+.skeletonMessageAi {
+  align-self: flex-start;
+  background: rgba(18, 18, 18, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ADDED: Skeleton message content */
+.skeletonMessageContent {
+  height: 16px;
+  width: 100%;
+}
+
+/* ADDED: Skeleton input area */
+.skeletonInputArea {
+  height: 56px;
+  width: 100%;
+  border-radius: 12px;
+  margin-top: auto;
+  background: rgba(18, 18, 18, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ADDED: Skeleton continue button */
+.skeletonContinueButton {
+  height: 40px;
+  width: 120px;
+  background: rgba(130, 255, 131, 0.1);
+  border-radius: 8px;
+}
+
+/* ADDED: Skeleton metrics grid */
+.skeletonMetricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+/* ADDED: Skeleton metric card */
+.skeletonMetricCard {
+  background: rgba(18, 18, 18, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ADDED: Skeleton metric title */
+.skeletonMetricTitle {
+  height: 16px;
+  width: 60%;
+}
+
+/* ADDED: Skeleton metric value */
+.skeletonMetricValue {
+  height: 36px;
+  width: 40%;
+}
+
+/* ADDED: Skeleton graphs container */
+.skeletonGraphsContainer {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  width: 100%;
+}
+
+/* ADDED: Skeleton graph card */
+.skeletonGraphCard {
+  background: rgba(18, 18, 18, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ADDED: Skeleton graph title */
+.skeletonGraphTitle {
+  height: 20px;
+  width: 40%;
+}
+
+/* ADDED: Skeleton graph content */
+.skeletonGraphContent {
+  height: 300px;
+  width: 100%;
+  border-radius: 8px;
+}
+
+/* Responsive Breakpoints */
+@media (min-width: 1441px) {
+  .content {
+    max-width: 1600px;
+  }
+}
+
+@media (max-width: 1280px) {
+  .contentLayout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    height: calc(100vh - 100px);
+  }
+  
+  .mainContent {
+    /* padding: 20px 24px; */
+  }
+  
+  /* ADDED: Responsive skeleton adjustments */
+  .skeletonGraphContent {
+    height: 250px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .contentLayout {
+    grid-template-columns: 1fr;
+    height: auto;
+    gap: 24px;
+  }
+
+  .leftPanel,
+  .rightPanel {
+    height: 600px; /* UPDATED: Fixed height for tablets */
+    position: relative;
+  }
+
+  .mainContent {
+    /* padding: 20px; */
+  }
+  .continueButtonContainer {
+    margin-bottom: 12px;
+  }
+  .continueButton {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* ADDED: Responsive skeleton adjustments */
+  .skeletonContinueButton {
+    width: 100%;
+  }
+  
+  .skeletonGraphContent {
+    height: 220px;
+  }
+  
+  .skeletonMetricCard {
+    height: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .mainContent {
+    padding: 16px;
+  }
+
+  .contentLayout {
+    gap: 20px;
+  }
+
+  .leftPanel,
+  .rightPanel {
+    height: 500px; /* UPDATED: Shorter height for mobile */
+  }
+
+  /* ADDED: Adjust padding for mobile */
+  .leftPanel,
+  .rightPanel {
+    /* padding: 12px; */
+  }
+
+  .continueButton {
+    padding: 10px 18px;
+    font-size: 14px;
+  }
+  
+  /* ADDED: Responsive skeleton adjustments */
+  .skeletonMessageUser, 
+  .skeletonMessageAi {
+    padding: 12px;
+  }
+  
+  .skeletonInputArea {
+    height: 48px;
+  }
+  
+  .skeletonMetricCard {
+    padding: 16px;
+  }
+  
+  .skeletonGraphCard {
+    padding: 16px;
+  }
+  
+  .skeletonGraphContent {
+    height: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mainContent {
+    padding: 12px;
+  }
+
+  .contentLayout {
+    gap: 16px;
+  }
+
+  .leftPanel,
+  .rightPanel {
+    height: 400px; /* UPDATED: Even shorter for small mobile */
+  }
+
+  /* ADDED: Minimal padding for small screens */
+  .leftPanel,
+  .rightPanel {
+    /* padding: 8px; */
+  }
+
+  .continueButton {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+  .iconWrapper {
+    width: 20px;
+    height: 20px;
+  }
+  
+  /* ADDED: Responsive skeleton adjustments */
+  .skeletonChatContainer {
+    padding: 12px;
+  }
+  
+  .skeletonMessageUser, 
+  .skeletonMessageAi {
+    padding: 10px;
+  }
+  
+  .skeletonMessageContent {
+    height: 14px;
+  }
+  
+  .skeletonMetricCard {
+    padding: 12px;
+    height: 90px;
+  }
+  
+  .skeletonGraphCard {
+    padding: 12px;
+  }
+  
+  .skeletonGraphContent {
+    height: 150px;
+  }
 }

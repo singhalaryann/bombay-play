@@ -7,22 +7,23 @@ import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 
 const Header = () => {
-  const { userId } = useAuth();
+  const { userId, logout } = useAuth();
   const router = useRouter();
-
+  
   const handleLogout = () => {
-    localStorage.removeItem("userId");
-    router.push("/");
+    logout();
+    router.push("/ideationchat");
   };
-
+  
   const handleAIChat = () => {
     router.push("/ideationchat");
   };
+  
   // const handleKnowledgebase = () => {
-  //   // Add this new handler
-  //   router.push("/knowledgebase");
+  // // Add this new handler
+  // router.push("/knowledgebase");
   // };
-
+  
   return (
     <header className={styles.header}>
       <div className={styles.leftSection}>
@@ -36,47 +37,51 @@ const Header = () => {
           />
         </div>
       </div>
-
       <div className={styles.rightSection}>
         {/* + AI Chat button */}
         <button onClick={handleAIChat} className={styles.aiChatButton}>
-  <Image 
-    src="/ai_chat.svg"
-    alt="AI Chat"
-    width={20}
-    height={20}
-    className={styles.aiIcon}
-  />
-  <span>AI Chat</span>
-</button>
+          <Image
+            src="/ai_chat.svg"
+            alt="AI Chat"
+            width={20}
+            height={20}
+            className={styles.aiIcon}
+          />
+          <span>AI Chat</span>
+        </button>
         {/* <button
-  onClick={handleKnowledgebase}
-  className={styles.knowledgebaseButton}
->
-  <Image 
-    src="/kb_icon.svg"
-    alt="Knowledgebase"
-    width={20}
-    height={20}
-    className={styles.kbIcon}
-  />
-  <span>Knowledgebase</span>
-</button>{" "} */}
-        {/* User block with logout button */}
+         onClick={handleKnowledgebase}
+         className={styles.knowledgebaseButton}
+        >
+         <Image
+         src="/kb_icon.svg"
+         alt="Knowledgebase"
+         width={20}
+         height={20}
+         className={styles.kbIcon}
+         />
+         <span>Knowledgebase</span>
+        </button>{" "} */}
+        
+        {/* CHANGED: User block with conditional logout button */}
         <div className={styles.userBlock}>
-  {/* Using Image component for user_icon.svg */}
-  <Image 
-    src="/user_icon.svg"
-    alt="User"
-    width={24}
-    height={24}
-    className={styles.userIcon}
-  />
-  <span className={styles.userId}>{userId || "Guest"}</span>
-  <button onClick={handleLogout} className={styles.logoutButton}>
-    <LogOut size={20} />
-  </button>
-</div>
+          {/* Using Image component for user_icon.svg */}
+          <Image
+            src="/user_icon.svg"
+            alt="User"
+            width={24}
+            height={24}
+            className={styles.userIcon}
+          />
+          <span className={styles.userId}>{userId || "Guest"}</span>
+          
+          {/* CHANGED: Only show logout button if user is logged in */}
+          {userId && (
+            <button onClick={handleLogout} className={styles.logoutButton}>
+              <LogOut size={20} />
+            </button>
+          )}
+        </div>
       </div>
     </header>
   );

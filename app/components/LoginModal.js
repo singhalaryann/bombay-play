@@ -1,0 +1,106 @@
+"use client";
+import React, { useState, useEffect } from "react";
+import styles from "../../styles/LoginModal.module.css";
+import { useAuth } from "../context/AuthContext";
+import { useRouter } from "next/navigation";
+
+const LoginModal = ({ onClose, onSuccess, redirectPath }) => {
+  const [userId, setUserId] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [mounted, setMounted] = useState(false);
+  const { login } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const response = await fetch("https://check-user-q54hzgyghq-uc.a.run.app", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: userId.trim(),
+        }),
+      });
+
+      const data = await response.json();
+      console.log("API Response:", data);
+
+      if (data.user_exists) {
+        console.log("User validated successfully");
+        login(userId.trim());
+        
+        // Close modal first
+        if (onClose) {
+          onClose();
+        }
+        
+        // CHANGED: Specifically prevent redirect when on ideationchat
+        // if (redirectPath && window.location.pathname !== '/ideationchat') {
+        //   router.push(redirectPath);
+        // }
+        
+        // Call onSuccess callback last, after other operations
+        if (onSuccess) {
+          onSuccess(userId.trim());
+        }
+      } else {
+        setError("Invalid user ID. Please try again.");
+        console.log("User validation failed");
+      }
+    } catch (error) {
+      console.error("API Error:", error);
+      setError("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className={styles.modalOverlay}>
+      <div className={`${styles.content} ${mounted ? styles.mounted : ""}`}>
+        <div className={styles.glassEffect}>
+          <div className={styles.title}>
+            Welcome to <span className={styles.highlight}>XG</span>
+          </div>
+          <p className={styles.subtitle}>Enter your user ID to continue</p>
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <input
+              type="text"
+              value={userId}
+              onChange={(e) => setUserId(e.target.value)}
+              placeholder="Enter your ID"
+              className={styles.input}
+              disabled={loading}
+              autoFocus
+            />
+            <button
+              type="submit"
+              className={styles.button}
+              disabled={loading || !userId.trim()}
+            >
+              {loading ? "Validating..." : "Enter"}
+            </button>
+          </form>
+          {error && <p className={styles.error}>{error}</p>}
+          {onClose && (
+            <button onClick={onClose} className={styles.cancelButton}>
+              Cancel
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default LoginModal;

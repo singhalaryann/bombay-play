@@ -37,12 +37,18 @@ export default function InsightPage() {
   // Separate arrays for metrics and graphs (just like the Analysis page)
   const [initialMetrics, setInitialMetrics] = useState([]);
   const [initialGraphs, setInitialGraphs] = useState([]);
+  
+  // ADDED: New state for tracking initial render
+  const [isInitialRender, setIsInitialRender] = useState(true);
 
   useEffect(() => {
     const fetchInsightData = async () => {
       try {
         const insightId = searchParams.get('id');
         console.log('Fetching insight data for:', { userId, insightId });
+
+        // ADDED: Mark initial render as completed
+        setIsInitialRender(false);
 
         // If missing required params, go back to dashboard
         if (!userId || !insightId) {
@@ -99,18 +105,59 @@ export default function InsightPage() {
     router.push(`/ideas?insight=${insightId}`);
   };
 
-  if (loading) {
+  // ADDED: Render skeleton content function
+  const renderSkeletonContent = () => {
     return (
       <div className={styles.container}>
         <Header />
         <div className={styles.mainLayout}>
           <Sidebar />
           <main className={styles.mainContent}>
-          <LoadingAnimation />
+            {/* ADDED: Skeleton glass box */}
+            <div className={`${styles.glassBox} ${styles.skeletonGlassBox}`}>
+              <div className={styles.skeletonText}></div>
+              <div className={styles.skeletonText}></div>
+            </div>
+
+            {/* ADDED: Skeleton action row */}
+            <div className={styles.actionRow}>
+              <div className={`${styles.subText} ${styles.skeletonSubText}`}></div>
+              <div className={`${styles.analyseButton} ${styles.skeletonButton}`}>
+                <div className={styles.skeletonButtonText}></div>
+                <div className={styles.iconWrapper}>
+                  <div className={styles.skeletonIcon}></div>
+                </div>
+              </div>
+            </div>
+
+            {/* ADDED: Skeleton metrics */}
+            <div className={styles.metricsDisplay}>
+              {[1, 2, 3, 4].map((index) => (
+                <div key={index} className={styles.skeletonMetricCard}>
+                  <div className={styles.skeletonMetricTitle}></div>
+                  <div className={styles.skeletonMetricValue}></div>
+                </div>
+              ))}
+            </div>
+
+            {/* ADDED: Skeleton graphs */}
+            <div className={styles.graphsGrid}>
+              {[1, 2].map((index) => (
+                <div key={index} className={`${styles.graphCard} ${styles.skeletonGraphCard}`}>
+                  <div className={styles.skeletonGraphTitle}></div>
+                  <div className={styles.skeletonGraphContent}></div>
+                </div>
+              ))}
+            </div>
           </main>
         </div>
       </div>
     );
+  };
+
+  // UPDATED: Modified loading handler to use skeleton content instead of just LoadingAnimation
+  if (isInitialRender || loading) {
+    return renderSkeletonContent();
   }
 
   return (

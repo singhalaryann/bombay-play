@@ -28,11 +28,11 @@ export default function Dashboard() {
     searchParams.get("tab") || "insights"
   );
 
-  // Add new effect to handle URL param changes
+  // Add effect to handle URL param changes
   useEffect(() => {
     // Update active tab when URL params change
     const tabParam = searchParams.get("tab");
-    if (tabParam) {
+    if (tabParam && ["insights", "experiments"].includes(tabParam)) {
       setActiveTab(tabParam);
     }
   }, [searchParams]);
@@ -47,8 +47,7 @@ export default function Dashboard() {
   const fetchDashboardData = async (time) => {
     try {
       setLoading(true);
-      console.log("Fetching dashboard data:", { userId, time });
-
+      
       const response = await fetch(
         "https://dashboard-q54hzgyghq-uc.a.run.app",
         {
@@ -73,7 +72,9 @@ export default function Dashboard() {
         }
       }
     } catch (error) {
-      console.error("Error fetching dashboard data:", error);
+      // Silent error handling to avoid console logs in production
+      setMetrics([]);
+      setInsights([]);
     } finally {
       setLoading(false);
     }
@@ -93,35 +94,76 @@ export default function Dashboard() {
     setSelectedTime(newTime);
   };
 
-  // Render insights section content
-  const renderInsightsContent = () => (
+  // Render skeleton insights
+  const renderSkeletonContent = () => (
     <>
-      {insights.length > 0 && (
-        <div className={styles.insightsSection}>
-          <div className={styles.insightsList}>
-            {insights.map((insight, index) => (
-              <InsightCard
-                key={`${insight.insight_id}-${index}`}
-                description={insight.description}
-                insight_id={insight.insight_id}
-              />
-            ))}
-          </div>
+      <div className={styles.insightsSection}>
+        <div className={styles.insightsList}>
+          {[1, 2, 3].map((index) => (
+            <div key={index} className={`${styles.insightCard} ${styles.skeletonInsight}`}>
+              <div className={styles.skeletonInsightContent}></div>
+              <div className={styles.skeletonInsightButton}></div>
+            </div>
+          ))}
         </div>
-      )}
+      </div>
       <div className={styles.metricsGrid}>
-        {loading ? (
-           <LoadingAnimation />
-        ) : metrics.length > 0 ? (
-          metrics.map((metric, index) => (
-            <MetricCard key={`${metric.name}-${index}`} {...metric} />
-          ))
-        ) : (
-          <div className={styles.noData}>No metrics available</div>
-        )}
+        {[1, 2, 3, 4].map((index) => (
+          <div key={index} className={`${styles.metricCard} ${styles.skeletonMetric}`}>
+            <div className={styles.skeletonMetricHeader}>
+              <div className={styles.skeletonMetricTitle}></div>
+              <div className={styles.skeletonMetricIcon}></div>
+            </div>
+            <div className={styles.skeletonMetricValue}></div>
+            <div className={styles.skeletonMetricSubtitle}></div>
+          </div>
+        ))}
       </div>
     </>
   );
+
+  // Render insights section content
+  const renderInsightsContent = () => {
+    // Show skeleton content while loading
+    if (loading) {
+      return renderSkeletonContent();
+    }
+
+    return (
+      <>
+        {insights.length > 0 ? (
+          <div className={styles.insightsSection}>
+            <div className={styles.insightsList}>
+              {insights.map((insight, index) => (
+                <InsightCard
+                  key={`${insight.insight_id || index}`}
+                  description={insight.description || "No description available"}
+                  insight_id={insight.insight_id || `insight-${index}`}
+                />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className={styles.noData}>No insights available</div>
+        )}
+        <div className={styles.metricsGrid}>
+          {metrics.length > 0 ? (
+            metrics.map((metric, index) => (
+              <MetricCard 
+                key={`${metric.name || index}`} 
+                name={metric.name || "Unnamed Metric"}
+                value={metric.value !== undefined ? metric.value : "N/A"}
+                change={metric.change !== undefined ? metric.change : 0}
+                description={metric.description || ""}
+              />
+            ))
+          ) : (
+            <div className={styles.noData}>No metrics available</div>
+          )}
+        </div>
+      </>
+    );
+  };
 
   // Main render
   return (
@@ -130,20 +172,24 @@ export default function Dashboard() {
       <div className={styles.mainLayout}>
         <Sidebar />
         <main className={styles.mainContent}>
-        <div className={styles.filterSection}>
-  <div className={styles.tabsContainer}>
-    <DashboardTabs
-      activeTab={activeTab}
-      onTabChange={handleTabChange}
-      experimentContent={<ExperimentContent userId={userId} />}
-    >
-      {renderInsightsContent()}
-    </DashboardTabs>
-  </div>
-  <div className={styles.filterContainer}>
-    <TabFilter selected={selectedTime} onChange={handleTimeChange} />
-  </div>
-</div>
+          <div className={styles.filterSection}>
+            <div className={styles.tabsContainer}>
+              <DashboardTabs
+                activeTab={activeTab}
+                onTabChange={handleTabChange}
+                experimentContent={<ExperimentContent userId={userId} />}
+              >
+                {renderInsightsContent()}
+              </DashboardTabs>
+            </div>
+            <div className={styles.filterContainer}>
+              <TabFilter 
+                selected={selectedTime} 
+                onChange={handleTimeChange} 
+                disabled={loading}
+              />
+            </div>
+          </div>
         </main>
       </div>
     </div>

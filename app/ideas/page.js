@@ -16,15 +16,23 @@ export default function IdeasPage() {
   const { userId } = useAuth();
   const [loading, setLoading] = useState(true);
   const [ideasData, setIdeasData] = useState(null);
+  
+  // ADDED: New state for tracking initial render
+  const [isInitialRender, setIsInitialRender] = useState(true);
 
   useEffect(() => {
     const fetchIdeas = async () => {
       try {
         const insightId = searchParams.get('insight');
+        
+        // ADDED: Mark initial render as completed
+        setIsInitialRender(false);
+        
         if (!userId || !insightId) {
           router.push('/dashboard');
           return;
         }
+        
         const response = await fetch('https://get-ideas-q54hzgyghq-uc.a.run.app', {
           method: 'POST',
           headers: {
@@ -35,15 +43,16 @@ export default function IdeasPage() {
             insight_id: insightId
           })
         });
+        
         const data = await response.json();
-
+        
         // NEW: Merge any new ideas with existing ideas (no duplicates)
         setIdeasData((prev) => {
           // If there's no previous data, just use the new data
           if (!prev) {
             return data;
           }
-
+          
           // Otherwise, merge old ideas with new ones
           const mergedIdeas = [...(prev.ideas || [])];
           data.ideas.forEach(newIdea => {
@@ -51,12 +60,13 @@ export default function IdeasPage() {
             const alreadyExists = mergedIdeas.some(
               oldIdea => oldIdea.idea_id === newIdea.idea_id
             );
+            
             // If it's truly new, push it in
             if (!alreadyExists) {
               mergedIdeas.push(newIdea);
             }
           });
-
+          
           return {
             ...prev,
             // (Optional) update the problem statement if needed
@@ -65,15 +75,55 @@ export default function IdeasPage() {
             ideas: mergedIdeas
           };
         });
-
       } catch (error) {
         console.error('Error fetching ideas:', error);
       } finally {
         setLoading(false);
       }
     };
+    
     fetchIdeas();
   }, [userId, searchParams, router]);
+
+  // ADDED: Render skeleton content function
+  const renderSkeletonContent = () => {
+    return (
+      <div className={styles.content}>
+        <section className={styles.problemSection}>
+          <h2 className={styles.sectionTitle}>Problem statement</h2>
+          <div className={`${styles.problemStatement} ${styles.skeletonProblemStatement}`}>
+            <div className={styles.skeletonText}></div>
+            <div className={styles.skeletonText}></div>
+            <div className={styles.skeletonText} style={{ width: '70%' }}></div>
+          </div>
+        </section>
+        
+        <section className={styles.hypothesisSection}>
+          <div className={styles.hypothesisHeader}>
+            <h2 className={styles.sectionTitle}>Hypothesis</h2>
+            <HelpCircle className={styles.questionIcon} size={30} />
+          </div>
+          
+          <div className={styles.ideasContainer}>
+            {[1, 2, 3, 4].map((index) => (
+              <div key={index} className={`${styles.skeletonCard}`}>
+                <div className={styles.glassEffect}>
+                  <div className={styles.content}>
+                    <div className={`${styles.skeletonIdeaLabel}`}>
+                      <div className={styles.skeletonBulb}></div>
+                      <div className={styles.skeletonLabelText}></div>
+                    </div>
+                    <div className={styles.skeletonDescription}></div>
+                    <div className={styles.skeletonButton}></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    );
+  };
 
   return (
     <div className={styles.container}>
@@ -81,10 +131,9 @@ export default function IdeasPage() {
       <div className={styles.mainLayout}>
         <Sidebar />
         <main className={styles.mainContent}>
-          {loading ? (
-             <main className={styles.mainContent}>
-             <LoadingAnimation />
-         </main>
+          {/* UPDATED: Show skeleton content when loading */}
+          {isInitialRender || loading ? (
+            renderSkeletonContent()
           ) : (
             <div className={styles.content}>
               <section className={styles.problemSection}>
@@ -93,22 +142,23 @@ export default function IdeasPage() {
                   {ideasData?.description || 'No problem statement available'}
                 </div>
               </section>
-
+              
               <section className={styles.hypothesisSection}>
                 <div className={styles.hypothesisHeader}>
                   <h2 className={styles.sectionTitle}>Hypothesis</h2>
                   <HelpCircle className={styles.questionIcon} size={30} />
                 </div>
+                
                 <div className={styles.ideasContainer}>
-                {ideasData?.ideas?.map((idea, index) => (  // Added index parameter
-  <IdeaCard
-    key={idea.idea_id}
-    number={index + 1}  // Using index+1 for sequential numbering
-    description={idea.description}
-    ideaId={idea.idea_id}
-    insightId={idea.insight_id}
-  />
-))}
+                  {ideasData?.ideas?.map((idea, index) => (
+                    <IdeaCard
+                      key={idea.idea_id}
+                      number={index + 1}
+                      description={idea.description}
+                      ideaId={idea.idea_id}
+                      insightId={idea.insight_id}
+                    />
+                  ))}
                 </div>
               </section>
             </div>

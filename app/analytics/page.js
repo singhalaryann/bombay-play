@@ -20,6 +20,7 @@ export default function AnalyticsPage() {
     const fetchData = async () => {
         try {
             setIsLoading(true);
+            
             const response = await fetch('https://heart-q54hzgyghq-uc.a.run.app');
             
             if (!response.ok) {
@@ -30,12 +31,10 @@ export default function AnalyticsPage() {
             
             // Extract only engagement and retention data
             const { engagement, retention, order } = apiData;
-            console.log('Engagement Data:', engagement);
-            console.log('Retention Data:', retention);
 
             setData({ engagement, retention, order });
+            setError(null);
         } catch (err) {
-            console.error("Fetch Error:", err);
             setError("Failed to load data");
         } finally {
             setIsLoading(false);
@@ -117,6 +116,71 @@ export default function AnalyticsPage() {
             </div>
         );
     };
+    
+    // Skeleton tables for loading state
+    const renderSkeletonTables = () => {
+        return (
+            <>
+                {/* Skeleton engagement table */}
+                <div className={styles.glassBox}>
+                    <div className={styles.skeletonTableTitle}></div>
+                    <div className={styles.tableWrapper}>
+                        <table className={styles.glassTable}>
+                            <thead>
+                                <tr>
+                                    {[1, 2, 3, 4, 5].map((index) => (
+                                        <th key={index} className={styles.skeletonTableHeader}>
+                                            <div className={styles.skeletonContent}></div>
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {[1, 2, 3, 4, 5, 6].map((rowIndex) => (
+                                    <tr key={rowIndex} className={styles.skeletonTableRow}>
+                                        {[1, 2, 3, 4, 5].map((cellIndex) => (
+                                            <td key={cellIndex} className={styles.skeletonTableCell}>
+                                                <div className={styles.skeletonContent}></div>
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                {/* Skeleton retention table */}
+                <div className={`${styles.glassBox} ${styles.marginTop}`}>
+                    <div className={styles.skeletonTableTitle}></div>
+                    <div className={styles.tableWrapper}>
+                        <table className={styles.glassTable}>
+                            <thead>
+                                <tr>
+                                    {[1, 2, 3, 4, 5].map((index) => (
+                                        <th key={index} className={styles.skeletonTableHeader}>
+                                            <div className={styles.skeletonContent}></div>
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {[1, 2, 3, 4, 5, 6].map((rowIndex) => (
+                                    <tr key={rowIndex} className={styles.skeletonTableRow}>
+                                        {[1, 2, 3, 4, 5].map((cellIndex) => (
+                                            <td key={cellIndex} className={styles.skeletonTableCell}>
+                                                <div className={styles.skeletonContent}></div>
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </>
+        );
+    };
 
     return (
         <div className={styles.container}>
@@ -124,20 +188,27 @@ export default function AnalyticsPage() {
             <div className={styles.mainLayout}>
                 <Sidebar />
                 {isLoading ? (
-    <main className={styles.mainContent}>
-        <LoadingAnimation />
-    </main>
+                    <main className={styles.mainContent}>
+                        {renderSkeletonTables()}
+                    </main>
                 ) : error ? (
                     <main className={styles.mainContent}>
                         <div className={styles.errorState}>{error}</div>
                     </main>
                 ) : (
                     <main className={styles.mainContent}>
-                        {data.engagement && renderTable(data.engagement, 'engagement')}
-                        {data.retention && (
+                        {data.engagement && data.order?.engagement ? (
+                            renderTable(data.engagement, 'engagement')
+                        ) : (
+                            <div className={styles.noDataState}>No engagement data available</div>
+                        )}
+                        
+                        {data.retention && data.order?.retention ? (
                             <div className={styles.marginTop}>
                                 {renderTable(data.retention, 'retention')}
                             </div>
+                        ) : (
+                            <div className={`${styles.noDataState} ${styles.marginTop}`}>No retention data available</div>
                         )}
                     </main>
                 )}

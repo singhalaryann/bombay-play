@@ -25,6 +25,12 @@ export default function ExperimentPage() {
   const [offerData, setOfferData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // ADDED: New state for tracking initial render
+  const [isInitialRender, setIsInitialRender] = useState(true);
+  
+  // ADDED: New state for tracking launch button loading state
+  const [isLaunching, setIsLaunching] = useState(false);
 
   useEffect(() => {
     let isSubscribed = true;
@@ -34,6 +40,9 @@ export default function ExperimentPage() {
       setError(null);
 
       try {
+        // ADDED: Mark initial render as completed
+        setIsInitialRender(false);
+
         if (!activeExperimentId) {
           setLoading(false);
           return;
@@ -107,7 +116,6 @@ export default function ExperimentPage() {
           );
 
           // CHANGED: Simplified offer data mapping
-          // CHANGED: Simplified offer data mapping
           if (isSubscribed) {
             const newOfferData = {};
 
@@ -179,7 +187,8 @@ export default function ExperimentPage() {
         return;
       }
 
-      setLoading(true);
+      // CHANGED: Use isLaunching state instead of general loading
+      setIsLaunching(true);
       setError(null);
 
       // NEW: Launch all experiments in parallel
@@ -215,9 +224,11 @@ export default function ExperimentPage() {
       console.error("Launch error:", err);
       setError(err.message);
     } finally {
-      setLoading(false);
+      // CHANGED: Reset isLaunching state instead of general loading
+      setIsLaunching(false);
     }
   };
+  
   const handleSplitUpdate = (splitValue, controlUsers, variantUsers) => {
     if (!experimentData?.total_players) return;
 
@@ -237,6 +248,96 @@ export default function ExperimentPage() {
         },
       },
     }));
+  };
+
+  // ADDED: Render skeleton content function
+  const renderSkeletonContent = () => {
+    return (
+      <>
+        <div className={styles.pageHeader}>
+          <h2 className={styles.pageTitle}>Setting up Experiments</h2>
+
+          <div className={styles.tabContainer}>
+            <div className={styles.tabHeader}>
+              {[1, 2].map((index) => (
+                <button
+                  key={index}
+                  className={`${styles.tab} ${index === 1 ? styles.activeTab : ""}`}
+                >
+                  Experiment {index}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.tabUnderline}>
+          <div
+            className={styles.activeUnderline}
+            style={{
+              left: '0%',
+              width: '50%',
+            }}
+          />
+        </div>
+
+        <div className={styles.scrollableSection}>
+          <div className={`${styles.glassWrapper} ${styles.skeletonGlass}`}>
+            {/* Skeleton experiment form */}
+            <div className={styles.skeletonForm}>
+              <div className={styles.skeletonFormTitle}></div>
+              
+              <div className={styles.skeletonFormRow}>
+                <div className={styles.skeletonFormLabel}></div>
+                <div className={styles.skeletonFormInput}></div>
+              </div>
+              
+              <div className={styles.skeletonFormRow}>
+                <div className={styles.skeletonFormLabel}></div>
+                <div className={styles.skeletonFormRange}></div>
+              </div>
+              
+              <div className={styles.skeletonFormRow}>
+                <div className={styles.skeletonFormLabel}></div>
+                <div className={styles.skeletonFormInput}></div>
+              </div>
+            </div>
+            
+            {/* Skeleton variant groups */}
+            <div className={styles.skeletonVariant}>
+              <div className={styles.skeletonVariantHeader}>
+                <div className={styles.skeletonVariantTitle}></div>
+                <div className={styles.skeletonVariantBadge}></div>
+              </div>
+              
+              <div className={styles.skeletonVariantContent}>
+                <div className={styles.skeletonVariantItem}></div>
+                <div className={styles.skeletonVariantItem}></div>
+                <div className={styles.skeletonVariantItem}></div>
+              </div>
+            </div>
+            
+            <div className={styles.skeletonVariant}>
+              <div className={styles.skeletonVariantHeader}>
+                <div className={styles.skeletonVariantTitle}></div>
+                <div className={styles.skeletonVariantBadge}></div>
+              </div>
+              
+              <div className={styles.skeletonVariantContent}>
+                <div className={styles.skeletonVariantItem}></div>
+                <div className={styles.skeletonVariantItem}></div>
+                <div className={styles.skeletonVariantItem}></div>
+              </div>
+            </div>
+            
+            {/* Skeleton button */}
+            <div className={styles.buttonGroup}>
+              <div className={styles.skeletonButton}></div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
   };
 
   if (error) {
@@ -261,80 +362,83 @@ export default function ExperimentPage() {
       <div className={styles.mainLayout}>
         <Sidebar />
         <main className={styles.mainContent}>
-          <div className={styles.pageHeader}>
-            <h2 className={styles.pageTitle}>Setting up Experiments</h2>
+          {/* UPDATED: Show skeleton content when loading or initial render */}
+          {isInitialRender || loading ? (
+            renderSkeletonContent()
+          ) : (
+            <>
+              <div className={styles.pageHeader}>
+                <h2 className={styles.pageTitle}>Setting up Experiments</h2>
 
-            <div className={styles.tabContainer}>
-              <div className={styles.tabHeader}>
-                {experimentIds.map((expId, index) => (
-                  <button
-                    key={expId}
-                    className={`${styles.tab} ${
-                      activeExperimentId === expId ? styles.activeTab : ""
-                    }`}
-                    onClick={() => handleTabClick(expId)}
-                  >
-                    Experiment {index + 1}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.tabUnderline}>
-            <div
-              className={styles.activeUnderline}
-              style={{
-                left: `${
-                  (experimentIds.indexOf(activeExperimentId) /
-                    experimentIds.length) *
-                  100
-                }%`,
-                width: `${100 / experimentIds.length}%`,
-              }}
-            />
-          </div>
-
-          <div className={styles.scrollableSection}>
-            {loading ? (
-              // Loading state without glass effect
-              <main className={styles.mainContent}>
-              <LoadingAnimation />
-              </main>
-            ) : (
-              // Main content with glass effect
-              experimentData && (
-                <div className={styles.glassWrapper}>
-                  <ExperimentForm
-                    experimentData={experimentData}
-                    totalPlayers={experimentData?.total_players || 0} // Changed: Pass total_players directly
-                    setExperimentData={setExperimentData}
-                    onSplitChange={handleSplitUpdate}
-                  />
-                  <VariantGroup
-                    experimentData={experimentData}
-                    offerData={offerData}
-                  />
-                  <div className={styles.buttonGroup}>
-                    <button
-                      className={styles.launchButton}
-                      onClick={handleLaunchExperiment}
-                      disabled={experimentData.status !== "pending"}
-                    >
-                      Launch Experiment
-                      <Image
-                        src="/experiment.png"
-                        alt="Launch"
-                        width={24}
-                        height={24}
-                        priority
-                      />
-                    </button>
+                <div className={styles.tabContainer}>
+                  <div className={styles.tabHeader}>
+                    {experimentIds.map((expId, index) => (
+                      <button
+                        key={expId}
+                        className={`${styles.tab} ${
+                          activeExperimentId === expId ? styles.activeTab : ""
+                        }`}
+                        onClick={() => handleTabClick(expId)}
+                      >
+                        Experiment {index + 1}
+                      </button>
+                    ))}
                   </div>
                 </div>
-              )
-            )}
-          </div>
+              </div>
+
+              <div className={styles.tabUnderline}>
+                <div
+                  className={styles.activeUnderline}
+                  style={{
+                    left: `${
+                      (experimentIds.indexOf(activeExperimentId) /
+                        experimentIds.length) *
+                      100
+                    }%`,
+                    width: `${100 / experimentIds.length}%`,
+                  }}
+                />
+              </div>
+
+              <div className={styles.scrollableSection}>
+                {/* Main content with glass effect */}
+                {experimentData && (
+                  <div className={styles.glassWrapper}>
+                    <ExperimentForm
+                      experimentData={experimentData}
+                      totalPlayers={experimentData?.total_players || 0} // Changed: Pass total_players directly
+                      setExperimentData={setExperimentData}
+                      onSplitChange={handleSplitUpdate}
+                    />
+                    <VariantGroup
+                      experimentData={experimentData}
+                      offerData={offerData}
+                    />
+                    <div className={styles.buttonGroup}>
+                      {/* UPDATED: Modified button to show launching state */}
+                      <button
+                        className={styles.launchButton}
+                        onClick={handleLaunchExperiment}
+                        disabled={experimentData.status !== "pending" || isLaunching}
+                      >
+                        {isLaunching ? 'Launching...' : 'Launch Experiment'}
+                        {!isLaunching && (
+                          <Image
+                            src="/experiment.png"
+                            alt="Launch"
+                            width={24}
+                            height={24}
+                            priority
+                          />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </main>
       </div>
     </div>

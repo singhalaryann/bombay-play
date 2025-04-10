@@ -1,4 +1,4 @@
-/* Main container - full viewport height */
+/* Main container and layout */
 .container {
   height: 100vh;
   display: flex;
@@ -7,72 +7,41 @@
   overflow: hidden;
 }
 
-/* Main layout - accounts for header height */
 .mainLayout {
   display: flex;
   height: calc(100vh - 64px);
   width: 100%;
 }
 
-/* Main content area */
 .mainContent {
   flex: 1;
   padding: 20px;
   height: 100%;
-  overflow-y: auto; /* Changed to prevent double scroll */
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
 }
 
-/* Title styling */
-.title {
-  color: #FFFFFF;
-  font-size: 24px;
-  font-weight: 500;
-  margin: 0 0 24px 20px;
-}
-
-/* Chat container - holds glass wrapper */
 .chatContainer {
-  height: 100%; /* Take full height */
+  height: 100%;
   display: flex;
 }
 
 /* Glass wrapper - main chat interface */
 .glassWrapper {
-  width: 100%; /* Changed from flex: 1 */
+  width: 100%;
   height: 100%;
-  background: rgba(23, 23, 23, 0.95);
-  border-radius: 12px;
-  padding: 20px;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(17, 18, 17, 0.8);
+  border-radius: 16px;
+  padding: 24px;
   position: relative;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(48, 48, 48, 0.6);
 }
 
-/* Messages area - scrollable content */
-
-.glassWrapper::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  padding: 1px;
-  background: linear-gradient(
-    -100deg,
-    rgba(255, 255, 255, 0.4),
-    rgba(255, 255, 255, 0.03)
-  );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
 .messagesArea {
   flex: 1;
   overflow-y: auto;
@@ -81,7 +50,10 @@
   gap: 16px;
   padding-right: 12px;
   margin-bottom: 20px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 }
+
 .messagesArea::-webkit-scrollbar {
   width: 6px;
 }
@@ -99,25 +71,349 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
+/* Welcome Content Styles */
+.welcomeContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 40px 0;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.welcomeHeading {
+  color: #FFFFFF;
+  font-size: 32px;
+  font-weight: 500;
+  margin-bottom: 40px;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Search Input and File Upload Styles */
+.searchWrapper {
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto 40px;
+  position: relative;
+}
+
+.searchContainer {
+  background: rgba(30, 32, 30, 0.8);
+  border-radius: 30px;
+  padding: 6px 6px 6px 20px;
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(48, 48, 48, 0.9);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.searchInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #FFFFFF;
+  font-size: 15px;
+  outline: none;
+  padding: 12px 0;
+  line-height: 1.5;
+  min-width: 0; /* This prevents overflow issues */
+}.searchContainer {
+  background: rgba(30, 32, 30, 0.8);
+  border-radius: 30px;
+  padding: 6px 6px 6px 20px;
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(48, 48, 48, 0.9);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.searchInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #FFFFFF;
+  font-size: 15px;
+  outline: none;
+  padding: 12px 0;
+  line-height: 1.5;
+  min-width: 0; /* This prevents overflow issues */
+}
+.searchContainer:focus-within {
+  box-shadow: 0 4px 16px rgba(130, 255, 131, 0.15);
+  border-color: rgba(130, 255, 131, 0.3);
+}
+
+.searchInput::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.fileInput {
+  display: none;
+}
+
+.plusButton, .arrowButton, .fileButton {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  margin-left: 8px;
+  transition: all 0.2s ease;
+}
+
+.plusButton {
+  background: rgba(48, 48, 48, 0.8);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.plusButton:hover {
+  background: rgba(60, 60, 60, 0.9);
+  transform: scale(1.05);
+  color: #82FF83;
+}
+
+.fileButton {
+  background: rgba(48, 48, 48, 0.8);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.fileButton:hover:not(:disabled) {
+  background: rgba(60, 60, 60, 0.9);
+  transform: scale(1.05);
+  color: #82FF83;
+}
+
+.fileButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.arrowButton {
+  background: rgba(130, 255, 131, 0.15);
+  color: #82FF83;
+}
+
+.arrowButton:hover:not(:disabled) {
+  background: rgba(130, 255, 131, 0.3);
+  transform: scale(1.05);
+}
+
+.arrowButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Uploaded files display */
+.uploadedFiles {
+  background: rgba(25, 27, 25, 0.9);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 150px;
+  overflow-y: auto;
+  animation: slideDown 0.3s ease-out;
+  border: 1px solid rgba(48, 48, 48, 0.9);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 150px;
+  }
+}
+
+.fileItem {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(35, 37, 35, 0.8);
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.fileItem:hover {
+  background: rgba(40, 42, 40, 0.9);
+}
+
+.fileIcon {
+  color: #82FF83;
+  margin-right: 8px;
+}
+
+.fileName {
+  flex: 1;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.removeFileBtn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+}
+
+.removeFileBtn:hover {
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.1);
+}
+
+/* Feature Grid Styles */
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.featureCard {
+  background: rgba(30, 32, 30, 0.8);
+  border-radius: 12px;
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  position: relative;
+  border: 1px solid rgba(48, 48, 48, 0.9);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.featureCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(130, 255, 131, 0), transparent);
+  transition: all 0.3s ease;
+  opacity: 0;
+}
+
+.featureCard:hover {
+  background: rgba(35, 38, 35, 0.95);
+  border-color: rgba(130, 255, 131, 0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.featureCard:hover::before {
+  background: linear-gradient(90deg, transparent, rgba(130, 255, 131, 0.7), transparent);
+  opacity: 1;
+}
+
+.featureCard:active {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.cardIcon {
+  margin-bottom: 16px;
+  color: #82FF83;
+  opacity: 0.9;
+  transition: transform 0.3s ease;
+}
+
+.featureCard:hover .cardIcon {
+  transform: scale(1.1);
+}
+
+.cardTitle {
+  font-size: 18px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 12px 0;
+  transition: color 0.3s ease;
+}
+
+.featureCard:hover .cardTitle {
+  color: #82FF83;
+}
+
+.cardDescription {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
 /* Message Styles */
 .message {
-  padding: 14px 18px; /* UPDATED: More padding */
+  padding: 14px 18px;
   border-radius: 12px;
-  max-width: 90%; /* UPDATED: Wider on mobile */
+  max-width: 90%;
   word-wrap: break-word;
-  font-size: 15px; /* ADDED: Better readable size */
+  font-size: 15px;
   line-height: 1.5;
+  animation: messageIn 0.3s ease-out;
+}
+
+@keyframes messageIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .userMessage {
   background: #0F110F;
   color: #B3B3B3;
   align-self: flex-end;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
 }
 
 .aiMessage {
+  background: rgba(40, 42, 40, 0.8);
   color: rgba(255, 255, 255, 0.9);
   align-self: flex-start;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
 }
 
 .loadingMessage {
@@ -125,10 +421,20 @@
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(40, 42, 40, 0.8);
   border-radius: 12px;
   color: rgba(255, 255, 255, 0.7);
   align-self: flex-start;
+  animation: pulse 1.5s infinite alternate;
+}
+
+@keyframes pulse {
+  from {
+    opacity: 0.7;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .loadingIcon {
@@ -152,33 +458,20 @@
 }
 
 .inputContainer {
-  background: rgba(25, 28, 23, 0.4);
+  background: rgba(30, 32, 30, 0.8);
   border-radius: 12px;
-  padding: 14px; /* UPDATED: More padding */
+  padding: 14px;
   display: flex;
   gap: 12px;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(48, 48, 48, 0.9);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
 }
 
-.inputContainer::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  padding: 1px;
-  background: linear-gradient(
-    -100deg,
-    rgba(255, 255, 255, 0.4),
-    rgba(255, 255, 255, 0.03)
-  );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
+.inputContainer:focus-within {
+  box-shadow: 0 4px 16px rgba(130, 255, 131, 0.15);
+  border-color: rgba(130, 255, 131, 0.3);
 }
 
 .input {
@@ -186,7 +479,7 @@
   background: transparent;
   border: none;
   color: rgba(255, 255, 255, 0.9);
-  font-size: 15px; /* UPDATED: Better readable */
+  font-size: 15px;
   outline: none;
   padding: 10px 14px;
   line-height: 1.5;
@@ -202,7 +495,7 @@
 }
 
 .sendButton {
-  background: rgba(130, 255, 131, 0.1);
+  background: rgba(130, 255, 131, 0.15);
   border: none;
   border-radius: 8px;
   width: 40px;
@@ -217,7 +510,8 @@
 }
 
 .sendButton:hover:not(:disabled) {
-  background: rgba(130, 255, 131, 0.2);
+  background: rgba(130, 255, 131, 0.3);
+  transform: scale(1.05);
 }
 
 .sendButton:disabled {
@@ -233,12 +527,10 @@
 }
 
 .message pre {
-  background: rgba(18, 18, 18, 0.4);
+  background: rgba(18, 18, 18, 0.6);
   padding: 16px;
-  border-radius: 12px;
+  border-radius: 8px;
   overflow-x: auto;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(130, 255, 131, 0.1);
   margin: 12px 0;
 }
@@ -263,139 +555,15 @@
   border-bottom-color: #82FF83;
 }
 
-.message ul,
-.message ol {
-  margin: 12px 0;
-  padding-left: 24px;
-  color: inherit;
-}
-
-.message li {
-  margin: 6px 0;
-}
-
-.message h1,
-.message h2,
-.message h3,
-.message h4,
-.message h5,
-.message h6 {
-  color: rgba(255, 255, 255, 0.9);
-  margin: 20px 0 12px 0;
-  font-weight: 500;
-  line-height: 1.3;
-}
-
-.message h1 { font-size: 24px; }
-.message h2 { font-size: 20px; }
-.message h3 { font-size: 18px; }
-.message h4 { font-size: 16px; }
-.message h5 { font-size: 14px; }
-.message h6 { font-size: 14px; }
-
-.message blockquote {
-  border-left: 3px solid rgba(130, 255, 131, 0.5);
-  margin: 16px 0;
-  padding: 8px 0 8px 16px;
-  background: rgba(130, 255, 131, 0.05);
-  border-radius: 0 8px 8px 0;
-}
-
-.message hr {
-  border: none;
-  border-top: 1px solid rgba(130, 255, 131, 0.2);
-  margin: 24px 0;
-}
-
-.message table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 16px 0;
-}
-
-.message th,
-.message td {
-  border: 1px solid rgba(130, 255, 131, 0.2);
-  padding: 8px 12px;
-  text-align: left;
-}
-
-.message th {
-  background: rgba(130, 255, 131, 0.1);
-  font-weight: 500;
-}
-
-.message img {
-  max-width: 100%;
-  border-radius: 8px;
-  margin: 16px 0;
-}
-
-/* Insight Grid - UPDATED */
-.insightGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  padding: 20px; /* CHANGED: Reduced padding */
-  margin-top: 40px; /* CHANGED: Reduced top margin */
-  width: 100%;
-}
-
-/* CHANGED: Completely redesigned insight blocks to match dashboard style */
-.insightBlock {
-  background: rgba(18, 18, 18, 0.4); /* CHANGED: Darker background to match cards */
-  border-radius: 12px;
-  padding: 18px; /* CHANGED: Adjusted padding */
-  cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
-  /* CHANGED: Added glass effect styling similar to metric cards */
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  /* ADDED: Subtle shadow for depth */
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-}
-
-/* ADDED: Hover effect similar to dashboard elements */
-.insightBlock:hover {
-  background: rgba(25, 28, 23, 0.6);
-  border-color: rgba(130, 255, 131, 0.2);
-}
-
-/* ADDED: Active/clicked state */
-.insightBlock:active {
-  transform: translateY(1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-/* CHANGED: Better alignment and spacing */
-.insightContent {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-/* CHANGED: Better icon styling */
-.insightIcon {
-  width: 18px; /* CHANGED: Slightly larger */
-  height: 18px;
-  opacity: 0.9; /* ADDED: Better visibility */
-  filter: brightness(0) saturate(100%) invert(95%) sepia(24%) saturate(1857%) hue-rotate(48deg) brightness(99%) contrast(80%); /* ADDED: Match green theme */
-}
-
-/* CHANGED: Better text styling */
-.insightContent span {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 15px; /* CHANGED: Slightly larger */
-  line-height: 1.5;
-  font-weight: 500; /* ADDED: More prominent */
-}
-
 /* Responsive Breakpoints */
 @media (max-width: 1200px) {
-  .insightGrid {
-    margin-top: 40px; /* CHANGED: Consistent margin */
+  .featureGrid {
+    gap: 20px;
+  }
+  
+  .welcomeHeading {
+    font-size: 28px;
+    margin-bottom: 30px;
   }
 }
 
@@ -415,26 +583,24 @@
     font-size: 14px;
   }
 
-  .insightGrid {
+  .featureGrid {
     grid-template-columns: 1fr;
-    padding: 16px;
-    margin-top: 30px; /* CHANGED: Reduced more for mobile */
     gap: 16px;
   }
 
-  .insightBlock {
-    padding: 16px;
+  .searchWrapper {
+    margin-bottom: 30px;
   }
   
-  /* ADDED: Better mobile touch target */
-  .insightContent {
-    min-height: 24px;
+  .welcomeHeading {
+    font-size: 24px;
+    margin-bottom: 24px;
   }
 }
 
 @media (max-width: 480px) {
   .mainContent {
-    padding: 12px; /* CHANGED: Slightly increased from 8px */
+    padding: 12px;
     margin: 0 8px;
   }
 
@@ -442,32 +608,40 @@
     max-width: 98%;
   }
 
-  .insightGrid {
-    padding: 12px;
-    margin-top: 20px; /* CHANGED: Even less margin on small screens */
+  .featureGrid {
     gap: 12px;
   }
 
-  .title {
-    font-size: 20px;
-    margin: 0 0 16px 12px;
+  .featureCard {
+    padding: 20px;
   }
 
-  .insightBlock {
-    padding: 14px; /* CHANGED: Slightly increased */
+  .cardTitle {
+    font-size: 16px;
+    margin-bottom: 8px;
   }
 
-  .insightContent {
-    gap: 10px; /* CHANGED: Better spacing on small screens */
-  }
-
-  .insightIcon {
-    width: 16px;
-    height: 16px;
+  .cardDescription {
+    font-size: 13px;
   }
   
-  /* CHANGED: Slightly larger text on small screens */
-  .insightContent span {
+  .welcomeHeading {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+  
+  .searchContainer {
+    padding: 6px 6px 6px 16px;
+  }
+  .searchInput {
     font-size: 14px;
+    padding: 8px 0;
+  }
+  
+  .plusButton, .arrowButton {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
   }
 }
+
