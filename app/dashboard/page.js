@@ -23,31 +23,64 @@ export default function Dashboard() {
   const [metrics, setMetrics] = useState([]);
   const [insights, setInsights] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [cache, setCache] = useState({});
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState(
     searchParams.get("tab") || "insights"
   );
 
-  // Add effect to handle URL param changes
-  useEffect(() => {
-    // Update active tab when URL params change
-    const tabParam = searchParams.get("tab");
-    if (tabParam && ["insights", "experiments"].includes(tabParam)) {
-      setActiveTab(tabParam);
-    }
-  }, [searchParams]);
+  // Cache duration in milliseconds (e.g., 5 minutes)
+  const CACHE_DURATION = 5 * 60 * 1000;
 
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    // Update URL without full page reload
-    router.push(`/dashboard?tab=${tab}`, { shallow: true });
-  };
+  // Load cached data from localStorage on mount
+  useEffect(() => {
+    const loadCachedData = () => {
+      try {
+        const cachedData = localStorage.getItem(`dashboard_cache_${userId}`);
+        if (cachedData) {
+          const parsedCache = JSON.parse(cachedData);
+          setCache(parsedCache);
+          
+          // If we have cached data for the current time, use it immediately
+          if (parsedCache[selectedTime] && 
+              Date.now() - parsedCache[selectedTime].timestamp < CACHE_DURATION) {
+            const { metrics: cachedMetrics, insights: cachedInsights } = parsedCache[selectedTime].data;
+            setMetrics(cachedMetrics);
+            setInsights(cachedInsights);
+            setLoading(false);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading cache:', error);
+      }
+    };
+
+    loadCachedData();
+  }, []);
 
   // Fetch dashboard data
   const fetchDashboardData = async (time) => {
+    // Check cache first
+    if (cache[time] && Date.now() - cache[time].timestamp < CACHE_DURATION) {
+      const { metrics: cachedMetrics, insights: cachedInsights } = cache[time].data;
+      console.log('Loading from cache for time:', time, {
+        metrics: cachedMetrics,
+        insights: cachedInsights
+      });
+      setMetrics(cachedMetrics);
+      setInsights(cachedInsights);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       
+      console.log('Fetching dashboard data with params:', {
+        user_id: userId,
+        time: time,
+      });
+
       const response = await fetch(
         "https://dashboard-q54hzgyghq-uc.a.run.app",
         {
@@ -63,21 +96,58 @@ export default function Dashboard() {
       );
 
       const data = await response.json();
+      console.log('API Response Data:', {
+        metrics: data.metrics,
+        insights: data.insights,
+        fullResponse: data
+      });
+      
       if (data) {
-        if (data.metrics) {
-          setMetrics(data.metrics);
-        }
-        if (data.insights && data.insights.length > 0) {
-          setInsights(data.insights);
+        const newMetrics = data.metrics || [];
+        const newInsights = data.insights || [];
+        
+        setMetrics(newMetrics);
+        setInsights(newInsights);
+
+        // Update cache
+        const newCache = {
+          ...cache,
+          [time]: {
+            data: { metrics: newMetrics, insights: newInsights },
+            timestamp: Date.now()
+          }
+        };
+        setCache(newCache);
+
+        // Update localStorage
+        try {
+          localStorage.setItem(`dashboard_cache_${userId}`, JSON.stringify(newCache));
+        } catch (error) {
+          console.error('Error saving to cache:', error);
         }
       }
     } catch (error) {
-      // Silent error handling to avoid console logs in production
+      console.error('Error fetching dashboard data:', error);
       setMetrics([]);
       setInsights([]);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Add effect to handle URL param changes
+  useEffect(() => {
+    // Update active tab when URL params change
+    const tabParam = searchParams.get("tab");
+    if (tabParam && ["insights", "experiments"].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    // Update URL without full page reload
+    router.push(`/dashboard?tab=${tab}`, { shallow: true });
   };
 
   // Effect to handle data fetching and authentication

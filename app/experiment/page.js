@@ -32,6 +32,9 @@ export default function ExperimentPage() {
   // ADDED: New state for tracking launch button loading state
   const [isLaunching, setIsLaunching] = useState(false);
 
+  // Cache duration: 5 minutes in milliseconds
+  const CACHE_DURATION = 5 * 60 * 1000;
+
   useEffect(() => {
     let isSubscribed = true;
 
@@ -48,103 +51,172 @@ export default function ExperimentPage() {
           return;
         }
 
-        // 1) Fetch the main experiment data
-        console.log("Starting experiment fetch with ID:", activeExperimentId);
-        const expResponse = await fetch(
-          "https://get-experiment-q54hzgyghq-uc.a.run.app",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ experiment_id: activeExperimentId }),
-          }
-        );
+        // Check experiment cache first
+        const expCacheKey = `experiment_cache_${activeExperimentId}`;
+        const cachedExp = localStorage.getItem(expCacheKey);
+        let expData;
 
-        if (!expResponse.ok) {
-          throw new Error(
-            `Failed to fetch experiment details: ${expResponse.statusText}`
-          );
+        if (cachedExp) {
+          const { data: cachedExpData, timestamp } = JSON.parse(cachedExp);
+          if (Date.now() - timestamp < CACHE_DURATION) {
+            const loadStart = performance.now();
+            console.log('🔄 Loading experiment from cache...');
+            expData = cachedExpData;
+            const loadEnd = performance.now();
+            console.log(`✅ Cache load completed in ${((loadEnd - loadStart) / 1000).toFixed(2)} seconds`);
+          } else {
+            console.log('🕒 Experiment cache expired, fetching fresh data...');
+          }
+        } else {
+          console.log('💭 No experiment cache found, fetching fresh data...');
         }
 
-        const expData = await expResponse.json();
-        if (!expData.experiment) {
-          throw new Error("No experiment data received");
+        // Fetch experiment data if no valid cache
+        if (!expData) {
+          const apiStart = performance.now();
+          console.log('🔄 Starting API call to fetch experiment...');
+
+          const expResponse = await fetch(
+            "https://get-experiment-q54hzgyghq-uc.a.run.app",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ experiment_id: activeExperimentId }),
+            }
+          );
+
+          if (!expResponse.ok) {
+            throw new Error(
+              `Failed to fetch experiment details: ${expResponse.statusText}`
+            );
+          }
+
+          const expResult = await expResponse.json();
+          if (!expResult.experiment) {
+            throw new Error("No experiment data received");
+          }
+
+          expData = expResult.experiment;
+          const apiEnd = performance.now();
+          console.log(`✅ Experiment API call completed in ${((apiEnd - apiStart) / 1000).toFixed(2)} seconds`);
+
+          // Cache the experiment data
+          try {
+            localStorage.setItem(expCacheKey, JSON.stringify({
+              data: expData,
+              timestamp: Date.now()
+            }));
+            console.log('💾 Experiment data cached successfully');
+          } catch (error) {
+            console.error('❌ Error caching experiment:', error);
+          }
         }
 
         // Set experiment data
         if (isSubscribed) {
-          console.log("Experiment Status:", expData.experiment.status);
-          setExperimentData(expData.experiment);
+          console.log("Experiment Status:", expData.status);
+          setExperimentData(expData);
         }
 
-        // 2) Prepare to fetch offers
-        const fetchPromises = [];
-        const controlOfferId = expData.experiment.groups?.control?.offer_id;
-        const variantOfferId = expData.experiment.groups?.variant?.offer_id;
+        // Prepare to fetch offers
+        const controlOfferId = expData.groups?.control?.offer_id;
+        const variantOfferId = expData.groups?.variant?.offer_id;
+        const newOfferData = {};
 
-        // CHANGED: Simplified offer fetching logic
+        // Check offer caches and fetch if needed
         if (controlOfferId) {
-          fetchPromises.push(
-            fetch("https://get-offer-q54hzgyghq-uc.a.run.app", {
+          const controlCacheKey = `offer_cache_${controlOfferId}`;
+          const cachedControl = localStorage.getItem(controlCacheKey);
+          
+          if (cachedControl) {
+            const { data: cachedOffer, timestamp } = JSON.parse(cachedControl);
+            if (Date.now() - timestamp < CACHE_DURATION) {
+              console.log('🔄 Loading control offer from cache...');
+              newOfferData.control = cachedOffer;
+            } else {
+              console.log('🕒 Control offer cache expired, fetching fresh data...');
+            }
+          }
+
+          if (!newOfferData.control) {
+            console.log('🔄 Fetching control offer...');
+            const controlResponse = await fetch("https://get-offer-q54hzgyghq-uc.a.run.app", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ offer_id: controlOfferId }),
-            })
-          );
+            });
+
+            if (controlResponse.ok) {
+              const controlResult = await controlResponse.json();
+              newOfferData.control = {
+                ...controlResult.offer,
+                name: controlResult.offer?.offer_name || "No Bundle Name",
+              };
+
+              // Cache control offer
+              try {
+                localStorage.setItem(controlCacheKey, JSON.stringify({
+                  data: newOfferData.control,
+                  timestamp: Date.now()
+                }));
+                console.log('💾 Control offer cached successfully');
+              } catch (error) {
+                console.error('❌ Error caching control offer:', error);
+              }
+            }
+          }
         }
 
         if (variantOfferId) {
-          fetchPromises.push(
-            fetch("https://get-offer-q54hzgyghq-uc.a.run.app", {
+          const variantCacheKey = `offer_cache_${variantOfferId}`;
+          const cachedVariant = localStorage.getItem(variantCacheKey);
+          
+          if (cachedVariant) {
+            const { data: cachedOffer, timestamp } = JSON.parse(cachedVariant);
+            if (Date.now() - timestamp < CACHE_DURATION) {
+              console.log('🔄 Loading variant offer from cache...');
+              newOfferData.variant = cachedOffer;
+            } else {
+              console.log('🕒 Variant offer cache expired, fetching fresh data...');
+            }
+          }
+
+          if (!newOfferData.variant) {
+            console.log('🔄 Fetching variant offer...');
+            const variantResponse = await fetch("https://get-offer-q54hzgyghq-uc.a.run.app", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ offer_id: variantOfferId }),
-            })
-          );
-        }
+            });
 
-        // 3) Fetch offers in parallel
-        if (fetchPromises.length > 0) {
-          const responses = await Promise.all(fetchPromises);
-          responses.forEach((response, index) => {
-            if (!response.ok) {
-              throw new Error(`Failed to fetch data for request ${index + 1}`);
-            }
-          });
-
-          const responseData = await Promise.all(
-            responses.map((r) => r.json())
-          );
-
-          // CHANGED: Simplified offer data mapping
-          if (isSubscribed) {
-            const newOfferData = {};
-
-            // If controlOfferId is present, assume the first fetch promise corresponds to it
-            if (controlOfferId) {
-              const controlRes = responseData[0];
-              newOfferData.control = {
-                ...controlRes.offer,
-                name: controlRes.offer?.offer_name || "No Bundle Name",
-              };
-            }
-
-            // If variantOfferId is present, figure out which response index to use
-            // (index 1 if both control and variant exist, otherwise index 0)
-            if (variantOfferId) {
-              const variantIndex = controlOfferId ? 1 : 0;
-              const variantRes = responseData[variantIndex];
+            if (variantResponse.ok) {
+              const variantResult = await variantResponse.json();
               newOfferData.variant = {
-                ...variantRes.offer,
-                name: variantRes.offer?.offer_name || "No Bundle Name",
+                ...variantResult.offer,
+                name: variantResult.offer?.offer_name || "No Bundle Name",
               };
-            }
 
-            // Updated part: now handles cases where only one offer_id exists
-            setOfferData(newOfferData);
+              // Cache variant offer
+              try {
+                localStorage.setItem(variantCacheKey, JSON.stringify({
+                  data: newOfferData.variant,
+                  timestamp: Date.now()
+                }));
+                console.log('💾 Variant offer cached successfully');
+              } catch (error) {
+                console.error('❌ Error caching variant offer:', error);
+              }
+            }
           }
         }
+
+        // Set offer data
+        if (isSubscribed) {
+          setOfferData(newOfferData);
+        }
+
       } catch (err) {
-        console.error("Error fetching data:", err);
+        console.error("❌ Error fetching data:", err);
         if (isSubscribed) {
           setError(err.message);
         }

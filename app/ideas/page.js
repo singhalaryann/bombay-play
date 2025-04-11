@@ -17,21 +17,50 @@ export default function IdeasPage() {
   const [loading, setLoading] = useState(true);
   const [ideasData, setIdeasData] = useState(null);
   
-  // ADDED: New state for tracking initial render
+  // Cache duration: 5 minutes in milliseconds
+  const CACHE_DURATION = 5 * 60 * 1000;
+  
   const [isInitialRender, setIsInitialRender] = useState(true);
 
   useEffect(() => {
     const fetchIdeas = async () => {
       try {
         const insightId = searchParams.get('insight');
+        console.log('🔍 Processing ideas request for:', { userId, insightId });
         
-        // ADDED: Mark initial render as completed
         setIsInitialRender(false);
         
         if (!userId || !insightId) {
+          console.log('⚠️ Missing required parameters, redirecting to dashboard');
           router.push('/dashboard');
           return;
         }
+
+        // Check cache first
+        const cacheKey = `ideas_cache_${insightId}`;
+        const cachedData = localStorage.getItem(cacheKey);
+        if (cachedData) {
+          const { data: cachedIdeas, timestamp } = JSON.parse(cachedData);
+          if (Date.now() - timestamp < CACHE_DURATION) {
+            const loadStart = performance.now();
+            console.log('🔄 Loading ideas from cache...');
+            
+            setIdeasData(cachedIdeas);
+            
+            const loadEnd = performance.now();
+            console.log(`✅ Cache load completed in ${((loadEnd - loadStart) / 1000).toFixed(2)} seconds`);
+            setLoading(false);
+            return;
+          } else {
+            console.log('🕒 Cache expired, fetching fresh data...');
+          }
+        } else {
+          console.log('💭 No cache found, fetching fresh data...');
+        }
+        
+        // Fetch from API if no valid cache
+        const apiStart = performance.now();
+        console.log('🔄 Starting API call to fetch ideas...');
         
         const response = await fetch('https://get-ideas-q54hzgyghq-uc.a.run.app', {
           method: 'POST',
@@ -45,38 +74,37 @@ export default function IdeasPage() {
         });
         
         const data = await response.json();
+        const apiEnd = performance.now();
+        console.log(`✅ API call completed in ${((apiEnd - apiStart) / 1000).toFixed(2)} seconds`);
         
-        // NEW: Merge any new ideas with existing ideas (no duplicates)
+        // Process and merge ideas
         setIdeasData((prev) => {
-          // If there's no previous data, just use the new data
-          if (!prev) {
-            return data;
-          }
-          
-          // Otherwise, merge old ideas with new ones
-          const mergedIdeas = [...(prev.ideas || [])];
-          data.ideas.forEach(newIdea => {
-            // Check if this new idea already exists
-            const alreadyExists = mergedIdeas.some(
-              oldIdea => oldIdea.idea_id === newIdea.idea_id
-            );
-            
-            // If it's truly new, push it in
-            if (!alreadyExists) {
-              mergedIdeas.push(newIdea);
-            }
-          });
-          
-          return {
+          const newData = !prev ? data : {
             ...prev,
-            // (Optional) update the problem statement if needed
             description: data.description || prev.description,
-            // Use the merged ideas list
-            ideas: mergedIdeas
+            ideas: [...(prev.ideas || [])].concat(
+              data.ideas.filter(newIdea => 
+                !prev.ideas.some(oldIdea => oldIdea.idea_id === newIdea.idea_id)
+              )
+            )
           };
+
+          // Cache the merged data
+          try {
+            localStorage.setItem(cacheKey, JSON.stringify({
+              data: newData,
+              timestamp: Date.now()
+            }));
+            console.log('💾 Ideas data cached successfully');
+          } catch (error) {
+            console.error('❌ Error caching ideas:', error);
+          }
+
+          return newData;
         });
+
       } catch (error) {
-        console.error('Error fetching ideas:', error);
+        console.error('❌ Error fetching ideas:', error);
       } finally {
         setLoading(false);
       }

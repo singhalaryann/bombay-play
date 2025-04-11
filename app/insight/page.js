@@ -38,24 +38,62 @@ export default function InsightPage() {
   const [initialMetrics, setInitialMetrics] = useState([]);
   const [initialGraphs, setInitialGraphs] = useState([]);
   
-  // ADDED: New state for tracking initial render
+  // Cache duration: 5 minutes in milliseconds
+  const CACHE_DURATION = 5 * 60 * 1000;
+  
   const [isInitialRender, setIsInitialRender] = useState(true);
 
   useEffect(() => {
     const fetchInsightData = async () => {
       try {
         const insightId = searchParams.get('id');
-        console.log('Fetching insight data for:', { userId, insightId });
+        console.log('🔍 Processing insight request for:', { userId, insightId });
 
-        // ADDED: Mark initial render as completed
         setIsInitialRender(false);
 
         // If missing required params, go back to dashboard
         if (!userId || !insightId) {
-          console.log('Missing required parameters, redirecting to dashboard');
+          console.log('⚠️ Missing required parameters, redirecting to dashboard');
           router.push('/dashboard');
           return;
         }
+
+        // Check cache first
+        const cacheKey = `insight_cache_${insightId}`;
+        const cachedData = localStorage.getItem(cacheKey);
+        if (cachedData) {
+          const { data: cachedInsight, timestamp } = JSON.parse(cachedData);
+          if (Date.now() - timestamp < CACHE_DURATION) {
+            const loadStart = performance.now();
+            console.log('🔄 Loading insight from cache...');
+            
+            setInsightData(cachedInsight);
+            
+            // Process cached data for metrics and graphs
+            if (cachedInsight?.graphs) {
+              const metricItems = cachedInsight.graphs.filter(m => m.metric_type === 'metric');
+              setInitialMetrics(metricItems);
+
+              const chartCandidates = cachedInsight.graphs.filter(
+                m => ['line', 'bar', 'pie', 'hist'].includes(m.metric_type)
+              );
+              setInitialGraphs(convertMetricsToGraphs(chartCandidates));
+            }
+
+            const loadEnd = performance.now();
+            console.log(`✅ Cache load completed in ${((loadEnd - loadStart) / 1000).toFixed(2)} seconds`);
+            setLoading(false);
+            return;
+          } else {
+            console.log('🕒 Cache expired, fetching fresh data...');
+          }
+        } else {
+          console.log('💭 No cache found, fetching fresh data...');
+        }
+
+        // Fetch from API if no valid cache
+        const apiStart = performance.now();
+        console.log('🔄 Starting API call to fetch insight data...');
 
         const response = await fetch('https://get-insight-q54hzgyghq-uc.a.run.app', {
           method: 'POST',
@@ -67,29 +105,36 @@ export default function InsightPage() {
         });
 
         const data = await response.json();
-        console.log('Insight data received:', data);
+        const apiEnd = performance.now();
+        console.log(`✅ API call completed in ${((apiEnd - apiStart) / 1000).toFixed(2)} seconds`);
+
+        // Cache the fresh data
+        try {
+          localStorage.setItem(cacheKey, JSON.stringify({
+            data: data,
+            timestamp: Date.now()
+          }));
+          console.log('💾 Insight data cached successfully');
+        } catch (error) {
+          console.error('❌ Error caching insight data:', error);
+        }
+
         setInsightData(data);
 
-        // If we have data.graphs, split out "metric" items vs. line/bar/pie
+        // Process data for metrics and graphs
         if (data?.graphs) {
           // "metric" type items for MetricsDisplay
-          const metricItems = data.graphs.filter(
-            (m) => m.metric_type === 'metric'
-          );
+          const metricItems = data.graphs.filter(m => m.metric_type === 'metric');
           setInitialMetrics(metricItems);
 
           // line / bar / pie items for GraphDisplay
           const chartCandidates = data.graphs.filter(
-            (m) =>
-              m.metric_type === 'line' ||
-              m.metric_type === 'bar' ||
-              m.metric_type === 'pie' ||
-              m.metric_type === 'hist'
+            m => ['line', 'bar', 'pie', 'hist'].includes(m.metric_type)
           );
           setInitialGraphs(convertMetricsToGraphs(chartCandidates));
         }
       } catch (error) {
-        console.error('Error fetching insight data:', error);
+        console.error('❌ Error fetching insight data:', error);
       } finally {
         setLoading(false);
       }

@@ -6,6 +6,9 @@ import LoadingAnimation from "../common/LoadingAnimation";
 import { BarChart3, ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function ExperimentContent({ userId }) {
+  // Cache duration: 5 minutes in milliseconds
+  const CACHE_DURATION = 5 * 60 * 1000;
+
   const [experimentData, setExperimentData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -27,8 +30,30 @@ export default function ExperimentContent({ userId }) {
       }
 
       try {
-        // ADDED: Make sure we show skeleton content first
         setIsInitialRender(false);
+        
+        // Check cache first
+        const cachedData = localStorage.getItem(`experiments_cache_${userId}`);
+        if (cachedData) {
+          const { data, timestamp } = JSON.parse(cachedData);
+          if (Date.now() - timestamp < CACHE_DURATION) {
+            const loadStart = performance.now();
+            console.log('🔄 Loading experiments from cache...');
+            setExperimentData(data);
+            const loadEnd = performance.now();
+            console.log(`✅ Cache load completed in ${((loadEnd - loadStart) / 1000).toFixed(2)} seconds`);
+            setLoading(false);
+            return;
+          } else {
+            console.log('🕒 Cache expired, fetching fresh data...');
+          }
+        } else {
+          console.log('💭 No cache found, fetching fresh data...');
+        }
+        
+        // First API call - Get experiment IDs
+        const firstApiStart = performance.now();
+        console.log('🔄 API Call 1: Fetching experiment IDs...');
         
         const userExperimentsResponse = await fetch(
           "https://get-user-experiments-q54hzgyghq-uc.a.run.app",
@@ -46,6 +71,8 @@ export default function ExperimentContent({ userId }) {
         }
 
         const userExperiments = await userExperimentsResponse.json();
+        const firstApiEnd = performance.now();
+        console.log(`✅ API Call 1 completed in ${((firstApiEnd - firstApiStart) / 1000).toFixed(2)} seconds`);
 
         if (!isSubscribed) return;
 
@@ -54,6 +81,10 @@ export default function ExperimentContent({ userId }) {
           setLoading(false);
           return;
         }
+
+        // Second API call - Get experiment details
+        const secondApiStart = performance.now();
+        console.log(`🔄 API Call 2: Fetching details for ${userExperiments.experiment_ids.length} experiments...`);
 
         const experimentsPromises = userExperiments.experiment_ids.map((id) =>
           fetch("https://get-experiment-q54hzgyghq-uc.a.run.app", {
@@ -72,26 +103,33 @@ export default function ExperimentContent({ userId }) {
           experimentsPromises
         );
 
-        if (!isSubscribed) return;
+        const secondApiEnd = performance.now();
+        console.log(`✅ API Call 2 completed in ${((secondApiEnd - secondApiStart) / 1000).toFixed(2)} seconds`);
+        console.log(`⏱️ Total API time: ${((secondApiEnd - firstApiStart) / 1000).toFixed(2)} seconds`);
 
-        console.log("Raw API Response:", experimentsResults);
+        if (!isSubscribed) return;
 
         const validExperiments = experimentsResults
           .filter((result) => result.status === "fulfilled")
-          .map((result) => {
-            console.log("Single result value:", result.value);
-            return result.value.experiment;
-          })
-          .filter((exp) => {
-            console.log("After mapping, single experiment:", exp);
-            return exp?.status === "active" || exp?.status === "complete";
-          });
+          .map((result) => result.value.experiment)
+          .filter((exp) => exp?.status === "active" || exp?.status === "complete");
+
+        // Store in cache
+        try {
+          localStorage.setItem(`experiments_cache_${userId}`, JSON.stringify({
+            data: validExperiments,
+            timestamp: Date.now()
+          }));
+          console.log('💾 Data cached successfully');
+        } catch (error) {
+          console.error('❌ Error caching experiments:', error);
+        }
 
         setExperimentData(validExperiments);
         setError(null);
       } catch (err) {
         if (isSubscribed) {
-          console.error("Error fetching experiments:", err);
+          console.error("❌ Error fetching experiments:", err);
           setError("Failed to load experiments");
         }
       } finally {
@@ -108,9 +146,9 @@ export default function ExperimentContent({ userId }) {
     };
   }, [userId]);
 
-  // New function to handle experiment click
+  // Modified handleExperimentClick to include timing
   const handleExperimentClick = async (experimentId) => {
-    console.log("Experiment clicked:", experimentId);
+    console.log("🖱️ Experiment clicked:", experimentId);
 
     // Toggle graphs if clicking same experiment
     if (selectedExperimentId === experimentId) {
@@ -119,10 +157,33 @@ export default function ExperimentContent({ userId }) {
       return;
     }
 
-    setLoadingGraphs(true);  // Start loading animation
+    setLoadingGraphs(true);
     setSelectedExperimentId(experimentId);
 
     try {
+      // Check cache first
+      const cachedGraphs = localStorage.getItem(`experiment_graphs_${experimentId}`);
+      if (cachedGraphs) {
+        const { data, timestamp } = JSON.parse(cachedGraphs);
+        if (Date.now() - timestamp < CACHE_DURATION) {
+          const loadStart = performance.now();
+          console.log('🔄 Loading graphs from cache...');
+          setSelectedGraphs(data);
+          const loadEnd = performance.now();
+          console.log(`✅ Graph cache load completed in ${((loadEnd - loadStart) / 1000).toFixed(2)} seconds`);
+          setLoadingGraphs(false);
+          return;
+        } else {
+          console.log('🕒 Graph cache expired, fetching fresh data...');
+        }
+      } else {
+        console.log('💭 No graph cache found, fetching fresh data...');
+      }
+
+      // Fetch from API
+      const apiStart = performance.now();
+      console.log('🔄 API Call: Fetching graph data...');
+
       const response = await fetch(
         "https://get-experiment-q54hzgyghq-uc.a.run.app",
         {
@@ -133,13 +194,26 @@ export default function ExperimentContent({ userId }) {
       );
 
       const data = await response.json();
-      console.log("Graph data received:", data.experiment.graphs);
+      
+      const apiEnd = performance.now();
+      console.log(`✅ Graph API call completed in ${((apiEnd - apiStart) / 1000).toFixed(2)} seconds`);
+
+      // Cache the graphs data
+      try {
+        localStorage.setItem(`experiment_graphs_${experimentId}`, JSON.stringify({
+          data: data.experiment.graphs,
+          timestamp: Date.now()
+        }));
+        console.log('💾 Graph data cached successfully');
+      } catch (error) {
+        console.error('❌ Error caching graph data:', error);
+      }
 
       setSelectedGraphs(data.experiment.graphs);
     } catch (err) {
-      console.error("Error fetching experiment graphs:", err);
+      console.error("❌ Error fetching experiment graphs:", err);
     } finally {
-      setLoadingGraphs(false);  // Stop loading whether success or error
+      setLoadingGraphs(false);
     }
   };
 

@@ -81,6 +81,12 @@ const GraphDisplay = ({ graphs }) => {
    const { metric_type, title, columns, values, x_unit, y_unit, value_unit } = graph;
 
    if (!Array.isArray(values)) return null;
+   
+   // Check for empty values array
+   if (values.length === 0) {
+     console.log(`Empty values array for chart ${title}`);
+     return null;
+   }
 
    const x_label = columns?.[0] || 'X';
    const y_label = columns?.[1] || 'Y';
@@ -93,163 +99,286 @@ const GraphDisplay = ({ graphs }) => {
      return [min - padding, max + padding];
    };
 
-   switch (metric_type) {
-     case 'pie': {
-       const data = values.map(([cat, val]) => ({
-         name: cat,
-         value: parseFloat(val),
-         unit: value_unit
-       }));
+   try {
+     switch (metric_type) {
+       case 'pie': {
+         let data;
+         
+         // Case 1: Flat array of numbers for pie chart (like geographical_breakdown or device_os_distribution)
+         if (typeof values[0] === 'number') {
+           console.log(`Converting flat array format for pie chart ${title}`);
+           // Convert the flat array of numbers to name-value pairs using index as name
+           data = values.map((value, index) => ({
+             name: `Region ${index + 1}`, // Generic name based on index
+             value: value,
+             unit: value_unit
+           }));
+           
+           // Filter out zero values for better visualization
+           data = data.filter(item => item.value > 0);
+           
+           // Limit to top values for readability
+           if (data.length > 10) {
+             data = data.sort((a, b) => b.value - a.value).slice(0, 10);
+           }
+         }
+         // Case 2: Array of [category, value] pairs (standard format)
+         else if (Array.isArray(values[0])) {
+           data = values.map(([cat, val]) => ({
+             name: cat,
+             value: parseFloat(val),
+             unit: value_unit
+           }));
+         }
+         // Case 3: Invalid format
+         else {
+           console.error(`Invalid pie chart values format for chart ${title}:`, values);
+           return null;
+         }
 
-       return (
-         <ResponsiveContainer width="100%" height={300}>
-           <PieChart>
-             <Pie
-               data={data}
-               cx="50%"
-               cy="50%"
-               innerRadius={60}
-               outerRadius={80}
-               fill="#8884d8"
-               paddingAngle={2}
-               dataKey="value"
-               label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-               labelLine={{ stroke: 'rgba(255,255,255,0.3)' }}
-             >
-               {data.map((entry, index) => (
-                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-               ))}
-             </Pie>
-             <Tooltip content={<CustomPieTooltip />} />
-           </PieChart>
-         </ResponsiveContainer>
-       );
-     }
+         return (
+           <ResponsiveContainer width="100%" height={300}>
+             <PieChart>
+               <Pie
+                 data={data}
+                 cx="50%"
+                 cy="50%"
+                 innerRadius={60}
+                 outerRadius={80}
+                 fill="#8884d8"
+                 paddingAngle={2}
+                 dataKey="value"
+                 label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                 labelLine={{ stroke: 'rgba(255,255,255,0.3)' }}
+               >
+                 {data.map((entry, index) => (
+                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                 ))}
+               </Pie>
+               <Tooltip content={<CustomPieTooltip />} />
+             </PieChart>
+           </ResponsiveContainer>
+         );
+       }
 
-     case 'line': {
-       const data = values.map(([xVal, yVal]) => ({
-         x: xVal,
-         y: parseFloat(yVal)
-       }));
-       const yDomain = calculateDomain(data, 'y');
-
-       return (
-         <ResponsiveContainer width="100%" height={300}>
-           <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-             {/* Updated XAxis with flexible date formatting */}
-             <XAxis
-               dataKey="x"
-               stroke="rgba(255,255,255,0.6)"
-               tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
-               tickFormatter={formatDateIfValid}
-               label={{
-                 value: x_label,
-                 position: 'bottom',
-                 fill: 'rgba(255,255,255,0.6)',
-                 fontSize: 12
-               }}
-             />
-             <YAxis
-               stroke="rgba(255,255,255,0.6)"
-               tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
-               label={{
-                 value: y_label,
-                 angle: -90,
-                 position: 'left',
-                 fill: 'rgba(255,255,255,0.6)',
-                 fontSize: 12
-               }}
-               domain={yDomain}
-               scale="linear"
-             />
-             <Tooltip
-               content={(props) => (
-                 <LineTooltip
-                   {...props}
-                   x_label={x_label}
-                   y_label={y_label}
-                   x_unit={x_unit}
-                   y_unit={y_unit}
+       case 'line': {
+         // Check if values is a flat array of numbers (like session_distribution_by_hour)
+         if (typeof values[0] === 'number') {
+           console.log(`Converting flat array format for line chart ${title}`);
+           const data = values.map((value, index) => ({
+             x: index.toString(), // Use index as x value
+             y: value
+           }));
+           
+           const yDomain = calculateDomain(data, 'y');
+           
+           return (
+             <ResponsiveContainer width="100%" height={300}>
+               <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                 <XAxis
+                   dataKey="x"
+                   stroke="rgba(255,255,255,0.6)"
+                   tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
+                   label={{
+                     value: x_label,
+                     position: 'bottom',
+                     fill: 'rgba(255,255,255,0.6)',
+                     fontSize: 12
+                   }}
                  />
-               )}
-             />
-             <Line
-               type="monotone"
-               dataKey="y"
-               stroke="#82FF83"
-               strokeWidth={2}
-               dot={{ fill: '#82FF83', strokeWidth: 2 }}
-               activeDot={{ r: 6 }}
-             />
-           </LineChart>
-         </ResponsiveContainer>
-       );
-     }
+                 <YAxis
+                   stroke="rgba(255,255,255,0.6)"
+                   tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
+                   label={{
+                     value: y_label,
+                     angle: -90,
+                     position: 'left',
+                     fill: 'rgba(255,255,255,0.6)',
+                     fontSize: 12
+                   }}
+                   domain={yDomain}
+                   scale="linear"
+                 />
+                 <Tooltip
+                   content={(props) => (
+                     <LineTooltip
+                       {...props}
+                       x_label={x_label}
+                       y_label={y_label}
+                       x_unit={x_unit}
+                       y_unit={y_unit}
+                     />
+                   )}
+                 />
+                 <Line
+                   type="monotone"
+                   dataKey="y"
+                   stroke="#82FF83"
+                   strokeWidth={2}
+                   dot={{ fill: '#82FF83', strokeWidth: 2 }}
+                   activeDot={{ r: 6 }}
+                 />
+               </LineChart>
+             </ResponsiveContainer>
+           );
+         }
+         // Standard format: array of [x, y] pairs
+         else if (Array.isArray(values[0])) {
+           const data = values.map(([xVal, yVal]) => ({
+             x: xVal,
+             y: parseFloat(yVal)
+           }));
+           const yDomain = calculateDomain(data, 'y');
 
-     case 'bar':
-      case 'hist': {
-        // Single implementation that works for both types
-        const data = values.map(([cat, val]) => ({
-          name: cat,
-          value: parseFloat(val)
-        }));
-        const yDomain = calculateDomain(data, 'value');
-      
-        return (
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
-              <XAxis
-                dataKey="name"
-                stroke="rgba(255,255,255,0.6)"
-                tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
-                tickFormatter={formatDateIfValid}
-                label={{
-                  value: x_label,
-                  position: 'bottom',
-                  fill: 'rgba(255,255,255,0.6)',
-                  fontSize: 12
-                }}
-              />
-              <YAxis
-                stroke="rgba(255,255,255,0.6)"
-                tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
-                label={{
-                  value: y_label,
-                  angle: -90,
-                  position: 'left',
-                  fill: 'rgba(255,255,255,0.6)',
-                  fontSize: 12
-                }}
-                domain={yDomain}
-                scale="linear"
-              />
-              <Tooltip
-                content={(props) => (
-                  <CustomTooltip {...props} valueUnit={value_unit} />
-                )}
-              />             
-              <Bar dataKey="value" fill="#82FF83" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        );
-      }
-     default:
-       return null;
+           return (
+             <ResponsiveContainer width="100%" height={300}>
+               <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                 <XAxis
+                   dataKey="x"
+                   stroke="rgba(255,255,255,0.6)"
+                   tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
+                   tickFormatter={formatDateIfValid}
+                   label={{
+                     value: x_label,
+                     position: 'bottom',
+                     fill: 'rgba(255,255,255,0.6)',
+                     fontSize: 12
+                   }}
+                 />
+                 <YAxis
+                   stroke="rgba(255,255,255,0.6)"
+                   tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
+                   label={{
+                     value: y_label,
+                     angle: -90,
+                     position: 'left',
+                     fill: 'rgba(255,255,255,0.6)',
+                     fontSize: 12
+                   }}
+                   domain={yDomain}
+                   scale="linear"
+                 />
+                 <Tooltip
+                   content={(props) => (
+                     <LineTooltip
+                       {...props}
+                       x_label={x_label}
+                       y_label={y_label}
+                       x_unit={x_unit}
+                       y_unit={y_unit}
+                     />
+                   )}
+                 />
+                 <Line
+                   type="monotone"
+                   dataKey="y"
+                   stroke="#82FF83"
+                   strokeWidth={2}
+                   dot={{ fill: '#82FF83', strokeWidth: 2 }}
+                   activeDot={{ r: 6 }}
+                 />
+               </LineChart>
+             </ResponsiveContainer>
+           );
+         } else {
+           console.error(`Invalid line chart values format for chart ${title}:`, values);
+           return null;
+         }
+       }
+
+       case 'bar':
+       case 'hist': {
+         // Different data formats handling for bar/hist charts
+         let data;
+         
+         // Handle flat array of numbers (like for session distribution by hour)
+         if (typeof values[0] === 'number') {
+           console.log(`Converting flat array format for chart ${title}`);
+           data = values.map((value, index) => ({
+             name: index.toString(),
+             value: value
+           }));
+         }
+         // Handle regular case: array of [category, value] pairs
+         else if (Array.isArray(values[0])) {
+           data = values.map(([cat, val]) => ({
+             name: cat,
+             value: parseFloat(val)
+           }));
+         }
+         // Handle invalid format
+         else {
+           console.error(`Invalid bar/hist values format for chart ${title}:`, values);
+           return null;
+         }
+        
+         const yDomain = calculateDomain(data, 'value');
+        
+         return (
+           <ResponsiveContainer width="100%" height={300}>
+             <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
+               <XAxis
+                 dataKey="name"
+                 stroke="rgba(255,255,255,0.6)"
+                 tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
+                 tickFormatter={formatDateIfValid}
+                 label={{
+                   value: x_label,
+                   position: 'bottom',
+                   fill: 'rgba(255,255,255,0.6)',
+                   fontSize: 12
+                 }}
+               />
+               <YAxis
+                 stroke="rgba(255,255,255,0.6)"
+                 tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
+                 label={{
+                   value: y_label,
+                   angle: -90,
+                   position: 'left',
+                   fill: 'rgba(255,255,255,0.6)',
+                   fontSize: 12
+                 }}
+                 domain={yDomain}
+                 scale="linear"
+               />
+               <Tooltip
+                 content={(props) => (
+                   <CustomTooltip {...props} valueUnit={value_unit} />
+                 )}
+               />             
+               <Bar dataKey="value" fill="#82FF83" radius={[4, 4, 0, 0]} />
+             </BarChart>
+           </ResponsiveContainer>
+         );
+       }
+       default:
+         return null;
+     }
+   } catch (error) {
+     console.error(`Error rendering chart ${title}:`, error);
+     return null;
    }
  };
 
  return (
    <div className={styles.analyticsContainer}>
-     {graphs.map((graph, index) => (
-       <div key={`${graph.metric_id}-${index}`} className={styles.section}>
-         <div className={styles.glassEffect}>
-           <h3 className={styles.chartTitle}>{graph.title || 'Untitled Chart'}</h3>
-           {renderChart(graph)}
+     {graphs.map((graph, index) => {
+       // Skip any invalid graph objects
+       if (!graph || typeof graph !== 'object') return null;
+       
+       return (
+         <div key={`${graph.metric_id || index}-${index}`} className={styles.section}>
+           <div className={styles.glassEffect}>
+             <h3 className={styles.chartTitle}>{graph.title || 'Untitled Chart'}</h3>
+             {renderChart(graph)}
+           </div>
          </div>
-       </div>
-     ))}
+       );
+     })}
    </div>
  );
 };
