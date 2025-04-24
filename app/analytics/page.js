@@ -54,19 +54,36 @@ export default function AnalyticsPage() {
 
             console.log(`Processing metric ${metric.metric_id} as ${metricType} chart`);
 
-            return {
-                metric_id: metric.metric_id || `metric-${Math.random().toString(36).substr(2, 9)}`,
-                metric_type: metricType,
-                title: metric.name || "Untitled Metric",
-                description: metric.description || "",
-                columns: [
-                    metric.x_label || "Date", 
-                    metric.y_label || "Value"
-                ],
-                values: metric.values || [],
-                x_unit: metric.x_unit || "",
-                y_unit: metric.y_unit || ""
-            };
+            // Handle multiline chart type differently to include categories and series
+if (metricType === 'multiline') {
+    return {
+        metric_id: metric.metric_id || `metric-${Math.random().toString(36).substr(2, 9)}`,
+        metric_type: metricType,
+        title: metric.name || "Untitled Metric",
+        description: metric.description || "",
+        categories: metric.categories || [],
+        series: metric.series || [],
+        x_label: metric.x_label || "Date",
+        y_label: metric.y_label || "Value",
+        x_unit: metric.x_unit || "",
+        y_unit: metric.y_unit || "",
+        value_unit: metric.value_unit || ""
+    };
+} else {
+    return {
+        metric_id: metric.metric_id || `metric-${Math.random().toString(36).substr(2, 9)}`,
+        metric_type: metricType,
+        title: metric.name || "Untitled Metric",
+        description: metric.description || "",
+        columns: [
+            metric.x_label || "Date", 
+            metric.y_label || "Value"
+        ],
+        values: metric.values || [],
+        x_unit: metric.x_unit || "",
+        y_unit: metric.y_unit || ""
+    };
+}
         });
     };
 

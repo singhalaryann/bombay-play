@@ -18,8 +18,10 @@
   height: 100%; /* Match parent height */
   overflow-y: auto; /* Enables scrolling */
   padding: 20px;
+  display: flex; /* Added to create proper layout flow */
+  flex-direction: column; /* Stack children vertically */
+  gap: 16px; 
 }
-
 .contentLoading {
   display: flex;
   align-items: center;
@@ -70,8 +72,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 32px 0;
-  gap: 32px;
+  margin: 5px 0 5px 0; /* Reduced both top and bottom margins */  gap: 32px;
 }
 
 .subText {

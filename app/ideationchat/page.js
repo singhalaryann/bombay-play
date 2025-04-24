@@ -45,10 +45,13 @@ const FeatureCard = ({ icon: Icon, title, description, shortDescription, onClick
   );
 };
 
+// UPDATED: FileItem component with new structure for horizontal layout
 const FileItem = ({ file, onRemove }) => (
   <div className={styles.fileItem}>
-    <FileText size={16} className={styles.fileIcon} />
-    <span className={styles.fileName}>{file.name}</span>
+    <div className={styles.fileContent}>
+      <FileText size={16} className={styles.fileIcon} />
+      <span className={styles.fileName}>{file.name}</span>
+    </div>
     <button className={styles.removeFileBtn} onClick={() => onRemove(file)}>
       <X size={14} />
     </button>
@@ -232,6 +235,17 @@ export default function IdeationChat() {
                     />
                     
                     <div className={styles.searchWrapper}>
+                      {/* UPDATED: Moved uploadedFilesContainer ABOVE the searchContainer */}
+                      {isFileUploadOpen && (
+                        <div className={styles.uploadedFilesContainer}>
+                          <div className={styles.uploadedFiles}>
+                            {uploadedFiles.map((file, idx) => (
+                              <FileItem key={idx} file={file} onRemove={removeFile} />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
                       <div className={styles.searchContainer}>
                         <input
                           type="text"
@@ -246,7 +260,7 @@ export default function IdeationChat() {
                           className={styles.plusButton} 
                           onClick={handleFileUploadClick}
                         >
-                          <span>+</span>
+                          <FileText size={18} />
                         </button>
                         <input
                           type="file"
@@ -260,17 +274,9 @@ export default function IdeationChat() {
                           className={styles.arrowButton}
                           disabled={(!input.trim() && uploadedFiles.length === 0) || isLoading}
                         >
-                          <span>→</span>
+                          <Send size={18} />
                         </button>
                       </div>
-                      
-                      {isFileUploadOpen && (
-                        <div className={styles.uploadedFiles}>
-                          {uploadedFiles.map((file, idx) => (
-                            <FileItem key={idx} file={file} onRemove={removeFile} />
-                          ))}
-                        </div>
-                      )}
                     </div>
                     
                     {/* UPDATED: Feature grid with new cards and hover interactions */}
@@ -304,7 +310,7 @@ export default function IdeationChat() {
 
                 {isLoading && (
                   <div className={styles.loadingMessage}>
-                    <Loader className={styles.loadingIcon} size={20} />
+                    <Loader className={styles.loadingIcon} size={18} />
                     <span>AI is thinking...</span>
                   </div>
                 )}
@@ -313,6 +319,17 @@ export default function IdeationChat() {
 
               {messages.length > 0 && (
                 <div className={styles.inputWrapper}>
+                  {/* UPDATED: Moved uploadedFilesContainer ABOVE the inputContainer */}
+                  {isFileUploadOpen && (
+                    <div className={styles.uploadedFilesContainer}>
+                      <div className={styles.uploadedFiles}>
+                        {uploadedFiles.map((file, idx) => (
+                          <FileItem key={idx} file={file} onRemove={removeFile} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
                   <div className={styles.inputContainer}>
                     <input
                       type="text"
@@ -342,17 +359,9 @@ export default function IdeationChat() {
                       className={styles.sendButton}
                       disabled={(!input.trim() && uploadedFiles.length === 0) || isLoading}
                     >
-                      <Send size={20} />
+                      <Send size={18} />
                     </button>
                   </div>
-                  
-                  {isFileUploadOpen && (
-                    <div className={styles.uploadedFiles}>
-                      {uploadedFiles.map((file, idx) => (
-                        <FileItem key={idx} file={file} onRemove={removeFile} />
-                      ))}
-                    </div>
-                  )}
                 </div>
               )}
             </div>
