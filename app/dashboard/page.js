@@ -10,6 +10,7 @@ import DashboardTabs from "../components/dashboard/DashboardTabs";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 
+
 // Import your separate ExperimentContent component
 import ExperimentContent from "../components/dashboard/ExperimentContent";
 import LoadingAnimation from "../components/common/LoadingAnimation";
