@@ -38,71 +38,22 @@
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+  padding-top: 20px;
 }
 
-/* Section Titles */
+/* ADDED: Section Header Styles */
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+/* ADDED: Section Title Styles */
 .sectionTitle {
   color: #FFFFFF;
   font-size: 24px;
   font-weight: 500;
-  margin: 0 0 24px 0;
-}
-
-/* Problem Section */
-.problemSection {
-  margin-bottom: 48px;
-  /* position: sticky; */
-  top: 0;
-  background: #050505;
-  z-index: 10;
-  /* padding: 20px 0; */
-}
-
-.problemStatement {
-  background: #EBFFE1;
-  color: #171717;
-  padding: 20px 24px;
-  border-radius: 12px;
-  font-size: 15px;
-  line-height: 1.5;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Hypothesis Section */
-.hypothesisSection {
-  margin-top: 32px;
-  /* position: sticky; */
-  top: 140px;
-  background: #050505;
-  z-index: 9;
-  padding: 20px 0;
-}
-
-.hypothesisHeader {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 32px;
-}
-
-.hypothesisHeader .sectionTitle {
-  margin-bottom: 0;
-}
-
-.questionIcon {
-  width: 30px;
-  height: 30px;
-  color: rgba(255, 255, 255, 0.6);
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  padding: 6px;
-  cursor: help;
-  transition: all 0.2s ease;
-}
-
-.questionIcon:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
 }
 
 /* Ideas Container */
@@ -111,6 +62,17 @@
   flex-direction: column;
   gap: 16px;
   width: 100%;
+}
+
+/* ADDED: No ideas message */
+.noIdeas {
+  background: rgba(25, 28, 23, 0.5);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 32px;
+  text-align: center;
+  border-radius: 12px;
+  font-size: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Scrollbar Styles */
@@ -140,28 +102,6 @@
   100% {
     background-position: 1000px 0;
   }
-}
-
-/* ADDED: Skeleton problem statement */
-.skeletonProblemStatement {
-  background: rgba(235, 255, 225, 0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  box-shadow: none;
-}
-
-/* ADDED: Skeleton text */
-.skeletonText {
-  height: 16px;
-  width: 100%;
-  background: linear-gradient(to right, 
-    rgba(235, 255, 225, 0.2) 8%, 
-    rgba(235, 255, 225, 0.3) 18%, 
-    rgba(235, 255, 225, 0.2) 33%);
-  background-size: 2000px 100%;
-  animation: shimmer 2s infinite linear;
-  border-radius: 4px;
 }
 
 /* ADDED: Skeleton card */
@@ -240,14 +180,11 @@
   .mainContent {
     /* padding: 28px; */
   }
+  .content {
+    padding-top: 15px;
+  }
   .sectionTitle {
     font-size: 22px;
-  }
-  .problemSection {
-    margin-bottom: 40px;
-  }
-  .problemStatement {
-    /* padding: 18px 22px; */
   }
 }
 
@@ -257,14 +194,22 @@
   }
   .content {
     max-width: 100%;
+    padding-top: 10px;
   }
-  .hypothesisSection {
-    top: 120px;
+  .sectionHeader {
+    margin-bottom: 20px;
+  }
+  .sectionTitle {
+    font-size: 20px;
   }
   /* ADDED: Responsive skeleton adjustments */
   .skeletonCard .content {
     gap: 20px;
     padding: 18px 20px;
+  }
+  .noIdeas {
+    padding: 28px;
+    font-size: 15px;
   }
 }
 
@@ -272,27 +217,14 @@
   .mainContent {
     /* padding: 20px; */
   }
-  .sectionTitle {
-    font-size: 20px;
-    margin-bottom: 20px;
-  }
-  .problemStatement {
-    /* padding: 16px; */
-    font-size: 14px;
-  }
-  .hypothesisHeader {
-    margin-bottom: 24px;
-  }
-  .questionIcon {
-    width: 26px;
-    height: 26px;
-    padding: 5px;
-  }
   .ideasContainer {
     gap: 14px;
   }
-  .hypothesisSection {
-    top: 100px;
+  .sectionHeader {
+    margin-bottom: 16px;
+  }
+  .sectionTitle {
+    font-size: 18px;
   }
   /* ADDED: Responsive skeleton adjustments */
   .skeletonCard .content {
@@ -303,6 +235,10 @@
   .skeletonButton {
     width: 100%;
   }
+  .noIdeas {
+    padding: 24px;
+    font-size: 14px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -310,28 +246,7 @@
     padding: 16px;
   }
   .sectionTitle {
-    font-size: 18px;
-    margin-bottom: 16px;
-  }
-  .problemSection {
-    margin-bottom: 32px;
-    /* padding: 16px 0; */
-  }
-  .problemStatement {
-    padding: 14px;
-  }
-  .hypothesisHeader {
-    gap: 8px;
-    margin-bottom: 20px;
-  }
-  .questionIcon {
-    width: 24px;
-    height: 24px;
-    padding: 4px;
-  }
-  .hypothesisSection {
-    top: 80px;
-    padding: 16px 0;
+    font-size: 16px;
   }
   /* ADDED: Responsive skeleton adjustments */
   .skeletonCard .content {
@@ -343,5 +258,9 @@
   }
   .skeletonButton {
     height: 32px;
+  }
+  .noIdeas {
+    padding: 20px;
+    font-size: 13px;
   }
 }

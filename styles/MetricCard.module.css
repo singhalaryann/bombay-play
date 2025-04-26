@@ -1,5 +1,4 @@
-/* styles/MetricCard.module.css */
-.card {
+/* .card {
   position: relative;
   width: 100%;
   min-height: 180px;
@@ -21,7 +20,6 @@
   gap: 16px;
 }
 
-/* Outer glow border */
 .cardInner::after {
   content: '';
   position: absolute;
@@ -44,7 +42,6 @@
   pointer-events: none;
 }
 
-/* Top gradient line */
 .cardInner::before {
   content: '';
   position: absolute;
@@ -150,7 +147,6 @@
   color: #CC6666;
 }
 
-/* Responsive styles */
 @media (max-width: 1280px) {
   .cardInner {
       padding: 20px;
@@ -233,4 +229,4 @@
   .descriptionContainer {
       padding: 10px 14px;
   }
-}
+} */

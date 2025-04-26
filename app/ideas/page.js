@@ -7,7 +7,6 @@ import Header from '../components/layout/Header';
 import Sidebar from '../components/layout/Sidebar';
 import IdeaCard from '../components/ideas/IdeaCard';
 import styles from '../../styles/Ideas.module.css';
-import { HelpCircle } from 'lucide-react';
 import LoadingAnimation from '../components/common/LoadingAnimation';
 
 export default function IdeasPage() {
@@ -21,23 +20,26 @@ export default function IdeasPage() {
   const CACHE_DURATION = 5 * 60 * 1000;
   
   const [isInitialRender, setIsInitialRender] = useState(true);
+  
+  // Fixed game ID for ideas as provided
+  const GAME_ID = "4705d90b-f4a9-4a71-b0b1-e4da22acfb36";
 
   useEffect(() => {
     const fetchIdeas = async () => {
       try {
         const insightId = searchParams.get('insight');
-        console.log('🔍 Processing ideas request for:', { userId, insightId });
+        console.log('🔍 Processing ideas request for:', { userId, insightId, gameId: GAME_ID });
         
         setIsInitialRender(false);
         
-        if (!userId || !insightId) {
-          console.log('⚠️ Missing required parameters, redirecting to dashboard');
+        if (!userId) {
+          console.log('⚠️ Missing user ID, redirecting to dashboard');
           router.push('/dashboard');
           return;
         }
 
         // Check cache first
-        const cacheKey = `ideas_cache_${insightId}`;
+        const cacheKey = `ideas_cache_${GAME_ID}`;
         const cachedData = localStorage.getItem(cacheKey);
         if (cachedData) {
           const { data: cachedIdeas, timestamp } = JSON.parse(cachedData);
@@ -62,46 +64,45 @@ export default function IdeasPage() {
         const apiStart = performance.now();
         console.log('🔄 Starting API call to fetch ideas...');
         
-        const response = await fetch('https://get-ideas-q54hzgyghq-uc.a.run.app', {
+        const response = await fetch('https://get-ideas-nrosabqhla-uc.a.run.app', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             user_id: userId,
-            insight_id: insightId
+            game_id: GAME_ID
           })
         });
         
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
+        console.log('📊 Received ideas data:', data);
+        
         const apiEnd = performance.now();
         console.log(`✅ API call completed in ${((apiEnd - apiStart) / 1000).toFixed(2)} seconds`);
         
-        // Process and merge ideas
-        setIdeasData((prev) => {
-          const newData = !prev ? data : {
-            ...prev,
-            description: data.description || prev.description,
-            ideas: [...(prev.ideas || [])].concat(
-              data.ideas.filter(newIdea => 
-                !prev.ideas.some(oldIdea => oldIdea.idea_id === newIdea.idea_id)
-              )
-            )
-          };
+        // Process the data directly without merging with previous
+        const processedData = {
+          count: data.count,
+          ideas: data.ideas || []
+        };
+        
+        setIdeasData(processedData);
 
-          // Cache the merged data
-          try {
-            localStorage.setItem(cacheKey, JSON.stringify({
-              data: newData,
-              timestamp: Date.now()
-            }));
-            console.log('💾 Ideas data cached successfully');
-          } catch (error) {
-            console.error('❌ Error caching ideas:', error);
-          }
-
-          return newData;
-        });
+        // Cache the data
+        try {
+          localStorage.setItem(cacheKey, JSON.stringify({
+            data: processedData,
+            timestamp: Date.now()
+          }));
+          console.log('💾 Ideas data cached successfully');
+        } catch (error) {
+          console.error('❌ Error caching ideas:', error);
+        }
 
       } catch (error) {
         console.error('❌ Error fetching ideas:', error);
@@ -111,44 +112,33 @@ export default function IdeasPage() {
     };
     
     fetchIdeas();
-  }, [userId, searchParams, router]);
+  }, [userId, searchParams, router, GAME_ID]);
 
-  // ADDED: Render skeleton content function
+  // Render skeleton content function
   const renderSkeletonContent = () => {
     return (
       <div className={styles.content}>
-        <section className={styles.problemSection}>
-          <h2 className={styles.sectionTitle}>Problem statement</h2>
-          <div className={`${styles.problemStatement} ${styles.skeletonProblemStatement}`}>
-            <div className={styles.skeletonText}></div>
-            <div className={styles.skeletonText}></div>
-            <div className={styles.skeletonText} style={{ width: '70%' }}></div>
-          </div>
-        </section>
+        {/* Added section title to skeleton */}
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>Ideas</h2>
+        </div>
         
-        <section className={styles.hypothesisSection}>
-          <div className={styles.hypothesisHeader}>
-            <h2 className={styles.sectionTitle}>Hypothesis</h2>
-            <HelpCircle className={styles.questionIcon} size={30} />
-          </div>
-          
-          <div className={styles.ideasContainer}>
-            {[1, 2, 3, 4].map((index) => (
-              <div key={index} className={`${styles.skeletonCard}`}>
-                <div className={styles.glassEffect}>
-                  <div className={styles.content}>
-                    <div className={`${styles.skeletonIdeaLabel}`}>
-                      <div className={styles.skeletonBulb}></div>
-                      <div className={styles.skeletonLabelText}></div>
-                    </div>
-                    <div className={styles.skeletonDescription}></div>
-                    <div className={styles.skeletonButton}></div>
+        <div className={styles.ideasContainer}>
+          {[1, 2, 3, 4].map((index) => (
+            <div key={index} className={`${styles.skeletonCard}`}>
+              <div className={styles.glassEffect}>
+                <div className={styles.content}>
+                  <div className={`${styles.skeletonIdeaLabel}`}>
+                    <div className={styles.skeletonBulb}></div>
+                    <div className={styles.skeletonLabelText}></div>
                   </div>
+                  <div className={styles.skeletonDescription}></div>
+                  <div className={styles.skeletonButton}></div>
                 </div>
               </div>
-            ))}
-          </div>
-        </section>
+            </div>
+          ))}
+        </div>
       </div>
     );
   };
@@ -159,36 +149,31 @@ export default function IdeasPage() {
       <div className={styles.mainLayout}>
         <Sidebar />
         <main className={styles.mainContent}>
-          {/* UPDATED: Show skeleton content when loading */}
+          {/* Show skeleton content when loading */}
           {isInitialRender || loading ? (
             renderSkeletonContent()
           ) : (
             <div className={styles.content}>
-              <section className={styles.problemSection}>
-                <h2 className={styles.sectionTitle}>Problem statement</h2>
-                <div className={styles.problemStatement}>
-                  {ideasData?.description || 'No problem statement available'}
-                </div>
-              </section>
+              {/* Added section title here */}
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>Ideas</h2>
+              </div>
               
-              <section className={styles.hypothesisSection}>
-                <div className={styles.hypothesisHeader}>
-                  <h2 className={styles.sectionTitle}>Hypothesis</h2>
-                  <HelpCircle className={styles.questionIcon} size={30} />
-                </div>
-                
-                <div className={styles.ideasContainer}>
-                  {ideasData?.ideas?.map((idea, index) => (
+              <div className={styles.ideasContainer}>
+                {ideasData?.ideas && ideasData.ideas.length > 0 ? (
+                  ideasData.ideas.map((idea, index) => (
                     <IdeaCard
-                      key={idea.idea_id}
+                      key={idea.idea_id || `idea-${index}`}
                       number={index + 1}
-                      description={idea.description}
-                      ideaId={idea.idea_id}
-                      insightId={idea.insight_id}
+                      description={idea.idea_desc || idea.description || ''}
+                      ideaId={idea.idea_id || `idea-${index}`}
+                      insightId={idea.insights || searchParams.get('insight') || ''}
                     />
-                  ))}
-                </div>
-              </section>
+                  ))
+                ) : (
+                  <div className={styles.noIdeas}>No ideas available</div>
+                )}
+              </div>
             </div>
           )}
         </main>

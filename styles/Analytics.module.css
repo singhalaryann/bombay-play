@@ -24,12 +24,30 @@
   padding: 20px;
 }
 
+/* NEW: Page header container for title and filter */
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  width: 100%;
+  position: relative;
+}
+
+/* NEW: Filter container styling */
+.filterContainer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10;
+}
+
 /* Page title styling */
 .pageTitle {
   color: #82FF83;
   font-size: 24px;
   font-weight: 600;
-  margin-bottom: 16px;
+  margin: 0;
   text-align: left;
   position: relative;
   padding-bottom: 10px;
@@ -50,8 +68,8 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 24px;
+  width: 100%;
 }
-
 /* Glass Box Styles - For error states and no data states */
 .glassBox {
   width: 100%;
@@ -229,6 +247,12 @@
   }
   .pageTitle {
       font-size: 22px;
+      margin-bottom: 12px;
+  }
+  .pageHeader {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
   }
   .skeletonGraphTitle {
       height: 22px;
@@ -246,6 +270,12 @@
   }
   .pageTitle {
       font-size: 20px;
+      margin-bottom: 10px;
+  }
+  .pageHeader {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
   }
   .skeletonGraphTitle {
       height: 20px;
@@ -263,9 +293,21 @@
   }
   .pageTitle {
       font-size: 18px;
+      margin-bottom: 8px;
+  }
+  .pageHeader {
+      margin-bottom: 16px;
   }
   .skeletonGraphTitle {
       height: 18px;
       width: 120px;
+  }
+  .pageHeader {
+    /* margin-bottom: 70px; Add space below for filter dropdown */
+    padding-right: 0;
+  }
+  .filterContainer {
+    /* top: 40px; */
+    right: 0;
   }
 }

@@ -11,12 +11,15 @@ const IdeaCard = ({ number, description, ideaId, insightId }) => {
   
   // Cache duration: 5 minutes in milliseconds
   const CACHE_DURATION = 5 * 60 * 1000;
-
+  
+  // Game ID constant
+  const GAME_ID = "4705d90b-f4a9-4a71-b0b1-e4da22acfb36";
+  
   const handleViewIdea = async () => {
     console.log("🖱️ View idea clicked for idea:", ideaId);
     try {
       setIsLoading(true);
-
+      
       // Check cache first
       const cacheKey = `chat_cache_${ideaId}`;
       const cachedData = localStorage.getItem(cacheKey);
@@ -25,7 +28,6 @@ const IdeaCard = ({ number, description, ideaId, insightId }) => {
         if (Date.now() - timestamp < CACHE_DURATION) {
           const loadStart = performance.now();
           console.log('🔄 Loading chat ID from cache...');
-          
           const loadEnd = performance.now();
           console.log(`✅ Cache load completed in ${((loadEnd - loadStart) / 1000).toFixed(2)} seconds`);
           
@@ -38,29 +40,32 @@ const IdeaCard = ({ number, description, ideaId, insightId }) => {
       } else {
         console.log('💭 No chat cache found, fetching fresh data...');
       }
-
+      
       // If no valid cache, initialize new chat
       const apiStart = performance.now();
       console.log('🔄 Starting API call to initialize chat...');
-
+      
       const response = await fetch('https://generate-chat-endpoint-flnr5jia5q-uc.a.run.app', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          idea_id: ideaId
+          idea_id: ideaId,
+          game_id: GAME_ID
         })
       });
-
+      
       if (!response.ok) {
-        throw new Error('Failed to initialize chat');
+        throw new Error(`Failed to initialize chat: ${response.status}`);
       }
-
+      
       const data = await response.json();
+      console.log('📊 Chat initialization response:', data);
+      
       const apiEnd = performance.now();
       console.log(`✅ Chat initialization completed in ${((apiEnd - apiStart) / 1000).toFixed(2)} seconds`);
-
+      
       // Cache the chat ID
       try {
         localStorage.setItem(cacheKey, JSON.stringify({
@@ -71,7 +76,7 @@ const IdeaCard = ({ number, description, ideaId, insightId }) => {
       } catch (error) {
         console.error('❌ Error caching chat ID:', error);
       }
-
+      
       // Route to analysis page with new chat ID
       router.push(`/analysis?idea=${ideaId}&insight=${insightId}&chat=${data.chat_id}`);
     } catch (error) {
@@ -79,7 +84,7 @@ const IdeaCard = ({ number, description, ideaId, insightId }) => {
       setIsLoading(false);
     }
   };
-
+  
   return (
     <div className={styles.card}>
       <div className={styles.glassEffect}>
@@ -88,8 +93,7 @@ const IdeaCard = ({ number, description, ideaId, insightId }) => {
             <Lightbulb size={16} className={styles.bulbIcon} />
             <span>Idea {number}</span>
           </div>
-          <p className={styles.description}>{description}</p>
-
+          <p className={styles.description}>{description || 'No description available'}</p>
           {isLoading ? (
             <button className={styles.viewButton} disabled>
               <div className={styles.viewButtonContent}>

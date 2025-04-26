@@ -21,45 +21,31 @@ const LoginModal = ({ onClose, onSuccess, redirectPath }) => {
     setError("");
     setLoading(true);
 
+    // Check for the specific user ID
+    const trimmedUserId = userId.trim();
+    if (trimmedUserId !== "a724a284-dd80-4ff2-8d0a-b36bff0fa426") {
+      setError("Invalid user ID. Please enter the correct ID.");
+      setLoading(false);
+      return;
+    }
+
+    // Direct login for the fixed user ID
     try {
-      const response = await fetch("https://check-user-q54hzgyghq-uc.a.run.app", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user_id: userId.trim(),
-        }),
-      });
-
-      const data = await response.json();
-      console.log("API Response:", data);
-
-      if (data.user_exists) {
-        console.log("User validated successfully");
-        login(userId.trim());
-        
-        // Close modal first
-        if (onClose) {
-          onClose();
-        }
-        
-        // CHANGED: Specifically prevent redirect when on ideationchat
-        // if (redirectPath && window.location.pathname !== '/ideationchat') {
-        //   router.push(redirectPath);
-        // }
-        
-        // Call onSuccess callback last, after other operations
-        if (onSuccess) {
-          onSuccess(userId.trim());
-        }
-      } else {
-        setError("Invalid user ID. Please try again.");
-        console.log("User validation failed");
+      console.log("Logging in with fixed user ID");
+      login(trimmedUserId);
+      
+      // Close modal first
+      if (onClose) {
+        onClose();
+      }
+      
+      // Call onSuccess callback last, after other operations
+      if (onSuccess) {
+        onSuccess(trimmedUserId);
       }
     } catch (error) {
-      console.error("API Error:", error);
-      setError("An error occurred. Please try again.");
+      console.error("Login Error:", error);
+      setError("An error occurred during login. Please try again.");
     } finally {
       setLoading(false);
     }

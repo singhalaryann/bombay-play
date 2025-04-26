@@ -13,6 +13,7 @@
   position: relative;
   overflow: hidden;
 }
+
 /* Outer glow border */
 .glassEffect::after {
   content: '';
@@ -35,7 +36,6 @@
   mask-composite: exclude;
   pointer-events: none;
 }
-
 
 .content {
   display: grid;
@@ -65,7 +65,7 @@
   font-size: 15px;
   line-height: 1.6;
   margin: 0;
-  
+  word-break: break-word;
 }
 
 .viewButton {
@@ -98,6 +98,16 @@
   background: rgba(130, 255, 131, 0.15);
 }
 
+.viewButton:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.viewButton:disabled .viewButtonContent {
+  background: rgba(130, 255, 131, 0.05);
+}
+
+/* Responsive Breakpoints */
 @media (max-width: 1024px) {
   .content {
     gap: 20px;
@@ -141,13 +151,4 @@
     padding: 8px 14px;
     font-size: 13px;
   }
-}
-
-.viewButton:disabled {
-  opacity: 0.7;
-  cursor: default;
-}
-
-.viewButton:disabled .viewButtonContent {
-  background: rgba(130, 255, 131, 0.05);
 }
