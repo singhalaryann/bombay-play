@@ -8,6 +8,7 @@ import Sidebar from '../components/layout/Sidebar';
 import IdeaCard from '../components/ideas/IdeaCard';
 import styles from '../../styles/Ideas.module.css';
 import LoadingAnimation from '../components/common/LoadingAnimation';
+import { FaLightbulb } from 'react-icons/fa';
 
 export default function IdeasPage() {
   const router = useRouter();
@@ -120,7 +121,10 @@ export default function IdeasPage() {
       <div className={styles.content}>
         {/* Added section title to skeleton */}
         <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Ideas</h2>
+          <h2 className={styles.sectionTitle}>
+            <FaLightbulb className={styles.titleIcon} />
+            Ideas
+          </h2>
         </div>
         
         <div className={styles.ideasContainer}>
@@ -156,7 +160,10 @@ export default function IdeasPage() {
             <div className={styles.content}>
               {/* Added section title here */}
               <div className={styles.sectionHeader}>
-                <h2 className={styles.sectionTitle}>Ideas</h2>
+                <h2 className={styles.sectionTitle}>
+                  <FaLightbulb className={styles.titleIcon} />
+                  Ideas
+                </h2>
               </div>
               
               <div className={styles.ideasContainer}>
