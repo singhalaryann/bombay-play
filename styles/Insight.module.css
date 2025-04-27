@@ -1,6 +1,5 @@
-/* Container Styles */
 .container {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: #050505;
@@ -8,44 +7,32 @@
 }
 
 .mainLayout {
-  display: flex; /* Makes it a flex container */
-  height: calc(100vh - 64px); /* Exact height minus header */
-  width: 100%; /* Full width */
+  display: flex;
+  flex: 1;
+  width: 100%;
 }
 
 .mainContent {
-  flex: 1; /* Takes available space */
-  height: 100%; /* Match parent height */
-  overflow-y: auto; /* Enables scrolling */
-  padding: 20px;
-  display: flex; /* Added to create proper layout flow */
-  flex-direction: column; /* Stack children vertically */
-  gap: 16px; 
-}
-.contentLoading {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  height: calc(100vh - 200px);
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 16px;
+  flex-direction: column;
+  gap: 24px;
 }
 
-/* Glass Box Styles */
-.glassBox {
-  background: #191C17;
+/* Insight Section */
+.insightSection {
+  width: 100%;
+  background: rgba(18, 18, 18, 0.5);
   border-radius: 12px;
-  padding: 20px 24px;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 15px;
-  line-height: 1.5;
-  margin-bottom: 32px;
+  padding: 24px;
   position: relative;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  overflow: hidden;
+  border: 1px solid rgba(130, 255, 131, 0.1);
 }
 
-.glassBox::after {
+.insightSection::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -53,18 +40,76 @@
   padding: 1px;
   background: linear-gradient(
     -100deg,
-    rgba(255, 255, 255, 0.3),
-    rgba(255, 255, 255, 0.03)
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.05)
   );
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
+}
+
+/* Top gradient line */
+.insightSection::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(130, 255, 131, 0.2),
+    transparent
+  );
+}
+
+.insightHeader {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.insightTitleContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.insightTitle {
+  color: #FFFFFF;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.filterContainer {
+  display: flex;
+  align-items: center;
+  margin-left: 20px;
+}
+
+.dateFilterButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.calendarIcon {
+  color: #94A3B8;
 }
 
 /* Action Row Styles */
@@ -72,16 +117,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 5px 0 5px 0; /* Reduced both top and bottom margins */  gap: 32px;
+  margin-top: 12px;
+  gap: 20px;
 }
 
 .subText {
   color: rgba(255, 255, 255, 0.7);
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.5;
-  flex: 1;
-  max-width: 800px;
   margin: 0;
+  flex: 1;
 }
 
 .analyseButton {
@@ -102,6 +147,7 @@
 
 .analyseButton:hover {
   background: #98FF98;
+  transform: translateY(-1px);
 }
 
 .iconWrapper {
@@ -117,129 +163,30 @@
   height: 100%;
 }
 
-/* Metrics Display Section */
-.metricsDisplay {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
-  margin-bottom: 32px;
-}
-
-/* Graph Display Section */
-.graphsGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-  margin-top: 32px;
-  width: 100%; /* Added to ensure full width */
-}
-
-.graphCard {
-  background: rgba(18, 18, 18, 0.4);
+/* Graph Section */
+.graphSection {
+  width: 100%;
+  background: rgba(18, 18, 18, 0.5);
   border-radius: 12px;
   padding: 24px;
+  flex: 1;
   min-height: 400px;
   position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(130, 255, 131, 0.1);
 }
 
-.graphTitle {
-  font-size: 18px;
-  color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 24px;
-  font-weight: 500;
-}
-
-/* ADDED: Skeleton loading animation */
-@keyframes shimmer {
-  0% {
-    background-position: -1000px 0;
-  }
-  100% {
-    background-position: 1000px 0;
-  }
-}
-
-/* ADDED: Base skeleton element style */
-.skeletonText,
-.skeletonSubText,
-.skeletonButtonText,
-.skeletonMetricTitle,
-.skeletonMetricValue,
-.skeletonGraphTitle,
-.skeletonGraphContent,
-.skeletonIcon {
-  background: linear-gradient(to right, rgba(255, 255, 255, 0.05) 8%, rgba(255, 255, 255, 0.1) 18%, rgba(255, 255, 255, 0.05) 33%);
-  background-size: 2000px 100%;
-  animation: shimmer 2s infinite linear;
-  border-radius: 4px;
-}
-
-/* ADDED: Skeleton glass box */
-.skeletonGlassBox {
-  background: rgba(25, 28, 23, 0.5);
-  min-height: 80px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* ADDED: Skeleton text lines */
-.skeletonGlassBox .skeletonText {
-  height: 16px;
-  width: 100%;
-}
-
-.skeletonGlassBox .skeletonText:last-child {
-  width: 70%;
-}
-
-/* ADDED: Skeleton sub text */
-.skeletonSubText {
-  height: 18px;
-  width: 80%;
-}
-
-/* ADDED: Skeleton button */
-.skeletonButton {
-  background: rgba(130, 255, 131, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: default;
-}
-
-/* ADDED: Skeleton button text */
-.skeletonButtonText {
-  height: 14px;
-  width: 80px;
-}
-
-/* ADDED: Skeleton icon */
-.skeletonIcon {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-}
-
-/* ADDED: Skeleton metric card */
-.skeletonMetricCard {
-  background: rgba(25, 28, 23, 0.5);
-  border-radius: 12px;
-  padding: 24px;
-  height: 140px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  position: relative;
-}
-
-.skeletonMetricCard::after {
+.graphSection::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: 12px;
   padding: 1px;
-  background: linear-gradient(-100deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+  background: linear-gradient(
+    -100deg,
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.05)
+  );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
@@ -247,66 +194,251 @@
   pointer-events: none;
 }
 
-/* ADDED: Skeleton metric title */
-.skeletonMetricTitle {
-  height: 18px;
-  width: 60%;
+/* Top gradient line */
+.graphSection::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(130, 255, 131, 0.2),
+    transparent
+  );
 }
 
-/* ADDED: Skeleton metric value */
-.skeletonMetricValue {
-  height: 36px;
-  width: 50%;
-}
-
-/* ADDED: Skeleton graph card */
-.skeletonGraphCard {
-  background: rgba(25, 28, 23, 0.5);
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-/* ADDED: Skeleton graph title */
-.skeletonGraphTitle {
-  height: 22px;
-  width: 40%;
-}
-
-/* ADDED: Skeleton graph content */
-.skeletonGraphContent {
-  height: 300px;
+/* No Insight Found State */
+.noInsight {
   width: 100%;
+  background: rgba(18, 18, 18, 0.5);
+  border-radius: 12px;
+  padding: 40px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(130, 255, 131, 0.1);
+}
+
+.noInsight::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  padding: 1px;
+  background: linear-gradient(
+    -100deg,
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.05)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.noInsightContent {
+  text-align: center;
+  max-width: 500px;
+}
+
+.noInsightContent h3 {
+  color: #FFFFFF;
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.noInsightContent p {
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 24px;
+}
+
+.returnButton {
+  background: rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.returnButton:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Dashboard-style Skeleton Animation */
+@keyframes skeletonPulse {
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Insight Skeleton Title */
+.insightSkeletonTitle {
+  height: 22px;
+  width: 60%;
+  background: #1a1a1a;
+  border-radius: 4px;
+  animation: skeletonPulse 2s infinite ease-in-out;
+}
+
+/* Insight Skeleton Filter */
+.insightSkeletonFilter {
+  height: 36px;
+  width: 140px;
+  background: #1a1a1a;
+  border-radius: 8px;
+  flex-shrink: 0;
+  animation: skeletonPulse 2s infinite ease-in-out;
+}
+
+/* Skeleton Subtext */
+.skeletonSubText {
+  height: 16px;
+  width: 70%;
+  background: #1a1a1a;
+  border-radius: 4px;
+  animation: skeletonPulse 2s infinite ease-in-out;
+}
+
+/* Skeleton Button */
+.skeletonButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(18, 18, 18, 0.8);
+  /* Border removed for consistency with dashboard */
+  padding: 12px 20px;
   border-radius: 8px;
 }
 
-/* Responsive Design */
-@media (max-width: 1280px) {
-  .mainContent {
-    padding: 24px;
-  }
-  .graphsGrid {
-    gap: 20px;
-  }
+/* Skeleton Button Text */
+.skeletonButtonText {
+  height: 14px;
+  width: 80px;
+  background: rgba(130, 255, 131, 0.15);
+  border-radius: 4px;
+  animation: skeletonPulse 2s infinite ease-in-out;
 }
 
+/* Skeleton Icon */
+.skeletonIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(130, 255, 131, 0.15);
+  animation: skeletonPulse 2s infinite ease-in-out;
+}
+
+/* Skeleton Graph Title */
+.skeletonGraphTitle {
+  height: 22px;
+  width: 40%;
+  background: #1a1a1a;
+  border-radius: 4px;
+  margin-bottom: 24px;
+  animation: skeletonPulse 2s infinite ease-in-out;
+}
+
+/* Skeleton Graph Content */
+.skeletonGraphContent {
+  height: 350px;
+  width: 100%;
+  background: #1a1a1a;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  animation: skeletonPulse 2s infinite ease-in-out;
+}
+
+.skeletonGraphContent::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.1), 
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+/* Custom Scrollbar */
+.mainContent::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.mainContent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mainContent::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.mainContent::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Responsive Design */
 @media (max-width: 1024px) {
-  .graphsGrid {
-    grid-template-columns: 1fr;
+  .mainContent {
+    padding: 20px;
   }
+  
+  .insightTitleContainer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .filterContainer {
+    margin-left: 0;
+    margin-top: 8px;
+  }
+  
   .actionRow {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
-    margin: 24px 0;
   }
+  
   .analyseButton {
     width: 100%;
     justify-content: center;
   }
-  /* ADDED: Skeleton responsive adjustments */
+  
   .skeletonGraphContent {
-    height: 250px;
+    height: 280px;
   }
 }
 
@@ -314,31 +446,19 @@
   .mainContent {
     padding: 16px;
   }
-  .glassBox {
-    padding: 16px;
-    font-size: 14px;
-    margin-bottom: 24px;
+  
+  .insightSection,
+  .graphSection {
+    padding: 20px;
   }
-  .subText {
-    font-size: 14px;
-  }
-  .graphCard {
-    padding: 16px;
-    min-height: 350px;
-  }
-  .graphTitle {
-    font-size: 16px;
-  }
-  /* ADDED: Skeleton responsive adjustments */
-  .skeletonMetricCard {
-    padding: 16px;
-    height: 120px;
-  }
-  .skeletonGraphTitle {
-    height: 18px;
-  }
+  
   .skeletonGraphContent {
-    height: 220px;
+    height: 250px;
+  }
+  
+  .insightSkeletonTitle {
+    height: 20px;
+    width: 70%;
   }
 }
 
@@ -346,30 +466,41 @@
   .mainContent {
     padding: 12px;
   }
-  .glassBox {
-    padding: 14px;
-    margin-bottom: 20px;
+  
+  .insightSection,
+  .graphSection {
+    padding: 16px;
   }
+  
+  .insightTitle {
+    font-size: 16px;
+  }
+  
+  .dateFilterButton {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+  
+  .subText {
+    font-size: 13px;
+  }
+  
   .analyseButton {
     padding: 10px 16px;
     font-size: 13px;
   }
-  .graphCard {
-    padding: 14px;
-    min-height: 300px;
-  }
-  /* ADDED: Skeleton responsive adjustments */
-  .skeletonMetricCard {
-    padding: 14px;
-    height: 100px;
-  }
-  .skeletonMetricTitle {
-    height: 16px;
-  }
-  .skeletonMetricValue {
-    height: 30px;
-  }
+  
   .skeletonGraphContent {
-    height: 180px;
+    height: 220px;
+  }
+  
+  .insightSkeletonTitle {
+    height: 18px;
+    width: 90%;
+  }
+  
+  .insightSkeletonFilter {
+    height: 32px;
+    width: 100%;
   }
 }

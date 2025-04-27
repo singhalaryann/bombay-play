@@ -52,7 +52,7 @@ export default function AnalyticsPage() {
                 apiDateFilter = { type: "last", days: 0 };
                 break;
             case "Yesterday":
-                apiDateFilter = { type: "yesterday" };
+                apiDateFilter = { type: "last", days: 1 };
                 break;
             case "7D":
                 apiDateFilter = { type: "last", days: 7 };
@@ -101,20 +101,25 @@ export default function AnalyticsPage() {
     };
 
     // ADDED: Helper to format dates for API
-    const formatApiDate = (dateStr) => {
-        try {
-            // Convert from "Apr 15, 2025" to "2025-04-15"
-            const date = new Date(dateStr);
-            if (isNaN(date.getTime())) {
-                console.error('Invalid date string:', dateStr);
-                return '';
-            }
-            return date.toISOString().split('T')[0];
-        } catch (err) {
-            console.error('Error formatting date:', err);
+// ADDED: Helper to format dates for API
+const formatApiDate = (dateStr) => {
+    try {
+        // Convert from "Apr 15, 2025" to "DD-MM-YYYY" format
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) {
+            console.error('Invalid date string:', dateStr);
             return '';
         }
-    };
+        // Format as DD-MM-YYYY instead of YYYY-MM-DD
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+    } catch (err) {
+        console.error('Error formatting date:', err);
+        return '';
+    }
+};
 
     // Function to transform metrics API data into format for GraphDisplay
     const transformMetricsForGraphs = (metricsData) => {

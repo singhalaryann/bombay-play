@@ -5,205 +5,161 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/layout/Header';
 import Sidebar from '../components/layout/Sidebar';
-import MetricsDisplay from '../components/analysis/MetricsDisplay';
 import GraphDisplay from '../components/analysis/GraphDisplay';
+import { Calendar } from 'lucide-react';
 import Image from 'next/image';
 import styles from '../../styles/Insight.module.css';
-import LoadingAnimation from '../components/common/LoadingAnimation';
-
-// Helper function to transform line/bar/pie metrics into GraphDisplay format
-function convertMetricsToGraphs(metrics) {
-  return metrics.map((m) => {
-    return {
-      metric_type: m.metric_type,
-      metric_id: m.metric_id,
-      title: m.title,
-      columns: m.columns,
-      values: m.values,
-      x_unit: '',
-      y_unit: '',
-      value_unit: ''
-    };
-  });
-}
 
 export default function InsightPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { userId } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [insightData, setInsightData] = useState(null);
+  const [insight, setInsight] = useState(null);
+  const [graphData, setGraphData] = useState([]);
 
-  // Separate arrays for metrics and graphs (just like the Analysis page)
-  const [initialMetrics, setInitialMetrics] = useState([]);
-  const [initialGraphs, setInitialGraphs] = useState([]);
-  
-  // Cache duration: 5 minutes in milliseconds
-  const CACHE_DURATION = 5 * 60 * 1000;
-  
-  const [isInitialRender, setIsInitialRender] = useState(true);
+  // Function to transform insight data into format for GraphDisplay
+  const transformInsightForGraph = (insightData) => {
+    if (!insightData || !insightData.query || !insightData.query[0]) {
+      console.log("No valid insight data to transform");
+      return [];
+    }
+
+    const { metric, date_filter, metric_type } = insightData.query[0];
+    console.log("Transforming insight data:", { metric, date_filter, metric_type });
+
+    // Determine the appropriate metric type based on the insight data
+    let chartType = 'line'; // Default to line chart
+    if (metric_type) {
+      chartType = metric_type.toLowerCase();
+    } else if (metric.includes('distribution') || metric.includes('breakdown')) {
+      chartType = 'bar'; // Use bar chart for distribution data
+    } else if (metric.includes('percentage') || metric.includes('ratio')) {
+      chartType = 'pie'; // Use pie chart for percentage/ratio data
+    }
+
+    // Create graph configuration based on the metric type
+    return [{
+      metric_id: `insight-${insightData.insight_id}`,
+      metric_type: chartType,
+      title: insightData.insight_text,
+      description: insightData.description || "",
+      columns: ['Date', metric],
+      values: insightData.data || [], // Use data if it exists, otherwise empty array
+      x_unit: "",
+      y_unit: "",
+      date_filter: date_filter
+    }];
+  };
 
   useEffect(() => {
     const fetchInsightData = async () => {
+      const insightId = searchParams.get('id');
+      console.log('🔍 Fetching insight for id:', insightId);
+      if (!userId || !insightId) {
+        console.log('⚠️ Missing userId or insightId, redirecting to dashboard');
+        router.push('/dashboard');
+        return;
+      }
+      setLoading(true);
       try {
-        const insightId = searchParams.get('id');
-        console.log('🔍 Processing insight request for:', { userId, insightId });
-
-        setIsInitialRender(false);
-
-        // If missing required params, go back to dashboard
-        if (!userId || !insightId) {
-          console.log('⚠️ Missing required parameters, redirecting to dashboard');
-          router.push('/dashboard');
-          return;
-        }
-
-        // Check cache first
-        const cacheKey = `insight_cache_${insightId}`;
-        const cachedData = localStorage.getItem(cacheKey);
-        if (cachedData) {
-          const { data: cachedInsight, timestamp } = JSON.parse(cachedData);
-          if (Date.now() - timestamp < CACHE_DURATION) {
-            const loadStart = performance.now();
-            console.log('🔄 Loading insight from cache...');
-            
-            setInsightData(cachedInsight);
-            
-            // Process cached data for metrics and graphs
-            if (cachedInsight?.graphs) {
-              const metricItems = cachedInsight.graphs.filter(m => m.metric_type === 'metric');
-              setInitialMetrics(metricItems);
-
-              const chartCandidates = cachedInsight.graphs.filter(
-                m => ['line', 'bar', 'pie', 'hist'].includes(m.metric_type)
-              );
-              setInitialGraphs(convertMetricsToGraphs(chartCandidates));
-            }
-
-            const loadEnd = performance.now();
-            console.log(`✅ Cache load completed in ${((loadEnd - loadStart) / 1000).toFixed(2)} seconds`);
-            setLoading(false);
-            return;
-          } else {
-            console.log('🕒 Cache expired, fetching fresh data...');
-          }
-        } else {
-          console.log('💭 No cache found, fetching fresh data...');
-        }
-
-        // Fetch from API if no valid cache
-        const apiStart = performance.now();
-        console.log('🔄 Starting API call to fetch insight data...');
-
-        const response = await fetch('https://get-insight-q54hzgyghq-uc.a.run.app', {
+        const response = await fetch('https://get-insight-data-nrosabqhla-uc.a.run.app', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             user_id: userId,
-            insight_id: insightId
-          })
+            game_id: '4705d90b-f4a9-4a71-b0b1-e4da22acfb36',
+            insight_ids: [insightId],
+          }),
         });
-
         const data = await response.json();
-        const apiEnd = performance.now();
-        console.log(`✅ API call completed in ${((apiEnd - apiStart) / 1000).toFixed(2)} seconds`);
-
-        // Cache the fresh data
-        try {
-          localStorage.setItem(cacheKey, JSON.stringify({
-            data: data,
-            timestamp: Date.now()
-          }));
-          console.log('💾 Insight data cached successfully');
-        } catch (error) {
-          console.error('❌ Error caching insight data:', error);
-        }
-
-        setInsightData(data);
-
-        // Process data for metrics and graphs
-        if (data?.graphs) {
-          // "metric" type items for MetricsDisplay
-          const metricItems = data.graphs.filter(m => m.metric_type === 'metric');
-          setInitialMetrics(metricItems);
-
-          // line / bar / pie items for GraphDisplay
-          const chartCandidates = data.graphs.filter(
-            m => ['line', 'bar', 'pie', 'hist'].includes(m.metric_type)
-          );
-          setInitialGraphs(convertMetricsToGraphs(chartCandidates));
+        console.log('✅ API response:', data);
+        if (data.insights && data.insights.length > 0) {
+          const selectedInsight = data.insights[0];
+          setInsight(selectedInsight);
+          
+          // Transform the insight data for the graph
+          const transformedData = transformInsightForGraph(selectedInsight);
+          setGraphData(transformedData);
+        } else {
+          setInsight(null);
+          setGraphData([]);
         }
       } catch (error) {
         console.error('❌ Error fetching insight data:', error);
+        setInsight(null);
+        setGraphData([]);
       } finally {
         setLoading(false);
       }
     };
-
     fetchInsightData();
   }, [userId, searchParams, router]);
 
-  // When user clicks "Analyse Board," navigate to ideas page
+  // Handle Analyse Board click
   const handleAnalyseClick = () => {
     const insightId = searchParams.get('id');
     console.log('Navigating to ideas with insight:', insightId);
     router.push(`/ideas?insight=${insightId}`);
   };
 
-  // ADDED: Render skeleton content function
-  const renderSkeletonContent = () => {
-    return (
-      <div className={styles.container}>
-        <Header />
-        <div className={styles.mainLayout}>
-          <Sidebar />
-          <main className={styles.mainContent}>
-            {/* ADDED: Skeleton glass box */}
-            <div className={`${styles.glassBox} ${styles.skeletonGlassBox}`}>
-              <div className={styles.skeletonText}></div>
-              <div className={styles.skeletonText}></div>
-            </div>
-
-            {/* ADDED: Skeleton action row */}
-            <div className={styles.actionRow}>
-              <div className={`${styles.subText} ${styles.skeletonSubText}`}></div>
-              <div className={`${styles.analyseButton} ${styles.skeletonButton}`}>
-                <div className={styles.skeletonButtonText}></div>
-                <div className={styles.iconWrapper}>
-                  <div className={styles.skeletonIcon}></div>
-                </div>
-              </div>
-            </div>
-
-            {/* ADDED: Skeleton metrics */}
-            <div className={styles.metricsDisplay}>
-              {[1, 2, 3, 4].map((index) => (
-                <div key={index} className={styles.skeletonMetricCard}>
-                  <div className={styles.skeletonMetricTitle}></div>
-                  <div className={styles.skeletonMetricValue}></div>
-                </div>
-              ))}
-            </div>
-
-            {/* ADDED: Skeleton graphs */}
-            <div className={styles.graphsGrid}>
-              {[1, 2].map((index) => (
-                <div key={index} className={`${styles.graphCard} ${styles.skeletonGraphCard}`}>
-                  <div className={styles.skeletonGraphTitle}></div>
-                  <div className={styles.skeletonGraphContent}></div>
-                </div>
-              ))}
-            </div>
-          </main>
-        </div>
-      </div>
-    );
+  // Format date filter for display
+  const formatDateFilter = (filter) => {
+    if (!filter) return '';
+    
+    if (filter.type === 'last') {
+      if (filter.days === 0) return 'Today';
+      if (filter.days === 1) return 'Yesterday';
+      return `Last ${filter.days} days`;
+    }
+    if (filter.type === 'yesterday') return 'Yesterday';
+    if (filter.type === 'between') return `${filter.start_date} - ${filter.end_date}`;
+    if (filter.type === 'since') return `Since ${filter.start_date}`;
+    return JSON.stringify(filter);
   };
 
-  // UPDATED: Modified loading handler to use skeleton content instead of just LoadingAnimation
-  if (isInitialRender || loading) {
-    return renderSkeletonContent();
-  }
+  // Skeleton loading for insight content
+  const renderSkeletonContent = () => (
+    <>
+      <div className={styles.insightSection}>
+        <div className={styles.insightHeader}>
+          <div className={styles.insightTitleContainer}>
+            <div className={styles.insightSkeletonTitle}></div>
+            <div className={styles.insightSkeletonFilter}></div>
+          </div>
+        </div>
+        
+        <div className={styles.actionRow}>
+          <div className={styles.skeletonSubText}></div>
+          <div className={styles.skeletonButton}>
+            <div className={styles.skeletonButtonText}></div>
+            <div className={styles.skeletonIcon}></div>
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.graphSection}>
+        <div className={styles.skeletonGraphTitle}></div>
+        <div className={styles.skeletonGraphContent}></div>
+      </div>
+    </>
+  );
+
+  // No insight found state
+  const renderNoInsight = () => (
+    <div className={styles.noInsight}>
+      <div className={styles.noInsightContent}>
+        <h3>No insight found</h3>
+        <p>The requested insight could not be found or is unavailable.</p>
+        <button 
+          className={styles.returnButton} 
+          onClick={() => router.push('/dashboard')}
+        >
+          Return to Dashboard
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <div className={styles.container}>
@@ -211,40 +167,54 @@ export default function InsightPage() {
       <div className={styles.mainLayout}>
         <Sidebar />
         <main className={styles.mainContent}>
-          <div className={styles.glassBox}>
-            {insightData?.description || 'No description available'}
-          </div>
+          {loading ? (
+            renderSkeletonContent()
+          ) : !insight ? (
+            renderNoInsight()
+          ) : (
+            <>
+              <div className={styles.insightSection}>
+                <div className={styles.insightHeader}>
+                  <div className={styles.insightTitleContainer}>
+                    <h2 className={styles.insightTitle}>{insight.insight_text}</h2>
+                    {graphData[0]?.date_filter && (
+                      <div className={styles.filterContainer}>
+                        <div className={styles.dateFilterButton}>
+                          <Calendar size={16} className={styles.calendarIcon} />
+                          <span>{formatDateFilter(graphData[0].date_filter)}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
 
-          <div className={styles.actionRow}>
-            <p className={styles.subText}>
-              Uncover actionable insights for each metric and enhance your strategies effortlessly.
-            </p>
-            <button className={styles.analyseButton} onClick={handleAnalyseClick}>
-              <span>Analyse Board</span>
-              <div className={styles.iconWrapper}>
-                <Image
-                  src="/Analyse_icon.svg"
-                  alt="Analyse"
-                  width={24}
-                  height={24}
-                  className={styles.buttonIcon}
-                  priority
-                />
+                <div className={styles.actionRow}>
+                  <p className={styles.subText}>
+                    Uncover actionable insights for each metric and enhance your strategies effortlessly.
+                  </p>
+                  <button className={styles.analyseButton} onClick={handleAnalyseClick}>
+                    <span>Analyse Board</span>
+                    <div className={styles.iconWrapper}>
+                      <Image
+                        src="/Analyse_icon.svg"
+                        alt="Analyse"
+                        width={24}
+                        height={24}
+                        className={styles.buttonIcon}
+                        priority
+                      />
+                    </div>
+                  </button>
+                </div>
               </div>
-            </button>
-          </div>
 
-          {/* Show only the metric-type items which have a single row of values */}
-          <MetricsDisplay
-            metrics={initialMetrics.filter(
-              (m) => m.values?.length === 1
-            )}
-          />
-
-          {/* Show line/bar/pie data as charts */}
-          <GraphDisplay
-            graphs={initialGraphs}
-          />
+              {graphData.length > 0 && (
+                <div className={styles.graphSection}>
+                  <GraphDisplay graphs={graphData} />
+                </div>
+              )}
+            </>
+          )}
         </main>
       </div>
     </div>

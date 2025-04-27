@@ -234,12 +234,12 @@ export default function Dashboard() {
       <>
         {renderInsights()}
         
-        {/* Progressively loading indicator */}
+        {/* Progressively loading indicator
         {insightsLoading && !isInitialRender && (
           <div className={styles.progressiveLoadingIndicator}>
             Loading more data...
           </div>
-        )}
+        )} */}
       </>
     );
   };
