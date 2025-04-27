@@ -339,6 +339,8 @@
   animation: none;
   cursor: default;
   overflow: hidden;
+  background: rgba(18, 18, 18, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* ADDED: Base skeleton element style */
@@ -356,19 +358,31 @@
 .skeletonTitle {
   height: 24px;
   width: 70%;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.05) 8%, rgba(255, 255, 255, 0.1) 18%, rgba(255, 255, 255, 0.05) 33%);
+  background-size: 2000px 100%;
+  animation: shimmer 2s infinite linear;
+  border-radius: 4px;
 }
 
 /* ADDED: Skeleton button placeholder */
 .skeletonButton {
   background: rgba(130, 255, 131, 0.05);
   border: 1px solid rgba(130, 255, 131, 0.1);
-  opacity: 0.7;
+  border-radius: 8px;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* ADDED: Skeleton button text placeholder */
 .skeletonButtonText {
   height: 14px;
   width: 100px;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.05) 8%, rgba(255, 255, 255, 0.1) 18%, rgba(255, 255, 255, 0.05) 33%);
+  background-size: 2000px 100%;
+  animation: shimmer 2s infinite linear;
+  border-radius: 4px;
 }
 
 /* ADDED: Skeleton header cell placeholder */
@@ -376,6 +390,10 @@
   height: 16px;
   width: 80px;
   display: inline-block;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.05) 8%, rgba(255, 255, 255, 0.1) 18%, rgba(255, 255, 255, 0.05) 33%);
+  background-size: 2000px 100%;
+  animation: shimmer 2s infinite linear;
+  border-radius: 4px;
 }
 
 /* ADDED: Skeleton value cell placeholder */
@@ -383,16 +401,43 @@
   height: 16px;
   width: 80px;
   display: inline-block;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.05) 8%, rgba(255, 255, 255, 0.1) 18%, rgba(255, 255, 255, 0.05) 33%);
+  background-size: 2000px 100%;
+  animation: shimmer 2s infinite linear;
+  border-radius: 4px;
 }
 
 /* ADDED: Responsive adjustments for skeletons */
 @media (max-width: 768px) {
   .skeletonTitle {
     height: 20px;
+    width: 60%;
   }
   
   .skeletonButtonText {
     height: 12px;
     width: 80px;
+  }
+
+  .skeletonHeader,
+  .skeletonCell {
+    width: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .skeletonTitle {
+    height: 18px;
+    width: 50%;
+  }
+  
+  .skeletonButtonText {
+    height: 12px;
+    width: 60px;
+  }
+
+  .skeletonHeader,
+  .skeletonCell {
+    width: 40px;
   }
 }

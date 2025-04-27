@@ -40,8 +40,8 @@
   padding: 1px;
   background: linear-gradient(
     -100deg,
-    rgba(255, 255, 255, 0.2),
-    rgba(255, 255, 255, 0.05)
+    rgba(255, 255, 255, 0.4),
+    rgba(255, 255, 255, 0.03)
   );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -51,7 +51,7 @@
 }
 
 /* Top gradient line */
-.insightSection::before {
+/* .insightSection::before {
   content: '';
   position: absolute;
   top: 0;
@@ -64,7 +64,7 @@
     rgba(130, 255, 131, 0.2),
     transparent
   );
-}
+} */
 
 .insightHeader {
   width: 100%;
@@ -163,53 +163,6 @@
   height: 100%;
 }
 
-/* Graph Section */
-.graphSection {
-  width: 100%;
-  background: rgba(18, 18, 18, 0.5);
-  border-radius: 12px;
-  padding: 24px;
-  flex: 1;
-  min-height: 400px;
-  position: relative;
-  overflow: hidden;
-  border: 1px solid rgba(130, 255, 131, 0.1);
-}
-
-.graphSection::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  padding: 1px;
-  background: linear-gradient(
-    -100deg,
-    rgba(255, 255, 255, 0.2),
-    rgba(255, 255, 255, 0.05)
-  );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
-
-/* Top gradient line */
-.graphSection::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(130, 255, 131, 0.2),
-    transparent
-  );
-}
-
 /* No Insight Found State */
 .noInsight {
   width: 100%;
@@ -233,8 +186,8 @@
   padding: 1px;
   background: linear-gradient(
     -100deg,
-    rgba(255, 255, 255, 0.2),
-    rgba(255, 255, 255, 0.05)
+    rgba(255, 255, 255, 0.4),
+    rgba(255, 255, 255, 0.03)
   );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -275,24 +228,12 @@
 }
 
 /* Dashboard-style Skeleton Animation */
-@keyframes skeletonPulse {
-  0% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 0.7;
-  }
-  100% {
-    opacity: 0.5;
-  }
-}
-
 @keyframes shimmer {
   0% {
-    left: -100%;
+    background-position: -1000px 0;
   }
   100% {
-    left: 100%;
+    background-position: 1000px 0;
   }
 }
 
@@ -300,28 +241,31 @@
 .insightSkeletonTitle {
   height: 22px;
   width: 60%;
-  background: #1a1a1a;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.05) 8%, rgba(255, 255, 255, 0.1) 18%, rgba(255, 255, 255, 0.05) 33%);
+  background-size: 2000px 100%;
+  animation: shimmer 2s infinite linear;
   border-radius: 4px;
-  animation: skeletonPulse 2s infinite ease-in-out;
 }
 
 /* Insight Skeleton Filter */
 .insightSkeletonFilter {
   height: 36px;
   width: 140px;
-  background: #1a1a1a;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.05) 8%, rgba(255, 255, 255, 0.1) 18%, rgba(255, 255, 255, 0.05) 33%);
+  background-size: 2000px 100%;
+  animation: shimmer 2s infinite linear;
   border-radius: 8px;
   flex-shrink: 0;
-  animation: skeletonPulse 2s infinite ease-in-out;
 }
 
 /* Skeleton Subtext */
 .skeletonSubText {
   height: 16px;
   width: 70%;
-  background: #1a1a1a;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.05) 8%, rgba(255, 255, 255, 0.1) 18%, rgba(255, 255, 255, 0.05) 33%);
+  background-size: 2000px 100%;
+  animation: shimmer 2s infinite linear;
   border-radius: 4px;
-  animation: skeletonPulse 2s infinite ease-in-out;
 }
 
 /* Skeleton Button */
@@ -329,8 +273,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(18, 18, 18, 0.8);
-  /* Border removed for consistency with dashboard */
+  background: rgba(18, 18, 18, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   padding: 12px 20px;
   border-radius: 8px;
 }
@@ -339,9 +283,10 @@
 .skeletonButtonText {
   height: 14px;
   width: 80px;
-  background: rgba(130, 255, 131, 0.15);
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.05) 8%, rgba(255, 255, 255, 0.1) 18%, rgba(255, 255, 255, 0.05) 33%);
+  background-size: 2000px 100%;
+  animation: shimmer 2s infinite linear;
   border-radius: 4px;
-  animation: skeletonPulse 2s infinite ease-in-out;
 }
 
 /* Skeleton Icon */
@@ -349,29 +294,31 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: rgba(130, 255, 131, 0.15);
-  animation: skeletonPulse 2s infinite ease-in-out;
+  background: rgba(130, 255, 131, 0.05);
+  border: 1px solid rgba(130, 255, 131, 0.1);
 }
 
 /* Skeleton Graph Title */
 .skeletonGraphTitle {
   height: 22px;
   width: 40%;
-  background: #1a1a1a;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.05) 8%, rgba(255, 255, 255, 0.1) 18%, rgba(255, 255, 255, 0.05) 33%);
+  background-size: 2000px 100%;
+  animation: shimmer 2s infinite linear;
   border-radius: 4px;
   margin-bottom: 24px;
-  animation: skeletonPulse 2s infinite ease-in-out;
 }
 
 /* Skeleton Graph Content */
 .skeletonGraphContent {
   height: 350px;
   width: 100%;
-  background: #1a1a1a;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.05) 8%, rgba(255, 255, 255, 0.1) 18%, rgba(255, 255, 255, 0.05) 33%);
+  background-size: 2000px 100%;
+  animation: shimmer 2s infinite linear;
   border-radius: 8px;
   position: relative;
   overflow: hidden;
-  animation: skeletonPulse 2s infinite ease-in-out;
 }
 
 .skeletonGraphContent::before {
@@ -409,6 +356,68 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
+/* Graph Section */
+.graphSection {
+  width: 100%;
+  background: rgba(18, 18, 18, 0.5);
+  border-radius: 12px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(130, 255, 131, 0.1);
+}
+
+.graphSection::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  padding: 1px;
+  background: linear-gradient(
+    -100deg,
+    rgba(255, 255, 255, 0.4),
+    rgba(255, 255, 255, 0.03)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* No Data State */
+.noData {
+  width: 100%;
+  background: rgba(18, 18, 18, 0.5);
+  border-radius: 12px;
+  padding: 40px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(130, 255, 131, 0.1);
+}
+
+.noData::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  padding: 1px;
+  background: linear-gradient(
+    -100deg,
+    rgba(255, 255, 255, 0.4),
+    rgba(255, 255, 255, 0.03)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .mainContent {
@@ -436,10 +445,6 @@
     width: 100%;
     justify-content: center;
   }
-  
-  .skeletonGraphContent {
-    height: 280px;
-  }
 }
 
 @media (max-width: 768px) {
@@ -450,15 +455,6 @@
   .insightSection,
   .graphSection {
     padding: 20px;
-  }
-  
-  .skeletonGraphContent {
-    height: 250px;
-  }
-  
-  .insightSkeletonTitle {
-    height: 20px;
-    width: 70%;
   }
 }
 

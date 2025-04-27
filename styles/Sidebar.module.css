@@ -13,7 +13,7 @@
 .glassEffect {
   width: 100%;
   height: 100%;
-  background: rgba(22, 28, 21, 0.95);
+  background: #161c15f2;
   border-radius: 12px;
   padding: 16px;
   overflow: hidden;
