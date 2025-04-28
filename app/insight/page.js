@@ -5,7 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/layout/Header';
 import Sidebar from '../components/layout/Sidebar';
-import GraphDisplay from '../components/analysis/GraphDisplay';
+// UPDATED: Import GetMetrics instead of GraphDisplay directly
+import GetMetrics from '../components/dashboard/GetMetrics';
 import { Calendar } from 'lucide-react';
 import Image from 'next/image';
 import styles from '../../styles/Insight.module.css';
@@ -16,41 +17,12 @@ export default function InsightPage() {
   const { userId } = useAuth();
   const [loading, setLoading] = useState(true);
   const [insight, setInsight] = useState(null);
-  const [graphData, setGraphData] = useState([]);
-
-  // Function to transform insight data into format for GraphDisplay
-  const transformInsightForGraph = (insightData) => {
-    if (!insightData || !insightData.query || !insightData.query[0]) {
-      console.log("No valid insight data to transform");
-      return [];
-    }
-
-    const { metric, date_filter, metric_type } = insightData.query[0];
-    console.log("Transforming insight data:", { metric, date_filter, metric_type });
-
-    // Determine the appropriate metric type based on the insight data
-    let chartType = 'line'; // Default to line chart
-    if (metric_type) {
-      chartType = metric_type.toLowerCase();
-    } else if (metric.includes('distribution') || metric.includes('breakdown')) {
-      chartType = 'bar'; // Use bar chart for distribution data
-    } else if (metric.includes('percentage') || metric.includes('ratio')) {
-      chartType = 'pie'; // Use pie chart for percentage/ratio data
-    }
-
-    // Create graph configuration based on the metric type
-    return [{
-      metric_id: `insight-${insightData.insight_id}`,
-      metric_type: chartType,
-      title: insightData.insight_text,
-      description: insightData.description || "",
-      columns: ['Date', metric],
-      values: insightData.data || [], // Use data if it exists, otherwise empty array
-      x_unit: "",
-      y_unit: "",
-      date_filter: date_filter
-    }];
-  };
+  // UPDATED: State to store the metric name and date filter
+  const [metricInfo, setMetricInfo] = useState({
+    metricName: '',
+    dateFilter: null,
+    metricType: ''
+  });
 
   useEffect(() => {
     const fetchInsightData = async () => {
@@ -78,17 +50,26 @@ export default function InsightPage() {
           const selectedInsight = data.insights[0];
           setInsight(selectedInsight);
           
-          // Transform the insight data for the graph
-          const transformedData = transformInsightForGraph(selectedInsight);
-          setGraphData(transformedData);
+          // UPDATED: Extract metric and date_filter information
+          if (selectedInsight.query && selectedInsight.query[0]) {
+            const { metric, date_filter, metric_type } = selectedInsight.query[0];
+            console.log("Found metric info:", { metric, date_filter, metric_type });
+            
+            // Set the metric info to pass to GetMetrics
+            setMetricInfo({
+              metricName: metric,
+              dateFilter: date_filter,
+              metricType: metric_type || ''
+            });
+          }
         } else {
           setInsight(null);
-          setGraphData([]);
+          setMetricInfo({ metricName: '', dateFilter: null, metricType: '' });
         }
       } catch (error) {
         console.error('❌ Error fetching insight data:', error);
         setInsight(null);
-        setGraphData([]);
+        setMetricInfo({ metricName: '', dateFilter: null, metricType: '' });
       } finally {
         setLoading(false);
       }
@@ -177,11 +158,11 @@ export default function InsightPage() {
                 <div className={styles.insightHeader}>
                   <div className={styles.insightTitleContainer}>
                     <h2 className={styles.insightTitle}>{insight.insight_text}</h2>
-                    {graphData[0]?.date_filter && (
+                    {metricInfo.dateFilter && (
                       <div className={styles.filterContainer}>
                         <div className={styles.dateFilterButton}>
                           <Calendar size={16} className={styles.calendarIcon} />
-                          <span>{formatDateFilter(graphData[0].date_filter)}</span>
+                          <span>{formatDateFilter(metricInfo.dateFilter)}</span>
                         </div>
                       </div>
                     )}
@@ -208,11 +189,19 @@ export default function InsightPage() {
                 </div>
               </div>
 
-              {graphData.length > 0 && (
-                <div className={styles.graphSection}>
-                  <GraphDisplay graphs={graphData} />
-                </div>
-              )}
+              {/* UPDATED: Use direct API date filter instead of converting through selectedTime */}
+              {metricInfo.metricName && (
+  // <div className={styles.graphSection}> ← Comment out this line
+    <GetMetrics 
+      selectedTime={null}
+      onTimeChange={() => {}}
+      specificMetric={metricInfo.metricName}
+      specificMetricType={metricInfo.metricType}
+      readOnly={true}
+      initialDateFilter={metricInfo.dateFilter}
+    />
+  // </div> ← Comment out this line
+)}
             </>
           )}
         </main>

@@ -50,22 +50,6 @@
   pointer-events: none;
 }
 
-/* Top gradient line */
-/* .insightSection::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(130, 255, 131, 0.2),
-    transparent
-  );
-} */
-
 .insightHeader {
   width: 100%;
   margin-bottom: 16px;
@@ -357,7 +341,7 @@
 }
 
 /* Graph Section */
-.graphSection {
+/* .graphSection {
   width: 100%;
   background: rgba(18, 18, 18, 0.5);
   border-radius: 12px;
@@ -383,7 +367,7 @@
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
-}
+} */
 
 /* No Data State */
 .noData {

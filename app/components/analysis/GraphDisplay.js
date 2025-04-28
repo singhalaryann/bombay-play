@@ -1,20 +1,20 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import {
- LineChart,
- Line,
- BarChart,
- Bar,
- PieChart,
- Pie,
- Cell,
- XAxis,
- YAxis,
- CartesianGrid,
- Tooltip,
- Legend,
- ResponsiveContainer,
- ReferenceArea,
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  ReferenceArea,
 } from 'recharts';
 import styles from '../../../styles/GraphDisplay.module.css';
 import { RotateCcw, MousePointer } from 'lucide-react';
@@ -69,6 +69,20 @@ const LineTooltip = ({ active, payload, x_label, y_label, x_unit, y_unit }) => {
  return null;
 };
 
+// ADDED: Component to display metric description
+const MetricDescription = ({ description, status }) => {
+  // Only render if we have a description and the status is active or completed
+  if (!description || (status !== 'active' && status !== 'completed')) {
+    return null;
+  }
+
+  return (
+    <div className={`${styles.metricDescription} ${status === 'active' ? styles.activeDescription : styles.completedDescription}`}>
+      <p>{description}</p>
+    </div>
+  );
+};
+
 const GraphDisplay = ({ graphs }) => {
  if (!graphs || graphs.length === 0) return null;
 
@@ -81,7 +95,7 @@ const GraphDisplay = ({ graphs }) => {
  };
 
  const renderChart = (graph, index) => {
-  const { metric_type, title, columns, values, categories, series, x_unit, y_unit, value_unit } = graph;
+  const { metric_type, title, columns, values, categories, series, x_unit, y_unit, value_unit, description, status } = graph;
 
   // Skip values check for multiline charts which use categories and series instead
   if (metric_type !== 'multiline') {
@@ -735,7 +749,7 @@ const GraphDisplay = ({ graphs }) => {
           });
           return point;
         });
-
+      
         // Calculate Y domain for all series
         const calculateYDomain = () => {
           let min = Infinity;
@@ -752,7 +766,7 @@ const GraphDisplay = ({ graphs }) => {
           const padding = (max - min) * 0.1;
           return [min - padding, max + padding];
         };
-
+      
         const yDomain = calculateYDomain();
         
         // Determine domains based on zoom state
@@ -763,10 +777,10 @@ const GraphDisplay = ({ graphs }) => {
         const yDomainFinal = isZoomed 
           ? [zoomState.bottom, zoomState.top] 
           : yDomain;
-
+      
         // Calculate appropriate tick count based on visible data
         const tickCount = calculateTickCount(data);
-
+      
         // Handle mouse wheel zoom for multiline chart
         const handleWheel = (e) => {
           if (zoomMode !== 'wheel') return;
@@ -824,7 +838,7 @@ const GraphDisplay = ({ graphs }) => {
           
           setIsZoomed(true);
         };
-
+      
         // Effect to add/remove wheel event listener
         useEffect(() => {
           const currentContainer = chartContainerRef.current;
@@ -841,7 +855,7 @@ const GraphDisplay = ({ graphs }) => {
             currentContainer.removeEventListener('wheel', wheelHandler);
           };
         }, [zoomMode, zoomState, isZoomed, data]);
-
+      
         return (
           <div className={styles.chartWrapper} ref={chartContainerRef}>
             <div className={styles.zoomControls}>
@@ -953,32 +967,40 @@ const GraphDisplay = ({ graphs }) => {
           </div>
         );
       }
-       default:
-         return null;
-     }
-   } catch (error) {
-     console.error(`Error rendering chart ${title}:`, error);
-     return null;
-   }
- };
-
- return (
-   <div className={styles.analyticsContainer}>
-     {graphs.map((graph, index) => {
-       // Skip any invalid graph objects
-       if (!graph || typeof graph !== 'object') return null;
-       
-       return (
-         <div key={`${graph.metric_id || index}-${index}`} className={styles.section}>
-           <div className={styles.glassEffect}>
-             <h3 className={styles.chartTitle}>{graph.title || 'Untitled Chart'}</h3>
-             {renderChart(graph, index)}
-           </div>
-         </div>
-       );
-     })}
-   </div>
- );
-};
-
-export default GraphDisplay;
+      default:
+        return null;
+      }
+      } catch (error) {
+        console.error(`Error rendering chart ${title}:`, error);
+        return null;
+      }
+      };
+      
+      return (
+       <div className={styles.analyticsContainer}>
+         {graphs.map((graph, index) => {
+           // Skip any invalid graph objects
+           if (!graph || typeof graph !== 'object') return null;
+           
+           return (
+             <div key={`${graph.metric_id || index}-${index}`} className={styles.section}>
+               <div className={styles.glassEffect}>
+                 <h3 className={styles.chartTitle}>{graph.title || 'Untitled Chart'}</h3>
+                 
+                 {/* ADDED: Display metric description if active or completed */}
+                 {graph.status === 'active' || graph.status === 'completed' ? (
+                   <div className={`${styles.metricDescription} ${graph.status === 'active' ? styles.activeDescription : styles.completedDescription}`}>
+                     <p>{graph.description}</p>
+                   </div>
+                 ) : null}
+                 
+                 {renderChart(graph, index)}
+               </div>
+             </div>
+           );
+         })}
+       </div>
+      );
+      };
+      
+      export default GraphDisplay;

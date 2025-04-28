@@ -20,6 +20,8 @@ export default function AnalyticsPage() {
     const [selectedTime, setSelectedTime] = useState("30D");
     // ADDED: State for date filter to pass to API
     const [dateFilter, setDateFilter] = useState({ type: "last", days: 30 });
+    // UPDATED: Added state for metric knowledge data
+    const [metricKnowledge, setMetricKnowledge] = useState({});
 
     // Cache duration: 5 minutes in milliseconds
     const CACHE_DURATION = 5 * 60 * 1000;
@@ -34,9 +36,11 @@ export default function AnalyticsPage() {
         "avg_sessions_per_day", 
         "session_distribution_by_hour", 
         "avg_session_length", 
-        "adaptive_session_length", 
+        // "adaptive_session_length", 
         "geographical_breakdown", 
-        "device_os_distribution"
+        "device_os_distribution",
+        "session_length_distribution",
+        // "d1_retention"
     ];
 
     // ADDED: Handle time filter changes
@@ -101,28 +105,115 @@ export default function AnalyticsPage() {
     };
 
     // ADDED: Helper to format dates for API
-// ADDED: Helper to format dates for API
-const formatApiDate = (dateStr) => {
-    try {
-        // Convert from "Apr 15, 2025" to "DD-MM-YYYY" format
-        const date = new Date(dateStr);
-        if (isNaN(date.getTime())) {
-            console.error('Invalid date string:', dateStr);
+    const formatApiDate = (dateStr) => {
+        try {
+            // Convert from "Apr 15, 2025" to "DD-MM-YYYY" format
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) {
+                console.error('Invalid date string:', dateStr);
+                return '';
+            }
+            // Format as DD-MM-YYYY instead of YYYY-MM-DD
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
+        } catch (err) {
+            console.error('Error formatting date:', err);
             return '';
         }
-        // Format as DD-MM-YYYY instead of YYYY-MM-DD
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}-${month}-${year}`;
-    } catch (err) {
-        console.error('Error formatting date:', err);
-        return '';
-    }
-};
+    };
+
+    // UPDATED: Added function to fetch metric knowledge data
+    const fetchMetricKnowledge = async () => {
+        try {
+            console.log('Fetching metric knowledge data');
+            
+            // Create a cache key for metric knowledge
+            const cacheKey = `metric_knowledge_cache`;
+            
+            // Check cache first
+            const cachedKnowledge = localStorage.getItem(cacheKey);
+            if (cachedKnowledge) {
+                const { data: cachedData, timestamp } = JSON.parse(cachedKnowledge);
+                if (Date.now() - timestamp < CACHE_DURATION) {
+                    console.log('Loading metric knowledge from cache');
+                    setMetricKnowledge(cachedData);
+                    return cachedData;
+                } else {
+                    console.log('Metric knowledge cache expired, fetching fresh data');
+                }
+            } else {
+                console.log('No metric knowledge cache found, fetching fresh data');
+            }
+            
+            // If no valid cache, fetch from API
+            const startTime = performance.now();
+            
+            const response = await fetch('https://get-metric-knowledge-nrosabqhla-uc.a.run.app', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    metrics: metricsToRequest,
+                    game_id: "4705d90b-f4a9-4a71-b0b1-e4da22acfb36",
+                    ...(userId && { user_id: userId })
+                })
+            });
+            
+            const endTime = performance.now();
+            console.log(`Metric knowledge API response time: ${((endTime - startTime) / 1000).toFixed(2)} seconds`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const knowledgeData = await response.json();
+            console.log('Metric knowledge API Response:', knowledgeData);
+            
+            // Process the knowledge data into a more usable format
+            const processedKnowledge = {};
+            
+            // Check if the response has the expected structure
+            if (knowledgeData && typeof knowledgeData === 'object') {
+                // Iterate through each metric in the knowledge data
+                Object.keys(knowledgeData).forEach(metricId => {
+                    const metricInfo = knowledgeData[metricId];
+                    
+                    // Only include metrics with active or completed status
+                    if (metricInfo.status === 'active' || metricInfo.status === 'completed') {
+                        processedKnowledge[metricId] = {
+                            description: metricInfo.description || '',
+                            status: metricInfo.status
+                        };
+                    }
+                });
+            }
+            
+            console.log('Processed metric knowledge:', processedKnowledge);
+            
+            // Update state with the processed knowledge
+            setMetricKnowledge(processedKnowledge);
+            
+            // Cache the processed knowledge
+            try {
+                localStorage.setItem(cacheKey, JSON.stringify({
+                    data: processedKnowledge,
+                    timestamp: Date.now()
+                }));
+                console.log('Metric knowledge cached successfully');
+            } catch (error) {
+                console.error('Error caching metric knowledge:', error);
+            }
+            
+            return processedKnowledge;
+        } catch (err) {
+            console.error('Error fetching metric knowledge:', err);
+            return {};
+        }
+    };
 
     // Function to transform metrics API data into format for GraphDisplay
-    const transformMetricsForGraphs = (metricsData) => {
+    const transformMetricsForGraphs = (metricsData, knowledgeData = {}) => {
         // Check if we have valid data
         if (!metricsData || !metricsData.metrics || !Array.isArray(metricsData.metrics)) {
             console.log("No valid metrics data to transform");
@@ -130,6 +221,7 @@ const formatApiDate = (dateStr) => {
         }
 
         console.log("Transforming metrics data:", metricsData);
+        console.log("Using knowledge data:", knowledgeData);
 
         // Transform data for visualization
         return metricsData.metrics.map(metric => {
@@ -143,41 +235,48 @@ const formatApiDate = (dateStr) => {
             const metricType = metric.type || (isTimeSeries ? 'line' : 'bar');
 
             console.log(`Processing metric ${metric.metric_id} as ${metricType} chart`);
+            
+            // UPDATED: Use knowledge data description if available
+            const metricId = metric.metric_id || '';
+            const knowledgeInfo = knowledgeData[metricId] || {};
+            const description = knowledgeInfo.description || metric.description || '';
 
             // Handle multiline chart type differently to include categories and series
             if (metricType === 'multiline') {
                 return {
-                    metric_id: metric.metric_id || `metric-${Math.random().toString(36).substr(2, 9)}`,
+                    metric_id: metricId || `metric-${Math.random().toString(36).substr(2, 9)}`,
                     metric_type: metricType,
                     title: metric.name || "Untitled Metric",
-                    description: metric.description || "",
+                    description: description,
                     categories: metric.categories || [],
                     series: metric.series || [],
                     x_label: metric.x_label || "Date",
                     y_label: metric.y_label || "Value",
                     x_unit: metric.x_unit || "",
                     y_unit: metric.y_unit || "",
-                    value_unit: metric.value_unit || ""
+                    value_unit: metric.value_unit || "",
+                    status: knowledgeInfo.status || "pending" // UPDATED: Added status
                 };
             } else {
                 return {
-                    metric_id: metric.metric_id || `metric-${Math.random().toString(36).substr(2, 9)}`,
+                    metric_id: metricId || `metric-${Math.random().toString(36).substr(2, 9)}`,
                     metric_type: metricType,
                     title: metric.name || "Untitled Metric",
-                    description: metric.description || "",
+                    description: description,
                     columns: [
                         metric.x_label || "Date", 
                         metric.y_label || "Value"
                     ],
                     values: metric.values || [],
                     x_unit: metric.x_unit || "",
-                    y_unit: metric.y_unit || ""
+                    y_unit: metric.y_unit || "",
+                    status: knowledgeInfo.status || "pending" // UPDATED: Added status
                 };
             }
         });
     };
 
-    // UPDATED: fetchMetricsData now uses the date filter
+    // UPDATED: fetchMetricsData now calls fetchMetricKnowledge
     const fetchMetricsData = async () => {
         try {
             setIsLoading(true);
@@ -192,9 +291,12 @@ const formatApiDate = (dateStr) => {
                 if (Date.now() - timestamp < CACHE_DURATION) {
                     console.log('Loading metrics from cache for filter:', dateFilter);
                     
-                    // Transform cached data for graphs
-                    const transformedData = transformMetricsForGraphs(cachedMetricsData);
-                    console.log('Transformed cached data:', transformedData);
+                    // UPDATED: Fetch metric knowledge first
+                    const knowledgeData = await fetchMetricKnowledge();
+                    
+                    // Transform cached data for graphs with knowledge data
+                    const transformedData = transformMetricsForGraphs(cachedMetricsData, knowledgeData);
+                    console.log('Transformed cached data with knowledge:', transformedData);
                     
                     setGraphData(transformedData);
                     setIsLoading(false);
@@ -240,9 +342,12 @@ const formatApiDate = (dateStr) => {
             const metricsData = await response.json();
             console.log('API Response:', metricsData);
             
-            // Transform data for visualization components
-            const graphsData = transformMetricsForGraphs(metricsData);
-            console.log('Transformed graph data:', graphsData);
+            // UPDATED: Fetch metric knowledge after metrics data
+            const knowledgeData = await fetchMetricKnowledge();
+            
+            // Transform data for visualization components with knowledge data
+            const graphsData = transformMetricsForGraphs(metricsData, knowledgeData);
+            console.log('Transformed graph data with knowledge:', graphsData);
             
             // Update state with transformed data
             setGraphData(graphsData);

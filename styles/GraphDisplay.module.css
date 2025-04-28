@@ -58,6 +58,29 @@
   letter-spacing: 0.2px;
 }
 
+/* ADDED: Metric Description Styles */
+.metricDescription {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+/* ADDED: Active status description style */
+.activeDescription {
+  background: rgba(130, 255, 131, 0.08);
+  border-left: 3px solid #82FF83;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ADDED: Completed status description style */
+.completedDescription {
+  background: rgba(130, 130, 255, 0.08);
+  border-left: 3px solid #8282FF;
+  color: rgba(255, 255, 255, 0.9);
+}
+
 /* Chart wrapper for zoom controls */
 .chartWrapper {
   position: relative;
@@ -214,6 +237,11 @@
   .chartTitle {
     font-size: 16px;
   }
+  .metricDescription {
+    padding: 10px 14px;
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -227,6 +255,11 @@
   }
   .chartTitle {
     font-size: 15px;
+  }
+  .metricDescription {
+    padding: 8px 12px;
+    font-size: 12px;
+    margin-bottom: 12px;
   }
   .customTooltip {
     padding: 10px 14px;
@@ -253,6 +286,11 @@
   }
   .chartTitle {
     font-size: 14px;
+  }
+  .metricDescription {
+    padding: 6px 10px;
+    font-size: 11px;
+    margin-bottom: 10px;
   }
   .customTooltip {
     padding: 8px 12px;
