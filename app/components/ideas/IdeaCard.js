@@ -1,9 +1,9 @@
-// components/ideas/IdeaCard.js
 'use client';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '../../../styles/IdeaCard.module.css';
-import { Lightbulb, ArrowRight } from 'lucide-react';
+import {ArrowRight} from 'lucide-react';
+import Image from "next/image";
 
 const IdeaCard = ({ number, description, ideaId, insightId }) => {
   const router = useRouter();
@@ -89,11 +89,20 @@ const IdeaCard = ({ number, description, ideaId, insightId }) => {
     <div className={styles.card}>
       <div className={styles.glassEffect}>
         <div className={styles.content}>
-          <div className={styles.ideaLabel}>
-            <Lightbulb size={16} className={styles.bulbIcon} />
+          {/* CHANGED: Replaced ideaLabel with ideaPill to get the pill-shaped button */}
+          <div className={styles.ideaPill}>
+            <Image
+              src="/bulb.svg"
+              alt="Lightbulb"
+              width={16}
+              height={16}
+              className={styles.bulbIcon}
+            />
             <span>Idea {number}</span>
           </div>
+          
           <p className={styles.description}>{description || 'No description available'}</p>
+          
           {isLoading ? (
             <button className={styles.viewButton} disabled>
               <div className={styles.viewButtonContent}>
@@ -103,7 +112,13 @@ const IdeaCard = ({ number, description, ideaId, insightId }) => {
           ) : (
             <button className={styles.viewButton} onClick={handleViewIdea}>
               <div className={styles.viewButtonContent}>
-                <Lightbulb size={16} />
+                <Image
+                  src="/bulb.svg"
+                  alt="Lightbulb"
+                  width={16}
+                  height={16}
+                  className={styles.buttonIcon}
+                />
                 <span>View Idea</span>
                 <ArrowRight size={16} />
               </div>

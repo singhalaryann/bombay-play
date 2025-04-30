@@ -10,7 +10,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 14px;
+  padding: 10px 12px;
   position: relative;
 }
 
@@ -29,7 +29,7 @@
 }
 
 .bullet {
-  color: #82FF83;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 18px;
   line-height: 0;
   margin-top: 1px;
@@ -39,12 +39,12 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 6px 10px;
   background: rgba(130, 255, 131, 0.1);
-  border: 1px solid #82FF83;
-  border-radius: 6px;
+  border: 1px solid #194D1A;
+  border-radius: 10px;
   color: #82FF83;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;

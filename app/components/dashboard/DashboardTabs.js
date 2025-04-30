@@ -33,7 +33,7 @@ const DashboardTabs = ({
           onClick={() => onTabChange("insights")}
         >
           <Image
-            src="/social_media.svg"
+            src="/insights.svg"
             alt="Insights"
             width={20}
             height={20}
@@ -41,6 +41,7 @@ const DashboardTabs = ({
           />
           <span>Insights</span>
         </button>
+        {/* COMMENTED: Experiment tab removed
         <button
           className={`${styles.tabButton} ${
             activeTab === "experiment" ? styles.active : ""
@@ -56,13 +57,14 @@ const DashboardTabs = ({
           />
           <span>Experiments</span>
         </button>
+        */}
       </div>
       <div className={styles.tabContent}>
-        {activeTab === "insights" 
-          ? children 
-          : activeTab === "overview" 
-            ? <Overview />
-            : experimentContent
+        {activeTab === "insights"
+          ? children
+          : activeTab === "overview"
+          ? <Overview />
+          : experimentContent
         }
       </div>
     </div>

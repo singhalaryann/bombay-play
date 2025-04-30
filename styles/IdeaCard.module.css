@@ -5,7 +5,7 @@
 }
 
 .glassEffect {
-  background: #191C17;
+  background: #171717;
   border-radius: 12px;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -46,13 +46,18 @@
   position: relative;
 }
 
-.ideaLabel {
+/* ADDED: New pill-shaped button styling for Idea label */
+.ideaPill {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #82FF83;
+  gap: 6px;
+  padding: 6px 10px;
+  background: #161c15f2;
+  border: 1px solid transparent;
+  border-radius: 50px;
+  color: rgba(255, 255, 255, 0.7);;
+  font-size: 14px;
   font-weight: 500;
-  font-size: 15px;
   white-space: nowrap;
 }
 
@@ -61,7 +66,7 @@
 }
 
 .description {
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.7); /* CHANGED: Changed text color to lighter gray */
   font-size: 15px;
   line-height: 1.6;
   margin: 0;
@@ -79,11 +84,11 @@
 .viewButtonContent {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
+  gap: 6px;
+  padding: 6px 10px;
   background: rgba(130, 255, 131, 0.1);
   border: 1px solid #82FF83;
-  border-radius: 8px;
+  border-radius: 10px;
   color: #82FF83;
   font-size: 14px;
   font-weight: 500;
@@ -107,6 +112,10 @@
   background: rgba(130, 255, 131, 0.05);
 }
 
+.buttonIcon {
+  color: #82FF83;
+}
+
 /* Responsive Breakpoints */
 @media (max-width: 1024px) {
   .content {
@@ -120,14 +129,26 @@
 
 @media (max-width: 768px) {
   .content {
-    grid-template-columns: 1fr;
+    grid-template-columns: auto 1fr; /* Changed: Keep auto width for ideaPill */
+    grid-template-rows: auto auto; /* Added: Use two rows instead */
+    grid-template-areas: 
+      "pill pill"
+      "desc button"; /* Added: Define grid areas */
     gap: 16px;
     padding: 16px;
   }
+  .ideaPill {
+    grid-area: pill; /* Added: Place in pill area */
+    font-size: 13px;
+    padding: 5px 8px;
+    width: fit-content; /* Added: Ensure it only takes needed width */
+  }
   .description {
+    grid-area: desc; /* Added: Place in desc area */
     font-size: 14px;
   }
   .viewButton {
+    grid-area: button; /* Added: Place in button area */
     width: 100%;
   }
   .viewButtonContent {
@@ -141,8 +162,9 @@
     padding: 14px;
     gap: 12px;
   }
-  .ideaLabel {
-    font-size: 14px;
+  .ideaPill {
+    font-size: 12px;
+    padding: 4px 8px;
   }
   .description {
     font-size: 13px;

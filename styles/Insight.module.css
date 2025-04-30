@@ -8,17 +8,15 @@
 
 .mainLayout {
   display: flex;
-  flex: 1;
+  height: calc(100vh - 64px);
   width: 100%;
 }
 
 .mainContent {
   flex: 1;
+  height: 100%;
   overflow-y: auto;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+  padding: 20px;
 }
 
 /* Insight Section */
@@ -29,7 +27,6 @@
   padding: 24px;
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(130, 255, 131, 0.1);
 }
 
 .insightSection::after {

@@ -62,7 +62,7 @@
   content: '';
   position: absolute;
   bottom: -2px;
-  left: 50%;
+  left: 60%;
   width: 40%; /* Half of the text width */
   transform: translateX(-50%); /* Center the line */
   height: 4px;

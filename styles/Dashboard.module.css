@@ -7,15 +7,15 @@
 }
 
 .mainLayout {
-  display: flex; /* Makes it a flex container */
-  height: calc(100vh - 64px); /* Exact height minus header */
-  width: 100%; /* Full width */
+  display: flex;
+  height: calc(100vh - 64px);
+  width: 100%;
 }
 
 .mainContent {
-  flex: 1; /* Takes available space */
-  height: 100%; /* Match parent height */
-  overflow-y: auto; /* Enables scrolling */
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
   padding: 20px;
 }
 
@@ -129,7 +129,6 @@
   flex-direction: column;
   gap: 14px;
   width: 100%;
-  /* margin-top: 10px; */
 }
 
 /* Custom Scrollbar (for mainContent) */
@@ -186,83 +185,65 @@
   padding: 16px;
   color: rgba(255, 255, 255, 0.6);
   font-size: 14px;
-  margin-top: 16px;
 }
 
-/* Responsive Breakpoints */
-@media (max-width: 1280px) {
-  .mainContent {
-    padding: 20px 24px;
-  }
-  .metricsGrid {
-    gap: 20px;
-  }
+/* COMMENTED OUT: Insight Tabs Container */
+.insightTabsWrapper {
+  margin: 14px 0 16px;
+  position: relative;
+  display: flex;
 }
 
-@media (max-width: 768px) {
-  .mainContent {
-    padding: 16px;
-    overflow-x: hidden;
-  }
-  .metricsGrid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-  .insightsSection {
-    padding: 12px;
-    margin-bottom: 32px;
-  }
-  .insightsHeader {
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  .experimentSection {
-    padding: 16px 0;
-  }
-  .experimentHeader {
-    margin-bottom: 16px;
-  }
-  .filterContainer {
-    position: relative;
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 16px;
-  }
-  
-  .filterSection {
-    flex-direction: column-reverse;
-  }
+.insightTabsContainer {
+  display: flex;
+  overflow-x: auto;
+  width: fit-content;
+  background: #161c15f2;
+  border-radius: 12px;
 }
 
-@media (max-width: 480px) {
-  .mainContent {
-    padding: 12px;
-  }
-  .metricsGrid {
-    gap: 12px;
-  }
-  .insightsList {
-    gap: 12px;
-  }
-  .insightsSection {
-    padding: 12px;
-    margin-bottom: 32px;
-  }
-  .insightGroup {
-    gap: 8px;
-  }
-  .experimentTitle {
-    font-size: 14px;
-  }
-  .experimentPlaceholder {
-    padding: 16px;
-    font-size: 13px;
-  }
-  .filterContainer {
-    margin-bottom: 12px;
-  }
+.insightTab {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  border: none;
+  background: transparent;
 }
+
+.insightTab:first-child {
+  border-radius: 12px 0 0 12px;
+}
+
+.insightTab:last-child {
+  border-radius: 0 12px 12px 0;
+}
+
+.insightTab:hover {
+  color: rgba(255, 255, 255, 1);
+}
+
+.activeInsightTab {
+  background: #354030;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.tabIcon {
+  font-size: 14px;
+  margin-left: 6px;
+  color: #FFC107;
+}
+
+.insightTabsWrapper.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
 
 /* ADDED: Skeleton loading animation */
 @keyframes shimmer {
@@ -364,8 +345,62 @@
   border-radius: 4px;
 }
 
-/* ADDED: Responsive adjustments for skeleton content */
+/* Responsive Breakpoints */
+@media (max-width: 1280px) {
+  .mainContent {
+    padding: 20px 24px;
+  }
+  .metricsGrid {
+    gap: 20px;
+  }
+}
+
 @media (max-width: 768px) {
+  .mainContent {
+    padding: 16px;
+    overflow-x: hidden;
+  }
+  .metricsGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .insightsSection {
+    padding: 12px;
+    margin-bottom: 32px;
+  }
+  .insightsHeader {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .experimentSection {
+    padding: 16px 0;
+  }
+  .experimentHeader {
+    margin-bottom: 16px;
+  }
+  .filterContainer {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+  }
+  
+  .filterSection {
+    flex-direction: column-reverse;
+  }
+  
+  /* COMMENTED OUT: Responsive mobile styles for insight tabs */
+  .insightTabsContainer {
+    gap: 6px;
+  }
+  
+  .insightTab {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+ 
+  
   .skeletonInsight {
     padding: 12px 16px;
     height: 64px;
@@ -379,4 +414,49 @@
   .skeletonMetricValue {
     height: 36px;
   }
+}
+
+@media (max-width: 480px) {
+  .mainContent {
+    padding: 12px;
+  }
+  .metricsGrid {
+    gap: 12px;
+  }
+  .insightsList {
+    gap: 12px;
+  }
+  .insightsSection {
+    padding: 12px;
+    margin-bottom: 32px;
+  }
+  .insightGroup {
+    gap: 8px;
+  }
+  .experimentTitle {
+    font-size: 14px;
+  }
+  .experimentPlaceholder {
+    padding: 16px;
+    font-size: 13px;
+  }
+  .filterContainer {
+    margin-bottom: 12px;
+  }
+  
+  /* COMMENTED OUT: Additional responsive mobile styles for insight tabs */
+  .insightTabsWrapper {
+    margin: 16px 0 12px;
+  }
+  
+  .insightTabsContainer {
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+  
+  .insightTab {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+ 
 }

@@ -26,6 +26,9 @@ export default function Dashboard() {
     searchParams.get("tab") || "insights"
   );
   
+  // NEW: Add state for insight filter tabs
+  const [activeInsightTab, setActiveInsightTab] = useState("segment");
+  
   // State variables for progressive loading
   const [insightsLoading, setInsightsLoading] = useState(true);
   const [isInitialRender, setIsInitialRender] = useState(true);
@@ -163,6 +166,13 @@ export default function Dashboard() {
     router.push(`/dashboard?tab=${tab}`, { shallow: true });
   };
 
+  // NEW: Handler for insight tab changes
+  const handleInsightTabChange = (tabId) => {
+    setActiveInsightTab(tabId);
+    // You could also update URL if needed
+    router.push(`/dashboard?tab=${activeTab}&insightTab=${tabId}`, { shallow: true });
+  };
+
   // Effect to handle authentication only
   useEffect(() => {
     if (!userId) {
@@ -186,6 +196,31 @@ export default function Dashboard() {
           </div>
         ))}
       </div>
+    </div>
+  );
+
+  // NEW: Render insight tabs
+  const renderInsightFilterTabs = () => (
+    <div className={styles.insightTabsContainer}>
+      <button
+        className={`${styles.insightTab} ${activeInsightTab === "segment" ? styles.activeInsightTab : ''}`}
+        onClick={() => handleInsightTabChange("segment")}
+      >
+        Segment Spectrum
+      </button>
+      <button
+        className={`${styles.insightTab} ${activeInsightTab === "persona" ? styles.activeInsightTab : ''}`}
+        onClick={() => handleInsightTabChange("persona")}
+      >
+        Persona Pulse
+        {/* <span className={styles.tabIcon}>🟡</span> */}
+      </button>
+      <button
+        className={`${styles.insightTab} ${activeInsightTab === "behavior" ? styles.activeInsightTab : ''}`}
+        onClick={() => handleInsightTabChange("behavior")}
+      >
+        Behavior Atlas
+      </button>
     </div>
   );
 
@@ -224,6 +259,10 @@ export default function Dashboard() {
     if (loading && isInitialRender) {
       return (
         <>
+          {/* NEW: Render insight filter tabs here too, but disabled */}
+          <div className={`${styles.insightTabsWrapper} ${styles.disabled}`}>
+            {renderInsightFilterTabs()}
+          </div>
           {renderSkeletonInsights()}
         </>
       );
@@ -232,6 +271,10 @@ export default function Dashboard() {
     // Otherwise render insights section with its own loading state
     return (
       <>
+        {/* NEW: Add insight filter tabs */}
+        <div className={styles.insightTabsWrapper}>
+          {renderInsightFilterTabs()}
+        </div>
         {renderInsights()}
         
         {/* Progressively loading indicator

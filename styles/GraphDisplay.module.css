@@ -8,7 +8,7 @@
 }
 
 /* Section styles */
-.section {
+/* .section {
   background: rgba(22, 28, 21, 0.95);
   border-radius: 16px;
   padding: 24px;
@@ -19,7 +19,6 @@
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
 }
 
-/* Glass border effect */
 .section::after {
   content: '';
   position: absolute;
@@ -32,7 +31,7 @@
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
-}
+} */
 
 /* Glass effect container */
 .glassEffect {
@@ -45,6 +44,21 @@
   border-radius: 12px;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  position: relative;
+}
+
+.glassEffect::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  padding: 1px;
+  background: linear-gradient(-100deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 /* Chart title */
@@ -58,7 +72,7 @@
   letter-spacing: 0.2px;
 }
 
-/* ADDED: Metric Description Styles */
+/* Metric Description Styles */
 .metricDescription {
   padding: 12px 16px;
   border-radius: 8px;
@@ -67,14 +81,14 @@
   line-height: 1.5;
 }
 
-/* ADDED: Active status description style */
+/* Active status description style */
 .activeDescription {
   background: rgba(130, 255, 131, 0.08);
   border-left: 3px solid #82FF83;
   color: rgba(255, 255, 255, 0.9);
 }
 
-/* ADDED: Completed status description style */
+/* Completed status description style */
 .completedDescription {
   background: rgba(130, 130, 255, 0.08);
   border-left: 3px solid #8282FF;
@@ -86,7 +100,7 @@
   position: relative;
   width: 100%;
   margin-top: 10px;
-  /* ADDED: Prevent page scrolling when using wheel zoom */
+  /* Prevent page scrolling when using wheel zoom */
   overflow: hidden;
 }
 
@@ -97,7 +111,7 @@
   margin-bottom: 5px;
 }
 
-/* Zoom button styling */
+/* UPDATED: Zoom button styling - simplified since we removed the toggle */
 .zoomButton {
   background: rgba(0, 0, 0, 0.3);
   border: none;
@@ -130,12 +144,41 @@
   cursor: default;
 }
 
-/* Zoom instruction text */
+/* UPDATED: Zoom instruction text - now describes both methods */
 .zoomInstructions {
   text-align: center;
   font-size: 12px;
   color: rgba(255, 255, 255, 0.6);
   margin-top: 5px;
+}
+
+/* NEW: Legend instructions text */
+.legendInstructions {
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 5px;
+}
+
+/* FIXED: Inactive line styling - make transparent but still present */
+.inactiveLine {
+  opacity: 0.3;
+  stroke-dasharray: 3 3; /* Add dotted style to indicate inactive state */
+}
+
+/* NEW: Legend item hover effect to indicate clickability */
+.section :global(.recharts-legend-item) {
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.section :global(.recharts-legend-item:hover) {
+  opacity: 0.7;
+}
+
+/* NEW: Adding styles for legend items that are toggled off */
+.section :global(.recharts-legend-item-inactive) {
+  opacity: 0.5;
 }
 
 /* Tooltip styles */
@@ -272,6 +315,10 @@
   .zoomButton span {
     font-size: 11px;
   }
+  /* Smaller legend instructions on tablets */
+  .legendInstructions {
+    font-size: 11px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -304,7 +351,8 @@
     display: none;
   }
   /* Smaller zoom instructions on mobile */
-  .zoomInstructions {
+  .zoomInstructions,
+  .legendInstructions {
     font-size: 10px;
   }
 }
