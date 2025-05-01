@@ -23,21 +23,18 @@ const COLORS = ['#82FF83', '#FF6B6B', '#94A3B8', '#FFB86C'];
 
 /** Tooltip for bar charts */
 const CustomTooltip = ({ active, payload, label, valueUnit }) => {
- if (active && payload && payload.length) {
-   return (
-  <div className={styles.analyticsContainer}>
-    {graphs.map((graph, index) => {
-      // Skip any invalid graph objects
-      if (!graph || typeof graph !== 'object') return null;
-      
-      // Using the standalone ChartContainer component for each graph
-      return <ChartContainer key={index} graph={graph} index={index} />;
-    })}
-  </div>
- );
-};
- return null;
-};
+  if (active && payload && payload.length) {
+    return (
+      <div className={styles.customTooltip}>
+        <p className={styles.tooltipLabel}>{label}</p>
+        <p className={styles.tooltipValue}>
+          {`${payload[0].value}${valueUnit ? ` ${valueUnit}` : ''}`}
+        </p>
+      </div>
+    );
+  }
+  return null;
+ };
 
 /** Tooltip for pie charts */
 const CustomPieTooltip = ({ active, payload }) => {
