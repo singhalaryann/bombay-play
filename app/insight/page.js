@@ -40,7 +40,7 @@ export default function InsightPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             user_id: userId,
-            game_id: '4705d90b-f4a9-4a71-b0b1-e4da22acfb36',
+            game_id: 'ludogoldrush',
             insight_ids: [insightId],
           }),
         });

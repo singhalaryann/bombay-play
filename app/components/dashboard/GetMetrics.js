@@ -49,7 +49,7 @@ const GetMetrics = ({
     ];
 
   // Game ID constant (same as used in Dashboard for insights)
-  const GAME_ID = "4705d90b-f4a9-4a71-b0b1-e4da22acfb36";
+  const GAME_ID = "ludogoldrush";
 
   // FIXED: Reset dateFilter when selectedTime or specificMetric changes
   useEffect(() => {

@@ -10,6 +10,8 @@ const DashboardTabs = ({
   onTabChange,
   children,
   experimentContent,
+  selectedTime,
+  apiDateFilter
 }) => {
   return (
     <div className={styles.tabContainer}>
@@ -60,11 +62,11 @@ const DashboardTabs = ({
         */}
       </div>
       <div className={styles.tabContent}>
-        {activeTab === "insights"
+        {activeTab === "insights" 
           ? children
-          : activeTab === "overview"
-          ? <Overview />
-          : experimentContent
+          : activeTab === "overview" 
+            ? <Overview selectedTime={selectedTime} apiDateFilter={apiDateFilter} />
+            : experimentContent
         }
       </div>
     </div>

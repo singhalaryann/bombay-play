@@ -23,10 +23,23 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState(
-    searchParams.get("tab") || "insights"
+    searchParams.get("tab") || "overview"
   );
   
-  // NEW: Add state for insight filter tabs
+  // State for between format date filter (used by Overview metrics)
+  const [apiDateFilter, setApiDateFilter] = useState({ 
+    type: "between", 
+    start_date: "", 
+    end_date: "" 
+  });
+  
+  // State for global format date filter (used by other components like Insights)
+  const [globalDateFilter, setGlobalDateFilter] = useState({ 
+    type: "last", 
+    days: 30 
+  });
+  
+  // State for insight filter tabs
   const [activeInsightTab, setActiveInsightTab] = useState("segment");
   
   // State variables for progressive loading
@@ -34,10 +47,145 @@ export default function Dashboard() {
   const [isInitialRender, setIsInitialRender] = useState(true);
 
   // Fixed game ID for insights as provided
-  const GAME_ID = "4705d90b-f4a9-4a71-b0b1-e4da22acfb36";
+  const GAME_ID = "ludogoldrush";
 
   // Cache duration in milliseconds (e.g., 5 minutes)
   const CACHE_DURATION = 5 * 60 * 1000;
+
+  // Define the data limit date
+  const DATA_LIMIT_DATE = new Date('2025-04-03'); // April 3, 2025
+
+  // Helper to format dates for API (DD-MM-YYYY format)
+  const formatApiDate = (dateStr) => {
+    try {
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) {
+        console.error('Invalid date string:', dateStr);
+        return '';
+      }
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}-${month}-${year}`;
+    } catch (err) {
+      console.error('Error formatting date:', err);
+      return '';
+    }
+  };
+
+  // Convert selectedTime to API date filter format (between format for Overview)
+  useEffect(() => {
+    console.log('Dashboard - Time filter changed to:', selectedTime);
+    
+    if (!selectedTime) {
+      console.log('Dashboard - No selectedTime provided');
+      return;
+    }
+    
+    let endDate, startDate;
+    const today = new Date();
+
+    // Check if the selectedTime includes a date range (from TabFilter's custom date)
+    if (selectedTime.includes(" - ")) {
+      const [startStr, endStr] = selectedTime.split(" - ");
+      const parsedEndDate = new Date(endStr.trim());
+      
+      // If selected end date is after data limit, use Apr 2-3 range
+      if (parsedEndDate > DATA_LIMIT_DATE) {
+        console.log('Dashboard - Using fixed Apr 2-3 range due to data limit');
+        endDate = new Date('2025-04-03');
+        startDate = new Date('2025-04-02');
+      } else {
+        // Otherwise use the selected range, but ensure start date is end date - 1
+        endDate = parsedEndDate;
+        startDate = new Date(endDate);
+        startDate.setDate(endDate.getDate() - 1);
+      }
+    } 
+    // Handle "Since" date format
+    else if (selectedTime.startsWith("Since ")) {
+      const sinceStr = selectedTime.replace("Since ", "");
+      const sinceDate = new Date(sinceStr);
+      
+      // If since date is after data limit, use Apr 2-3 range
+      if (sinceDate > DATA_LIMIT_DATE) {
+        console.log('Dashboard - Using fixed Apr 2-3 range due to data limit');
+        endDate = new Date('2025-04-03');
+        startDate = new Date('2025-04-02');
+      } else {
+        // Otherwise use today as end date and ensure start date is end date - 1
+        endDate = today < DATA_LIMIT_DATE ? today : DATA_LIMIT_DATE;
+        startDate = new Date(endDate);
+        startDate.setDate(endDate.getDate() - 1);
+      }
+    }
+    // Handle "Last X days" format
+    else if (selectedTime.startsWith("Last ")) {
+      const daysText = selectedTime.replace("Last ", "").replace(" days", "");
+      const days = parseInt(daysText);
+      
+      if (!isNaN(days)) {
+        endDate = today < DATA_LIMIT_DATE ? today : DATA_LIMIT_DATE;
+        startDate = new Date(endDate);
+        startDate.setDate(endDate.getDate() - 1);
+      } else {
+        console.log('Dashboard - Invalid days value, using default');
+        endDate = today < DATA_LIMIT_DATE ? today : DATA_LIMIT_DATE;
+        startDate = new Date(endDate);
+        startDate.setDate(endDate.getDate() - 1);
+      }
+    }
+    // Handle preset values (Today, Yesterday, 7D, 30D, etc.)
+    else {
+      // For all preset values, ensure we don't exceed data limit
+      const maxEndDate = today < DATA_LIMIT_DATE ? today : DATA_LIMIT_DATE;
+      
+      switch(selectedTime) {
+        case "Today":
+          endDate = maxEndDate;
+          startDate = new Date(endDate);
+          startDate.setDate(endDate.getDate() - 1);
+          break;
+        case "Yesterday":
+          endDate = new Date(maxEndDate);
+          endDate.setDate(maxEndDate.getDate() - 1);
+          startDate = new Date(endDate);
+          startDate.setDate(endDate.getDate() - 1);
+          break;
+        case "7D":
+        case "30D":
+        case "3M":
+        case "6M":
+        case "12M":
+          // All these presets should use the same logic - end date is today/max date
+          // and start date is end date - 1
+          endDate = maxEndDate;
+          startDate = new Date(endDate);
+          startDate.setDate(endDate.getDate() - 1);
+          break;
+        default:
+          console.log('Dashboard - Unknown time filter, using default');
+          endDate = maxEndDate;
+          startDate = new Date(endDate);
+          startDate.setDate(endDate.getDate() - 1);
+      }
+    }
+    
+    // Format dates for API
+    const formattedStartDate = formatApiDate(startDate);
+    const formattedEndDate = formatApiDate(endDate);
+    
+    // Create the between format for API
+    const newApiDateFilter = {
+      type: "between",
+      start_date: formattedStartDate,
+      end_date: formattedEndDate
+    };
+    
+    console.log('Dashboard - Converted to API date filter:', newApiDateFilter);
+    setApiDateFilter(newApiDateFilter);
+    
+  }, [selectedTime]);
 
   // Load cached data from localStorage on mount
   useEffect(() => {
@@ -166,7 +314,7 @@ export default function Dashboard() {
     router.push(`/dashboard?tab=${tab}`, { shallow: true });
   };
 
-  // NEW: Handler for insight tab changes
+  // Handler for insight tab changes
   const handleInsightTabChange = (tabId) => {
     setActiveInsightTab(tabId);
     // You could also update URL if needed
@@ -180,9 +328,57 @@ export default function Dashboard() {
     }
   }, [userId, router]);
 
-  // Handle time filter changes
+  // Handle time filter changes - Update both date filter formats
   const handleTimeChange = (newTime) => {
     setSelectedTime(newTime);
+    
+    // Create global format date filter based on selection
+    let newGlobalDateFilter;
+    
+    if (newTime === "Today") {
+      newGlobalDateFilter = { type: "last", days: 0 };
+    } else if (newTime === "Yesterday") {
+      newGlobalDateFilter = { type: "last", days: 1 };
+    } else if (newTime === "7D") {
+      newGlobalDateFilter = { type: "last", days: 7 };
+    } else if (newTime === "30D") {
+      newGlobalDateFilter = { type: "last", days: 30 };
+    } else if (newTime === "3M") {
+      newGlobalDateFilter = { type: "last", days: 90 };
+    } else if (newTime === "6M") {
+      newGlobalDateFilter = { type: "last", days: 180 };
+    } else if (newTime === "12M") {
+      newGlobalDateFilter = { type: "last", days: 365 };
+    } else if (newTime.includes(" - ")) {
+      // Parse date range like "Apr 1, 2025 - Apr 15, 2025"
+      const [start, end] = newTime.split(" - ");
+      newGlobalDateFilter = { 
+        type: "between", 
+        start_date: formatApiDate(start.trim()),
+        end_date: formatApiDate(end.trim())
+      };
+    } else if (newTime.startsWith("Since ")) {
+      // Parse "Since Apr 1, 2025"
+      const sinceDate = newTime.replace("Since ", "").trim();
+      newGlobalDateFilter = { 
+        type: "since", 
+        start_date: formatApiDate(sinceDate)
+      };
+    } else if (newTime.startsWith("Last ")) {
+      // Parse "Last 45 days"
+      const daysText = newTime.replace("Last ", "").replace(" days", "").trim();
+      const days = parseInt(daysText);
+      if (!isNaN(days)) {
+        newGlobalDateFilter = { type: "last", days: days };
+      } else {
+        newGlobalDateFilter = { type: "last", days: 30 }; // Default
+      }
+    } else {
+      newGlobalDateFilter = { type: "last", days: 30 }; // Default
+    }
+    
+    console.log('Dashboard - Set global date filter:', newGlobalDateFilter);
+    setGlobalDateFilter(newGlobalDateFilter);
   };
 
   // Skeleton loading for insights
@@ -199,7 +395,8 @@ export default function Dashboard() {
     </div>
   );
 
-  // NEW: Render insight tabs
+  // COMMENTED: Render insight tabs
+  /*
   const renderInsightFilterTabs = () => (
     <div className={styles.insightTabsContainer}>
       <button
@@ -213,7 +410,6 @@ export default function Dashboard() {
         onClick={() => handleInsightTabChange("persona")}
       >
         Persona Pulse
-        {/* <span className={styles.tabIcon}>🟡</span> */}
       </button>
       <button
         className={`${styles.insightTab} ${activeInsightTab === "behavior" ? styles.activeInsightTab : ''}`}
@@ -223,6 +419,7 @@ export default function Dashboard() {
       </button>
     </div>
   );
+  */
 
   // Render insights section with progressive loading
   const renderInsights = () => {
@@ -259,10 +456,11 @@ export default function Dashboard() {
     if (loading && isInitialRender) {
       return (
         <>
-          {/* NEW: Render insight filter tabs here too, but disabled */}
+          {/* COMMENTED: Render insight filter tabs here too, but disabled 
           <div className={`${styles.insightTabsWrapper} ${styles.disabled}`}>
             {renderInsightFilterTabs()}
           </div>
+          */}
           {renderSkeletonInsights()}
         </>
       );
@@ -271,18 +469,12 @@ export default function Dashboard() {
     // Otherwise render insights section with its own loading state
     return (
       <>
-        {/* NEW: Add insight filter tabs */}
+        {/* COMMENTED: Add insight filter tabs 
         <div className={styles.insightTabsWrapper}>
           {renderInsightFilterTabs()}
         </div>
+        */}
         {renderInsights()}
-        
-        {/* Progressively loading indicator
-        {insightsLoading && !isInitialRender && (
-          <div className={styles.progressiveLoadingIndicator}>
-            Loading more data...
-          </div>
-        )} */}
       </>
     );
   };
@@ -300,25 +492,30 @@ export default function Dashboard() {
                 activeTab={activeTab}
                 onTabChange={handleTabChange}
                 experimentContent={<ExperimentContent userId={userId} />}
+                selectedTime={selectedTime}
+                apiDateFilter={apiDateFilter}
               >
                 {activeTab === "insights" && (
                   <>
                     {renderInsightsContent()}
                     <GetMetrics 
                       selectedTime={selectedTime} 
-                      onTimeChange={handleTimeChange} 
+                      onTimeChange={handleTimeChange}
+                      initialDateFilter={globalDateFilter} // Pass global format date filter
                     />
                   </>
                 )}
               </DashboardTabs>
             </div>
             <div className={styles.filterContainer}>
-              <TabFilter 
-                selected={selectedTime} 
-                onChange={handleTimeChange} 
-                // Only disable during initial loading
-                disabled={loading && isInitialRender}
-              />
+            <div className={styles.filterContainer}>
+  <TabFilter 
+    selected={selectedTime} 
+    onChange={handleTimeChange} 
+    disabled={activeTab !== "overview"}
+    readOnly={activeTab === "insights"}
+  />
+</div>
             </div>
           </div>
         </main>

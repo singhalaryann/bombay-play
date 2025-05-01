@@ -155,7 +155,7 @@ export default function AnalyticsPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     metrics: metricsToRequest,
-                    game_id: "4705d90b-f4a9-4a71-b0b1-e4da22acfb36",
+                    game_id: "ludogoldrush",
                     ...(userId && { user_id: userId })
                 })
             });
@@ -320,7 +320,7 @@ export default function AnalyticsPage() {
                 // Only include user_id if it exists in auth context
                 ...(userId && { user_id: userId }),
                 // Include game_id as specified
-                game_id: "4705d90b-f4a9-4a71-b0b1-e4da22acfb36"
+                game_id: "ludogoldrush"
             };
             
             console.log('Full API request payload:', requestBody);

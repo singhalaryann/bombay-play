@@ -7,7 +7,7 @@ import Image from "next/image";
 
 const InsightCard = ({ description, insight_id }) => {
   const router = useRouter();
-
+  
   return (
     <div className={styles.card}>
       <div className={styles.content}>

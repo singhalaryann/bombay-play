@@ -23,7 +23,7 @@ export default function IdeasPage() {
   const [isInitialRender, setIsInitialRender] = useState(true);
   
   // Fixed game ID for ideas as provided
-  const GAME_ID = "4705d90b-f4a9-4a71-b0b1-e4da22acfb36";
+  const GAME_ID = "ludogoldrush";
 
   useEffect(() => {
     const fetchIdeas = async () => {

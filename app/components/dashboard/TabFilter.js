@@ -3,8 +3,21 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from '../../../styles/TabFilter.module.css';
 
-const TabFilter = ({ selected, onChange }) => {
-  const [isOpen, setIsOpen] = useState(false);
+// Updated to accept readOnly prop for displaying filter in disabled state
+const TabFilter = ({ selected, onChange, disabled, readOnly }) => {
+  // Early return with simplified read-only view if in readOnly mode
+  if (readOnly) {
+    return (
+      <div className={styles.filterWrapper}>
+        <div className={styles.dropdown}>
+          <div className={`${styles.dropdownToggle} ${styles.readOnly}`}>
+            <Calendar size={16} className={styles.calendarIcon} />
+            {selected}
+          </div>
+        </div>
+      </div>
+    );
+  }  const [isOpen, setIsOpen] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const dropdownRef = useRef(null);
   const filters = ["Today", "Yesterday", "7D", "30D", "3M", "6M", "12M", "Custom"];
