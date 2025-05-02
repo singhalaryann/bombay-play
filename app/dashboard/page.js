@@ -11,7 +11,6 @@ import { useAuth } from "../context/AuthContext";
 
 // Import your separate ExperimentContent component
 import ExperimentContent from "../components/dashboard/ExperimentContent";
-import GetMetrics from "../components/dashboard/GetMetrics";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -38,9 +37,6 @@ export default function Dashboard() {
     type: "last", 
     days: 30 
   });
-  
-  // State for insight filter tabs
-  const [activeInsightTab, setActiveInsightTab] = useState("segment");
   
   // State variables for progressive loading
   const [insightsLoading, setInsightsLoading] = useState(true);
@@ -250,7 +246,7 @@ export default function Dashboard() {
       
       console.log('Fetching insights data with game_id:', GAME_ID);
 
-      // API call to get-insights endpoint with game_id
+      // API call to get-insights endpoint with game_id and date filter
       const response = await fetch(
         "https://get-insights-nrosabqhla-uc.a.run.app",
         {
@@ -259,8 +255,8 @@ export default function Dashboard() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            user_id: userId,
-            game_id: GAME_ID
+            game_id: GAME_ID,
+            date_filter: globalDateFilter
           }),
         }
       );
@@ -271,21 +267,39 @@ export default function Dashboard() {
 
       const data = await response.json();
       
-      // Process insights data
-      if (data.insights) {
+      // Process insights data - extract insights from detailed_insights_by_lens
+      if (data.insights && data.insights.length > 0) {
         console.log('Received insights data:', data.insights);
-        setInsights(data.insights);
+        
+        // Transform the data to extract just the insights we need
+        const processedInsights = [];
+        
+        data.insights.forEach(insightItem => {
+          if (insightItem.insight_payload && 
+              insightItem.insight_payload.detailed_insights_by_lens) {
+            
+            insightItem.insight_payload.detailed_insights_by_lens.forEach(lens => {
+              if (lens.insight) {
+                processedInsights.push({
+                  insight_id: insightItem.insight_id,
+                  insight_text: lens.insight
+                });
+              }
+            });
+          }
+        });
+        
+        console.log('Processed insights:', processedInsights);
+        setInsights(processedInsights);
         
         // Cache insights data
-        try {
-          localStorage.setItem(`dashboard_insights_cache_${userId}`, JSON.stringify({
-            data: data.insights,
-            timestamp: Date.now()
-          }));
-          console.log('Insights data cached successfully');
-        } catch (cacheError) {
-          console.error('Error caching insights data:', cacheError);
-        }
+        localStorage.setItem(`dashboard_insights_cache_${userId}`, JSON.stringify({
+          data: processedInsights,
+          timestamp: Date.now()
+        }));
+      } else {
+        console.log('No insights data found in the response');
+        setInsights([]);
       }
       
       setInsightsLoading(false);
@@ -308,17 +322,17 @@ export default function Dashboard() {
     }
   }, [searchParams]);
 
+  // Add effect to fetch insights when tab changes to insights
+  useEffect(() => {
+    if (activeTab === "insights") {
+      fetchInsightsData();
+    }
+  }, [activeTab, globalDateFilter]);
+
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     // Update URL without full page reload
     router.push(`/dashboard?tab=${tab}`, { shallow: true });
-  };
-
-  // Handler for insight tab changes
-  const handleInsightTabChange = (tabId) => {
-    setActiveInsightTab(tabId);
-    // You could also update URL if needed
-    router.push(`/dashboard?tab=${activeTab}&insightTab=${tabId}`, { shallow: true });
   };
 
   // Effect to handle authentication only
@@ -395,32 +409,6 @@ export default function Dashboard() {
     </div>
   );
 
-  // COMMENTED: Render insight tabs
-  /*
-  const renderInsightFilterTabs = () => (
-    <div className={styles.insightTabsContainer}>
-      <button
-        className={`${styles.insightTab} ${activeInsightTab === "segment" ? styles.activeInsightTab : ''}`}
-        onClick={() => handleInsightTabChange("segment")}
-      >
-        Segment Spectrum
-      </button>
-      <button
-        className={`${styles.insightTab} ${activeInsightTab === "persona" ? styles.activeInsightTab : ''}`}
-        onClick={() => handleInsightTabChange("persona")}
-      >
-        Persona Pulse
-      </button>
-      <button
-        className={`${styles.insightTab} ${activeInsightTab === "behavior" ? styles.activeInsightTab : ''}`}
-        onClick={() => handleInsightTabChange("behavior")}
-      >
-        Behavior Atlas
-      </button>
-    </div>
-  );
-  */
-
   // Render insights section with progressive loading
   const renderInsights = () => {
     if (isInitialRender) {
@@ -440,8 +428,8 @@ export default function Dashboard() {
         <div className={styles.insightsList}>
           {insights.map((insight, index) => (
             <InsightCard
-              key={`${insight.insight_id || index}`}
-              description={insight.insight_text || insight.description || "No description available"}
+              key={`${insight.insight_id || index}-${index}`}
+              description={insight.insight_text || "No description available"}
               insight_id={insight.insight_id || `insight-${index}`}
             />
           ))}
@@ -456,11 +444,6 @@ export default function Dashboard() {
     if (loading && isInitialRender) {
       return (
         <>
-          {/* COMMENTED: Render insight filter tabs here too, but disabled 
-          <div className={`${styles.insightTabsWrapper} ${styles.disabled}`}>
-            {renderInsightFilterTabs()}
-          </div>
-          */}
           {renderSkeletonInsights()}
         </>
       );
@@ -469,11 +452,6 @@ export default function Dashboard() {
     // Otherwise render insights section with its own loading state
     return (
       <>
-        {/* COMMENTED: Add insight filter tabs 
-        <div className={styles.insightTabsWrapper}>
-          {renderInsightFilterTabs()}
-        </div>
-        */}
         {renderInsights()}
       </>
     );
@@ -498,24 +476,17 @@ export default function Dashboard() {
                 {activeTab === "insights" && (
                   <>
                     {renderInsightsContent()}
-                    <GetMetrics 
-                      selectedTime={selectedTime} 
-                      onTimeChange={handleTimeChange}
-                      initialDateFilter={globalDateFilter} // Pass global format date filter
-                    />
                   </>
                 )}
               </DashboardTabs>
             </div>
             <div className={styles.filterContainer}>
-            <div className={styles.filterContainer}>
-  <TabFilter 
-    selected={selectedTime} 
-    onChange={handleTimeChange} 
-    disabled={activeTab !== "overview"}
-    readOnly={activeTab === "insights"}
-  />
-</div>
+              <TabFilter 
+                selected={selectedTime} 
+                onChange={handleTimeChange} 
+                disabled={activeTab !== "overview"}
+                readOnly={activeTab === "insights"}
+              />
             </div>
           </div>
         </main>

@@ -4,14 +4,15 @@ import styles from "../../../styles/GetMetrics.module.css";
 import GraphDisplay from "../analysis/GraphDisplay";
 import { useAuth } from "../../context/AuthContext";
 
-// UPDATED: Added new props for specific metric, metric type, readonly mode, and initialDateFilter
+// UPDATED: Added new props for specific metric, metric type, readonly mode, initialDateFilter, and hideSkeletons
 const GetMetrics = ({ 
   selectedTime, 
   onTimeChange, 
   specificMetric = null, 
   specificMetricType = null, 
   readOnly = false,
-  initialDateFilter = null // NEW: Added prop to accept API date filter directly
+  initialDateFilter = null, // NEW: Added prop to accept API date filter directly
+  hideSkeletons = false // NEW: Added prop to hide skeletons during loading
 }) => {
   const { userId } = useAuth();
   
@@ -443,16 +444,19 @@ const GetMetrics = ({
     );
   };
 
+  // UPDATED: Modified return statement to handle hideSkeletons prop
   return (
     <div className={styles.metricsGraphContainer}>
       {/* UPDATED: Only show section title in non-readonly mode */}
       {!readOnly && <h3 className={styles.sectionTitle}>Metrics Visualization</h3>}
       
       {isLoading ? (
-        // Show skeleton loading state
-        <div className={styles.skeletonContainer}>
-          {renderSkeletonGraphs()}
-        </div>
+        // UPDATED: Show skeleton loading state only if not hidden
+        !hideSkeletons ? (
+          <div className={styles.skeletonContainer}>
+            {renderSkeletonGraphs()}
+          </div>
+        ) : <div className={styles.hiddenLoading}></div> // Empty div when loading but skeletons are hidden
       ) : error ? (
         // Show error state
         <div className={styles.errorState}>{error}</div>

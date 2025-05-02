@@ -3,8 +3,10 @@ import React, { useState, useEffect } from "react";
 import { Users, Target, TrendingUp, Clock } from "lucide-react";
 import styles from "../../../styles/Overview.module.css";
 import { useAuth } from "../../context/AuthContext";
+// ADDED: Import GetMetrics component
+import GetMetrics from "./GetMetrics";
 
-const Overview = ({ selectedTime, apiDateFilter }) => {
+const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => { // UPDATED: Added globalDateFilter prop
   const { userId } = useAuth();
   
   // State for storing the metrics data
@@ -307,7 +309,7 @@ const Overview = ({ selectedTime, apiDateFilter }) => {
           value: "N/A",
           change: "0%",
           isPositive: true,
-          icon: fallbackIcon
+icon: fallbackIcon
         };
       }
       
@@ -333,6 +335,48 @@ const Overview = ({ selectedTime, apiDateFilter }) => {
         ))}
       </div>
       {error && <div className={styles.errorMessage}>{error}</div>}
+      
+      {/* ADDED: Section to display graphs for each metric using GetMetrics */}
+      <div className={styles.overviewGraphsContainer}>
+        {/* Display DAU Graph - first graph shows skeletons */}
+        <GetMetrics 
+          selectedTime={selectedTime}
+          specificMetric="dau"
+          specificMetricType="line"
+          readOnly={true}
+          initialDateFilter={globalDateFilter}
+        />
+        
+        {/* UPDATED: Hide skeletons for the other graphs */}
+        <GetMetrics 
+          selectedTime={selectedTime}
+          specificMetric="classic_retention"
+          specificMetricType="multiline"
+          readOnly={true}
+          initialDateFilter={globalDateFilter}
+          hideSkeletons={true} // ADDED: Hide skeletons for this component
+        />
+        
+        {/* UPDATED: Hide skeletons for this graph too */}
+        <GetMetrics 
+          selectedTime={selectedTime}
+          specificMetric="new_players"
+          specificMetricType="line"
+          readOnly={true}
+          initialDateFilter={globalDateFilter}
+          hideSkeletons={true} // ADDED: Hide skeletons for this component
+        />
+        
+        {/* UPDATED: Hide skeletons for this graph too */}
+        <GetMetrics 
+          selectedTime={selectedTime}
+          specificMetric="avg_session_length"
+          specificMetricType="line"
+          readOnly={true}
+          initialDateFilter={globalDateFilter}
+          hideSkeletons={true} // ADDED: Hide skeletons for this component
+        />
+      </div>
     </div>
   );
 };
