@@ -329,11 +329,12 @@ export default function Dashboard() {
     }
   }, [activeTab, globalDateFilter]);
 
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    // Update URL without full page reload
-    router.push(`/dashboard?tab=${tab}`, { shallow: true });
-  };
+ // FIXED: Added 'static' flag by using React.useCallback
+const handleTabChange = React.useCallback((tab) => {
+  setActiveTab(tab);
+  // Update URL without full page reload
+  router.push(`/dashboard?tab=${tab}`, { shallow: true });
+}, [router]); // Added dependency array
 
   // Effect to handle authentication only
   useEffect(() => {

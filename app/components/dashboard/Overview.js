@@ -57,25 +57,26 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => { // UPD
     }
   };
 
-  // Fetch metrics data from API
-  const fetchMetricsData = async () => {
-    try {
-      setIsLoading(true);
-      
-      if (!apiDateFilter || !apiDateFilter.start_date || !apiDateFilter.end_date) {
-        console.log("Overview - Invalid date filter:", apiDateFilter);
-        return;
-      }
-      
-      // Create a cache key based on date filter
-      const dateFilterStr = JSON.stringify(apiDateFilter);
-      const cacheKey = `overview_metrics_cache_${dateFilterStr}`;
-      
-      console.log('Overview - Using cache key:', cacheKey);
-      
-      // Check cache first
-      const cachedMetrics = localStorage.getItem(cacheKey);
-      if (cachedMetrics) {
+// Fetch metrics data from API
+const fetchMetricsData = async () => {
+  try {
+    // UPDATED: Set loading state to true immediately when fetch starts
+    setIsLoading(true);
+    setMetricsData(null); // Clear current data to show loading state
+    
+    if (!apiDateFilter || !apiDateFilter.start_date || !apiDateFilter.end_date) {
+      console.log("Overview - Invalid date filter:", apiDateFilter);
+      return;
+    }
+    
+    // Create a cache key based on date filter
+    const dateFilterStr = JSON.stringify(apiDateFilter);
+    const cacheKey = `overview_metrics_cache_${dateFilterStr}`;
+    
+    // Check cache first
+    const cachedMetrics = localStorage.getItem(cacheKey);
+    // Rest of the function...
+          if (cachedMetrics) {
         const { data: cachedMetricsData, timestamp } = JSON.parse(cachedMetrics);
         if (Date.now() - timestamp < CACHE_DURATION) {
           console.log('Overview - Loading metrics from cache for filter:', apiDateFilter);
