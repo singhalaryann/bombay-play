@@ -8,66 +8,95 @@
 
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 24px;
   width: 100%;
 }
 
 .statCard {
-  background: rgba(18, 18, 18, 0.4);
+  background: #131313;
   border-radius: 12px;
-  padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 24px;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Outer glow border - same as Analytics glassBox */
+.statCard::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  padding: 1px;
+  background: linear-gradient(
+    -100deg,
+    rgba(255, 255, 255, 0.15),
+    rgba(255, 255, 255, 0.03)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 .statCard:hover {
-  background: rgba(18, 18, 18, 0.5);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: #1a1a1a;
   transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
 .statHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .statHeader h3 {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 14px;
-  font-weight: 400;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
 }
 
 .statIcon {
   color: #82FF83;
-  opacity: 0.8;
+  opacity: 0.9;
+  width: 24px;
+  height: 24px;
 }
 
 .statValue {
   color: #FFFFFF;
-  font-size: 28px;
-  font-weight: 500;
-  margin-bottom: 8px;
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  letter-spacing: -0.5px;
 }
 
 .statChange {
   font-size: 14px;
   font-weight: 500;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: rgba(23, 23, 23, 0.6);
 }
 
 .positive {
   color: #82FF83;
+  background: rgba(130, 255, 131, 0.1);
 }
 
 .negative {
   color: #FF8282;
+  background: rgba(255, 130, 130, 0.1);
 }
 
 .achievementsSection {
@@ -147,7 +176,14 @@
 /* Responsive Adjustments */
 @media (max-width: 1280px) {
   .statsGrid {
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
   }
 }
@@ -158,16 +194,20 @@
   }
 
   .statsGrid {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }
 
   .statCard {
-    padding: 16px;
+    padding: 20px;
   }
 
   .statValue {
-    font-size: 24px;
+    font-size: 26px;
+  }
+
+  .statHeader h3 {
+    font-size: 14px;
   }
 
   .achievementsSection {
@@ -195,11 +235,17 @@
   }
 
   .statCard {
-    padding: 14px;
+    padding: 18px;
   }
 
   .statValue {
-    font-size: 22px;
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
+
+  .statChange {
+    padding: 4px 10px;
+    font-size: 13px;
   }
 
   .achievementsSection {

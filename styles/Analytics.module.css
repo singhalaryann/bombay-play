@@ -1,24 +1,20 @@
-/* Container takes full viewport height */
 .container {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #050505 0%, #0a0a0a 100%);
+  background: #050505;
   overflow: hidden;
-  transition: background 0.3s ease;
 }
 
-/* Main layout with sidebar and content area */
 .mainLayout {
   display: flex;
-  flex: 1;
+  height: calc(100vh - 64px);
   width: 100%;
-  background: rgba(5, 5, 5, 0.8);
 }
 
-/* Main content area styling */
 .mainContent {
   flex: 1;
+  height: 100%;
   overflow-y: auto;
   padding: 20px;
 }
@@ -81,7 +77,6 @@
   -webkit-backdrop-filter: blur(20px);
   display: flex;
   flex-direction: column;
-  border: 1px solid rgba(130, 255, 131, 0.1);
   transition: all 0.3s ease;
 }
 
@@ -107,22 +102,6 @@
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
-}
-
-/* Top gradient line */
-.glassBox::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(130, 255, 131, 0.2),
-    transparent
-  );
 }
 
 /* Adds margin to elements */

@@ -666,7 +666,7 @@ const TabFilter = ({ selected, onChange, disabled, readOnly }) => {
           type="button"
         >
           <Calendar size={16} className={styles.calendarIcon} />
-          {selected}
+          <span className={styles.dateText}>{selected}</span>
           <ChevronDown size={16} />
         </button>
         

@@ -73,6 +73,7 @@
   border-radius: 12px;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  margin-top: 14px;
 }
 
 /* Insights Section */
