@@ -11,7 +11,8 @@ const DashboardTabs = ({
   children,
   experimentContent,
   selectedTime,
-  apiDateFilter
+  apiDateFilter,
+  globalDateFilter
 }) => {
   return (
     <div className={styles.tabContainer}>
@@ -61,14 +62,18 @@ const DashboardTabs = ({
         </button>
         */}
       </div>
-      <div className={styles.tabContent}>
-        {activeTab === "insights" 
-          ? children
-          : activeTab === "overview" 
-            ? <Overview selectedTime={selectedTime} apiDateFilter={apiDateFilter} />
-            : experimentContent
-        }
-      </div>
+<div className={styles.tabContent}>
+{activeTab === "insights"
+ ? children
+ : activeTab === "overview"
+ ? <Overview 
+     selectedTime={selectedTime} 
+     apiDateFilter={apiDateFilter} 
+     globalDateFilter={globalDateFilter} // ADDED: Pass globalDateFilter prop to Overview
+   />
+ : experimentContent
+}
+</div>
     </div>
   );
 };

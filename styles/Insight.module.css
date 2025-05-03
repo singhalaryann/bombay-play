@@ -27,6 +27,8 @@
   padding: 24px;
   position: relative;
   overflow: hidden;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .insightSection::after {
@@ -61,11 +63,11 @@
 }
 
 .insightTitle {
-  color: #FFFFFF;
+  color: #CDCDCB;
   font-size: 18px;
   font-weight: 600;
   margin: 0;
-  line-height: 1.4;
+  line-height: 1.5;
   flex: 1;
 }
 
@@ -98,7 +100,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 12px;
+  margin-top: 16px;
   gap: 20px;
 }
 
@@ -129,6 +131,7 @@
 .analyseButton:hover {
   background: #98FF98;
   transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(130, 255, 131, 0.2);
 }
 
 .iconWrapper {
@@ -144,6 +147,110 @@
   height: 100%;
 }
 
+/* Insights List Styles */
+.insightsList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.insightItem {
+  background: rgba(18, 18, 18, 0.5);
+  border-radius: 12px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.insightItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.insightItem::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  padding: 1px;
+  background: linear-gradient(
+    -100deg,
+    rgba(255, 255, 255, 0.4),
+    rgba(255, 255, 255, 0.03)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.insightItemHeader {
+  margin-bottom: 14px;
+}
+
+.insightItemTitle {
+  color: #82FF83;
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+.insightItemText {
+  color: #CDCDCB;
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0 0 20px 0;
+}
+
+/* Show Graphs Button */
+.showGraphsButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(130, 255, 131, 0.1);
+  color: #82FF83;
+  border: 1px solid rgba(130, 255, 131, 0.2);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: fit-content;
+  margin-bottom: 4px;
+}
+
+.showGraphsButton:hover {
+  background: rgba(130, 255, 131, 0.15);
+  transform: translateY(-1px);
+}
+
+.graphIcon, .chevronIcon {
+  color: #82FF83;
+}
+
+/* Graphs Container */
+.graphsContainer {
+  margin-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 20px;
+}
+
+/* .metricGraphWrapper {
+  margin-bottom: 32px;
+  background: rgba(24, 24, 24, 0.6);
+  border-radius: 10px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+} */
+
 /* No Insight Found State */
 .noInsight {
   width: 100%;
@@ -157,6 +264,7 @@
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(130, 255, 131, 0.1);
+  margin-top: 20px;
 }
 
 .noInsight::after {
@@ -184,20 +292,21 @@
 
 .noInsightContent h3 {
   color: #FFFFFF;
-  font-size: 18px;
-  margin-bottom: 12px;
+  font-size: 20px;
+  margin-bottom: 16px;
 }
 
 .noInsightContent p {
   color: rgba(255, 255, 255, 0.7);
   margin-bottom: 24px;
+  font-size: 15px;
 }
 
 .returnButton {
   background: rgba(255, 255, 255, 0.1);
   color: #FFFFFF;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 10px 20px;
+  padding: 12px 24px;
   border-radius: 8px;
   font-size: 14px;
   cursor: pointer;
@@ -206,6 +315,7 @@
 
 .returnButton:hover {
   background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
 }
 
 /* Dashboard-style Skeleton Animation */
@@ -279,43 +389,71 @@
   border: 1px solid rgba(130, 255, 131, 0.1);
 }
 
-/* Skeleton Graph Title */
-.skeletonGraphTitle {
-  height: 22px;
+/* Skeleton Insights List */
+.skeletonInsightsList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.skeletonInsightItem {
+  background: rgba(18, 18, 18, 0.5);
+  border-radius: 12px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.skeletonInsightTitle {
+  height: 18px;
   width: 40%;
   background: linear-gradient(to right, rgba(255, 255, 255, 0.05) 8%, rgba(255, 255, 255, 0.1) 18%, rgba(255, 255, 255, 0.05) 33%);
   background-size: 2000px 100%;
   animation: shimmer 2s infinite linear;
   border-radius: 4px;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
-/* Skeleton Graph Content */
-.skeletonGraphContent {
-  height: 350px;
+.skeletonInsightText {
+  height: 16px;
   width: 100%;
   background: linear-gradient(to right, rgba(255, 255, 255, 0.05) 8%, rgba(255, 255, 255, 0.1) 18%, rgba(255, 255, 255, 0.05) 33%);
   background-size: 2000px 100%;
   animation: shimmer 2s infinite linear;
-  border-radius: 8px;
-  position: relative;
-  overflow: hidden;
+  border-radius: 4px;
+  margin-bottom: 10px;
 }
 
-.skeletonGraphContent::before {
+.skeletonInsightText::before {
   content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg, 
-    transparent, 
-    rgba(255, 255, 255, 0.1), 
-    transparent
-  );
-  animation: shimmer 1.5s infinite;
+  display: block;
+  height: 16px;
+  width: 85%;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.05) 8%, rgba(255, 255, 255, 0.1) 18%, rgba(255, 255, 255, 0.05) 33%);
+  background-size: 2000px 100%;
+  animation: shimmer 2s infinite linear;
+  border-radius: 4px;
+  margin-top: 12px;
+}
+
+.skeletonInsightText::after {
+  content: '';
+  display: block;
+  height: 16px;
+  width: 70%;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.05) 8%, rgba(255, 255, 255, 0.1) 18%, rgba(255, 255, 255, 0.05) 33%);
+  background-size: 2000px 100%;
+  animation: shimmer 2s infinite linear;
+  border-radius: 4px;
+  margin-top: 12px;
+}
+
+/* Hidden loading state */
+.hiddenLoading {
+  display: none;
 }
 
 /* Custom Scrollbar */
@@ -337,35 +475,6 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Graph Section */
-/* .graphSection {
-  width: 100%;
-  background: rgba(18, 18, 18, 0.5);
-  border-radius: 12px;
-  padding: 24px;
-  position: relative;
-  overflow: hidden;
-  border: 1px solid rgba(130, 255, 131, 0.1);
-}
-
-.graphSection::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  padding: 1px;
-  background: linear-gradient(
-    -100deg,
-    rgba(255, 255, 255, 0.4),
-    rgba(255, 255, 255, 0.03)
-  );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-} */
-
 /* No Data State */
 .noData {
   width: 100%;
@@ -375,10 +484,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 300px;
+  min-height: 200px;
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(130, 255, 131, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 15px;
 }
 
 .noData::after {
@@ -413,7 +524,7 @@
   
   .filterContainer {
     margin-left: 0;
-    margin-top: 8px;
+    margin-top: 10px;
   }
   
   .actionRow {
@@ -426,6 +537,15 @@
     width: 100%;
     justify-content: center;
   }
+  
+  .showGraphsButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .insightItem {
+    padding: 20px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -433,9 +553,16 @@
     padding: 16px;
   }
   
-  .insightSection,
-  .graphSection {
+  .insightSection {
     padding: 20px;
+  }
+  
+  .insightItem {
+    padding: 20px;
+  }
+
+  .metricGraphWrapper {
+    padding: 12px;
   }
 }
 
@@ -444,13 +571,20 @@
     padding: 12px;
   }
   
-  .insightSection,
-  .graphSection {
+  .insightSection {
+    padding: 16px;
+  }
+  
+  .insightItem {
     padding: 16px;
   }
   
   .insightTitle {
     font-size: 16px;
+  }
+
+  .insightItemTitle {
+    font-size: 15px;
   }
   
   .dateFilterButton {
@@ -462,22 +596,18 @@
     font-size: 13px;
   }
   
-  .analyseButton {
+  .analyseButton,
+  .showGraphsButton {
     padding: 10px 16px;
     font-size: 13px;
   }
   
-  .skeletonGraphContent {
-    height: 220px;
+  .insightItemText {
+    font-size: 13px;
   }
-  
-  .insightSkeletonTitle {
-    height: 18px;
-    width: 90%;
-  }
-  
-  .insightSkeletonFilter {
-    height: 32px;
-    width: 100%;
+
+  .metricGraphWrapper {
+    padding: 10px;
+    margin-bottom: 24px;
   }
 }

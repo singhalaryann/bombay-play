@@ -8,6 +8,7 @@ import InsightCard from "../components/dashboard/InsightCard";
 import DashboardTabs from "../components/dashboard/DashboardTabs";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
+import { Clock } from "lucide-react";
 
 // Import your separate ExperimentContent component
 import ExperimentContent from "../components/dashboard/ExperimentContent";
@@ -41,6 +42,9 @@ export default function Dashboard() {
   // State variables for progressive loading
   const [insightsLoading, setInsightsLoading] = useState(true);
   const [isInitialRender, setIsInitialRender] = useState(true);
+  
+  // State for pending insights count
+  const [pendingInsightsCount, setPendingInsightsCount] = useState(0);
 
   // Fixed game ID for insights as provided
   const GAME_ID = "ludogoldrush";
@@ -191,6 +195,8 @@ export default function Dashboard() {
         
         // Check for cached insights data
         const cachedInsightsData = localStorage.getItem(`dashboard_insights_cache_${userId}`);
+        // Add cached pending count
+        const cachedPendingCount = localStorage.getItem(`dashboard_pending_insights_count_${userId}`);
         
         let shouldFetchInsights = true;
         
@@ -202,6 +208,15 @@ export default function Dashboard() {
             setInsightsLoading(false);
             shouldFetchInsights = false;
             console.log('Loading insights from cache');
+          }
+        }
+        
+        // Check if we have valid cached pending count
+        if (cachedPendingCount) {
+          const parsedCache = JSON.parse(cachedPendingCount);
+          if (Date.now() - parsedCache.timestamp < CACHE_DURATION) {
+            setPendingInsightsCount(parsedCache.count);
+            console.log('Loading pending insights count from cache');
           }
         }
         
@@ -227,16 +242,23 @@ export default function Dashboard() {
     }
   }, [userId]);
 
-  // Function to fetch insights data independently with game_id
+  // Function to fetch insights data from API with proper processing
   const fetchInsightsData = async () => {
     // Check cache first
     const cachedInsightsData = localStorage.getItem(`dashboard_insights_cache_${userId}`);
-    if (cachedInsightsData) {
+    const cachedPendingCount = localStorage.getItem(`dashboard_pending_insights_count_${userId}`);
+    
+    if (cachedInsightsData && cachedPendingCount) {
       const parsedCache = JSON.parse(cachedInsightsData);
-      if (Date.now() - parsedCache.timestamp < CACHE_DURATION) {
-        console.log('Loading insights from cache');
+      const parsedPendingCache = JSON.parse(cachedPendingCount);
+      
+      if (Date.now() - parsedCache.timestamp < CACHE_DURATION &&
+          Date.now() - parsedPendingCache.timestamp < CACHE_DURATION) {
+        console.log('Loading insights and pending count from cache');
         setInsights(parsedCache.data);
+        setPendingInsightsCount(parsedPendingCache.count);
         setInsightsLoading(false);
+        setLoading(false);
         return;
       }
     }
@@ -267,39 +289,49 @@ export default function Dashboard() {
 
       const data = await response.json();
       
-      // Process insights data - extract insights from detailed_insights_by_lens
+      // Process insights data to extract successful insights and count pending ones
       if (data.insights && data.insights.length > 0) {
         console.log('Received insights data:', data.insights);
         
-        // Transform the data to extract just the insights we need
-        const processedInsights = [];
+        const successfulInsights = [];
+        let pendingCount = 0;
         
+        // Process each insight in the response
         data.insights.forEach(insightItem => {
-          if (insightItem.insight_payload && 
-              insightItem.insight_payload.detailed_insights_by_lens) {
-            
-            insightItem.insight_payload.detailed_insights_by_lens.forEach(lens => {
-              if (lens.insight) {
-                processedInsights.push({
-                  insight_id: insightItem.insight_id,
-                  insight_text: lens.insight
-                });
-              }
+          // Check if status is "success" or "pending"
+          if (insightItem.status === "success" && insightItem.headline) {
+            // Add successful insights with headline text
+            successfulInsights.push({
+              insight_id: insightItem.insight_id,
+              insight_text: insightItem.headline // Use headline field instead of lens.insight
             });
+          } else if (insightItem.status === "pending") {
+            // Count pending insights
+            pendingCount++;
           }
         });
         
-        console.log('Processed insights:', processedInsights);
-        setInsights(processedInsights);
+        console.log('Processed successful insights:', successfulInsights);
+        console.log('Pending insights count:', pendingCount);
+        
+        setInsights(successfulInsights);
+        setPendingInsightsCount(pendingCount);
         
         // Cache insights data
         localStorage.setItem(`dashboard_insights_cache_${userId}`, JSON.stringify({
-          data: processedInsights,
+          data: successfulInsights,
+          timestamp: Date.now()
+        }));
+        
+        // Cache pending count
+        localStorage.setItem(`dashboard_pending_insights_count_${userId}`, JSON.stringify({
+          count: pendingCount,
           timestamp: Date.now()
         }));
       } else {
         console.log('No insights data found in the response');
         setInsights([]);
+        setPendingInsightsCount(0);
       }
       
       setInsightsLoading(false);
@@ -308,6 +340,7 @@ export default function Dashboard() {
     } catch (error) {
       console.error('Error fetching insights data:', error);
       setInsights([]);
+      setPendingInsightsCount(0);
       setInsightsLoading(false);
       setLoading(false);
     }
@@ -329,12 +362,24 @@ export default function Dashboard() {
     }
   }, [activeTab, globalDateFilter]);
 
- // FIXED: Added 'static' flag by using React.useCallback
-const handleTabChange = React.useCallback((tab) => {
-  setActiveTab(tab);
-  // Update URL without full page reload
-  router.push(`/dashboard?tab=${tab}`, { shallow: true });
-}, [router]); // Added dependency array
+  // Handle tab change function
+  const handleTabChange = React.useCallback((tab) => {
+    setActiveTab(tab);
+    
+    // Force refetch insights data with current globalDateFilter when switching to insights tab
+    if (tab === "insights") {
+      // Clear cache to ensure fresh data with current filter
+      localStorage.removeItem(`dashboard_insights_cache_${userId}`);
+      localStorage.removeItem(`dashboard_pending_insights_count_${userId}`);
+      
+      // This will trigger the useEffect that calls fetchInsightsData
+      // because we're creating a new reference for globalDateFilter
+      setGlobalDateFilter({...globalDateFilter});
+    }
+    
+    // Update URL without full page reload
+    router.push(`/dashboard?tab=${tab}`, { shallow: true });
+  }, [router, globalDateFilter, userId]);
 
   // Effect to handle authentication only
   useEffect(() => {
@@ -410,7 +455,7 @@ const handleTabChange = React.useCallback((tab) => {
     </div>
   );
 
-  // Render insights section with progressive loading
+  // UPDATED: Render insights section with processing of pending insights
   const renderInsights = () => {
     if (isInitialRender) {
       return renderSkeletonInsights();
@@ -420,7 +465,32 @@ const handleTabChange = React.useCallback((tab) => {
       return renderSkeletonInsights();
     }
 
-    if (insights.length === 0) {
+    // Display message when no successful insights but has pending ones
+    if (insights.length === 0 && pendingInsightsCount > 0) {
+      return (
+        <div className={styles.insightsSection}>
+          {/* IMPROVED: Using a more centered and visually appealing display for pending insights */}
+          <div className={styles.pendingInsightsFullContainer}>
+            <div className={styles.pendingInsightsIcon}>
+              <Clock size={32} className={styles.pendingIcon} />
+            </div>
+            <h3 className={styles.pendingInsightsTitle}>Insights in Progress</h3>
+            <p className={styles.pendingInsightsText}>
+              {pendingInsightsCount} {pendingInsightsCount === 1 ? 'insight' : 'insights'} pending analysis.
+            </p>
+            <button 
+              className={styles.pendingGenerateButton}
+              onClick={() => console.log("Generate insights clicked")}
+            >
+              Generate Insights
+            </button>
+          </div>
+        </div>
+      );
+    }
+    
+    // Display message when no insights at all
+    if (insights.length === 0 && pendingInsightsCount === 0) {
       return <div className={styles.noData}>No insights available</div>;
     }
 
@@ -435,6 +505,22 @@ const handleTabChange = React.useCallback((tab) => {
             />
           ))}
         </div>
+        
+        {/* ADDED: Enhanced pending insights section with Generate button */}
+        {pendingInsightsCount > 0 && (
+          <div className={styles.pendingInsightsContainer}>
+            <div className={styles.pendingInsightsHeader}>
+              <Clock size={20} className={styles.pendingHeaderIcon} />
+              <span className={styles.pendingCount}>{pendingInsightsCount} insights pending</span>
+            </div>
+            <button 
+              className={styles.generateInsightsButton}
+              onClick={() => console.log("Generate insights clicked")}
+            >
+              <span>Generate Insights</span>
+            </button>
+          </div>
+        )}
       </div>
     );
   };

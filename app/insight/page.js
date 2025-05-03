@@ -5,9 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/layout/Header';
 import Sidebar from '../components/layout/Sidebar';
-// UPDATED: Import GetMetrics instead of GraphDisplay directly
 import GetMetrics from '../components/dashboard/GetMetrics';
-import { Calendar } from 'lucide-react';
+import { Calendar, ChevronDown, ChevronUp, BarChart2 } from 'lucide-react';
 import Image from 'next/image';
 import styles from '../../styles/Insight.module.css';
 
@@ -17,12 +16,12 @@ export default function InsightPage() {
   const { userId } = useAuth();
   const [loading, setLoading] = useState(true);
   const [insight, setInsight] = useState(null);
-  // UPDATED: State to store the metric name and date filter
-  const [metricInfo, setMetricInfo] = useState({
-    metricName: '',
-    dateFilter: null,
-    metricType: ''
-  });
+  const [dateFilter, setDateFilter] = useState(null);
+  const [gameId, setGameId] = useState('ludogoldrush');
+  const [userIds, setUserIds] = useState([]);
+  
+  // State to track which insights have their graphs visible
+  const [visibleGraphs, setVisibleGraphs] = useState({});
 
   useEffect(() => {
     const fetchInsightData = async () => {
@@ -39,7 +38,7 @@ export default function InsightPage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            user_id: userId,
+            // user_id: userId,
             game_id: 'ludogoldrush',
             insight_ids: [insightId],
           }),
@@ -48,28 +47,24 @@ export default function InsightPage() {
         console.log('✅ API response:', data);
         if (data.insights && data.insights.length > 0) {
           const selectedInsight = data.insights[0];
+          console.log('Insight data:', selectedInsight);
           setInsight(selectedInsight);
           
-          // UPDATED: Extract metric and date_filter information
-          if (selectedInsight.query && selectedInsight.query[0]) {
-            const { metric, date_filter, metric_type } = selectedInsight.query[0];
-            console.log("Found metric info:", { metric, date_filter, metric_type });
-            
-            // Set the metric info to pass to GetMetrics
-            setMetricInfo({
-              metricName: metric,
-              dateFilter: date_filter,
-              metricType: metric_type || ''
-            });
+          // Extract query information
+          if (selectedInsight.query) {
+            console.log('Query data:', selectedInsight.query);
+            setDateFilter(selectedInsight.query.date_filter || null);
+            setGameId(selectedInsight.query.game_id || 'ludogoldrush');
+            setUserIds(selectedInsight.query.user_ids || []);
           }
         } else {
           setInsight(null);
-          setMetricInfo({ metricName: '', dateFilter: null, metricType: '' });
+          setDateFilter(null);
         }
       } catch (error) {
         console.error('❌ Error fetching insight data:', error);
         setInsight(null);
-        setMetricInfo({ metricName: '', dateFilter: null, metricType: '' });
+        setDateFilter(null);
       } finally {
         setLoading(false);
       }
@@ -82,6 +77,15 @@ export default function InsightPage() {
     const insightId = searchParams.get('id');
     console.log('Navigating to ideas with insight:', insightId);
     router.push(`/ideas?insight=${insightId}`);
+  };
+
+  // Toggle visibility of graphs for a specific lens
+  const toggleGraphVisibility = (lensIndex) => {
+    console.log('Toggling graph visibility for lens:', lensIndex);
+    setVisibleGraphs(prev => ({
+      ...prev,
+      [lensIndex]: !prev[lensIndex]
+    }));
   };
 
   // Format date filter for display
@@ -119,9 +123,13 @@ export default function InsightPage() {
         </div>
       </div>
 
-      <div className={styles.graphSection}>
-        <div className={styles.skeletonGraphTitle}></div>
-        <div className={styles.skeletonGraphContent}></div>
+      <div className={styles.skeletonInsightsList}>
+        {[1, 2, 3].map((index) => (
+          <div key={index} className={styles.skeletonInsightItem}>
+            <div className={styles.skeletonInsightTitle}></div>
+            <div className={styles.skeletonInsightText}></div>
+          </div>
+        ))}
       </div>
     </>
   );
@@ -157,12 +165,12 @@ export default function InsightPage() {
               <div className={styles.insightSection}>
                 <div className={styles.insightHeader}>
                   <div className={styles.insightTitleContainer}>
-                    <h2 className={styles.insightTitle}>{insight.insight_text}</h2>
-                    {metricInfo.dateFilter && (
+                    <h2 className={styles.insightTitle}>{insight.headline || insight.insight_text}</h2>
+                    {dateFilter && (
                       <div className={styles.filterContainer}>
                         <div className={styles.dateFilterButton}>
                           <Calendar size={16} className={styles.calendarIcon} />
-                          <span>{formatDateFilter(metricInfo.dateFilter)}</span>
+                          <span>{formatDateFilter(dateFilter)}</span>
                         </div>
                       </div>
                     )}
@@ -189,19 +197,52 @@ export default function InsightPage() {
                 </div>
               </div>
 
-              {/* UPDATED: Use direct API date filter instead of converting through selectedTime */}
-              {metricInfo.metricName && (
-  // <div className={styles.graphSection}> ← Comment out this line
-    <GetMetrics 
-      selectedTime={null}
-      onTimeChange={() => {}}
-      specificMetric={metricInfo.metricName}
-      specificMetricType={metricInfo.metricType}
-      readOnly={true}
-      initialDateFilter={metricInfo.dateFilter}
-    />
-  // </div> ← Comment out this line
-)}
+              {insight.insight_payload && insight.insight_payload.detailed_insights_by_lens && (
+                <div className={styles.insightsList}>
+                  {insight.insight_payload.detailed_insights_by_lens.map((lens, index) => (
+                    <div key={index} className={styles.insightItem}>
+                      <div className={styles.insightItemHeader}>
+                        {/* CHANGED: Show hidden_signal instead of lens_name */}
+                        <h3 className={styles.insightItemTitle}>{lens.hidden_signal}</h3>
+                      </div>
+                      <p className={styles.insightItemText}>{lens.insight}</p>
+                      
+                      <button 
+                        className={styles.showGraphsButton}
+                        onClick={() => toggleGraphVisibility(index)}
+                      >
+                        <BarChart2 size={18} className={styles.graphIcon} />
+                        <span>{visibleGraphs[index] ? 'Hide Graphs' : 'Show Graphs'}</span>
+                        {visibleGraphs[index] ? (
+                          <ChevronUp size={16} className={styles.chevronIcon} />
+                        ) : (
+                          <ChevronDown size={16} className={styles.chevronIcon} />
+                        )}
+                      </button>
+                      
+                      {visibleGraphs[index] && lens.metrics_examined && lens.metrics_examined.length > 0 && (
+                        <div className={styles.graphsContainer}>
+                          {lens.metrics_examined.map((metric, metricIndex) => (
+                            <div key={metricIndex} className={styles.metricGraphWrapper}>
+                              {/* REMOVED: The metric name heading */}
+                              <GetMetrics 
+                                selectedTime={null}
+                                onTimeChange={() => {}}
+                                specificMetric={metric}
+                                // REMOVED: specificMetricType="line"
+                                readOnly={true}
+                                initialDateFilter={dateFilter}
+                                // ADDED: Only show skeletons for the first metric
+                                hideSkeletons={metricIndex > 0}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </>
           )}
         </main>

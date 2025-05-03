@@ -133,6 +133,115 @@
   width: 100%;
 }
 
+/* Pending insights container styles (when some insights are available) */
+.pendingInsightsContainer {
+  background: rgba(18, 18, 18, 0.5);
+  border-radius: 12px;
+  margin-top: 20px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.pendingInsightsHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pendingHeaderIcon {
+  color: #ffb800;
+}
+
+.pendingCount {
+  font-size: 15px;
+  color: #ffffff;
+}
+
+.generateInsightsButton {
+  background: rgba(18, 18, 18, 0.7);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.generateInsightsButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.pendingIcon {
+  color: #ffb800;
+}
+
+/* IMPROVED: Full-screen pending insights display (when no insights are available) */
+.pendingInsightsFullContainer {
+  background: rgba(18, 18, 18, 0.7);
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-height: 300px;
+  justify-content: center;
+}
+
+.pendingInsightsIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255, 184, 0, 0.1);
+  margin-bottom: 8px;
+}
+
+.pendingInsightsTitle {
+  color: #FFFFFF;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.pendingInsightsText {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 16px;
+  margin: 0 0 8px 0;
+}
+
+.pendingGenerateButton {
+  background: rgba(130, 255, 131, 0.1);
+  border: 1px solid rgba(130, 255, 131, 0.3);
+  color: #82FF83;
+  font-weight: 500;
+  padding: 12px 28px;
+  font-size: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 12px;
+}
+
+.pendingGenerateButton:hover {
+  background: rgba(130, 255, 131, 0.15);
+  transform: translateY(-1px);
+}
+
 /* Custom Scrollbar (for mainContent) */
 .mainContent::-webkit-scrollbar {
   width: 6px;
@@ -190,66 +299,7 @@
   font-size: 14px;
 }
 
-/* COMMENTED OUT: Insight Tabs Container */
-/*
-.insightTabsWrapper {
-  margin: 14px 0 16px;
-  position: relative;
-  display: flex;
-}
-
-.insightTabsContainer {
-  display: flex;
-  overflow-x: auto;
-  width: fit-content;
-  background: #161c15f2;
-  border-radius: 12px;
-}
-
-.insightTab {
-  display: flex;
-  align-items: center;
-  padding: 12px 24px;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  border: none;
-  background: transparent;
-}
-
-.insightTab:first-child {
-  border-radius: 12px 0 0 12px;
-}
-
-.insightTab:last-child {
-  border-radius: 0 12px 12px 0;
-}
-
-.insightTab:hover {
-  color: rgba(255, 255, 255, 1);
-}
-
-.activeInsightTab {
-  background: #354030;
-  color: rgba(255, 255, 255, 0.95);
-}
-
-.tabIcon {
-  font-size: 14px;
-  margin-left: 6px;
-  color: #FFC107;
-}
-
-.insightTabsWrapper.disabled {
-  opacity: 0.6;
-  pointer-events: none;
-}
-*/
-
-/* ADDED: Skeleton loading animation */
+/* Skeleton loading animation */
 @keyframes shimmer {
   0% {
     background-position: -1000px 0;
@@ -259,7 +309,7 @@
   }
 }
 
-/* ADDED: Skeleton insight card */
+/* Skeleton insight card */
 .skeletonInsight {
   background: rgba(18, 18, 18, 0.5);
   height: 72px;
@@ -272,7 +322,7 @@
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* ADDED: Skeleton insight content */
+/* Skeleton insight content */
 .skeletonInsightContent {
   height: 18px;
   width: 70%;
@@ -282,7 +332,7 @@
   border-radius: 4px;
 }
 
-/* ADDED: Skeleton insight button */
+/* Skeleton insight button */
 .skeletonInsightButton {
   height: 32px;
   width: 100px;
@@ -291,7 +341,7 @@
   border-radius: 8px;
 }
 
-/* ADDED: Skeleton metric card */
+/* Skeleton metric card */
 .skeletonMetric {
   background: rgba(18, 18, 18, 0.5);
   border-radius: 12px;
@@ -302,7 +352,7 @@
   min-height: 180px;
 }
 
-/* ADDED: Skeleton metric card header */
+/* Skeleton metric card header */
 .skeletonMetricHeader {
   display: flex;
   justify-content: space-between;
@@ -310,7 +360,7 @@
   margin-bottom: 20px;
 }
 
-/* ADDED: Skeleton metric title */
+/* Skeleton metric title */
 .skeletonMetricTitle {
   height: 18px;
   width: 60%;
@@ -320,7 +370,7 @@
   border-radius: 4px;
 }
 
-/* ADDED: Skeleton metric icon */
+/* Skeleton metric icon */
 .skeletonMetricIcon {
   height: 24px;
   width: 24px;
@@ -328,7 +378,7 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* ADDED: Skeleton metric value */
+/* Skeleton metric value */
 .skeletonMetricValue {
   height: 48px;
   width: 50%;
@@ -339,7 +389,7 @@
   border-radius: 4px;
 }
 
-/* ADDED: Skeleton metric subtitle */
+/* Skeleton metric subtitle */
 .skeletonMetricSubtitle {
   height: 14px;
   width: 90%;
@@ -356,6 +406,13 @@
   }
   .metricsGrid {
     gap: 20px;
+  }
+  .pendingInsightsContainer {
+    flex-direction: row;
+    padding: 14px;
+  }
+  .pendingInsightsFullContainer {
+    padding: 30px 20px;
   }
 }
 
@@ -394,18 +451,6 @@
     flex-direction: column-reverse;
   }
   
-  /* COMMENTED OUT: Responsive mobile styles for insight tabs */
-  /*
-  .insightTabsContainer {
-    gap: 6px;
-  }
-  
-  .insightTab {
-    padding: 6px 12px;
-    font-size: 13px;
-  }
-  */
-  
   .skeletonInsight {
     padding: 12px 16px;
     height: 64px;
@@ -418,6 +463,35 @@
   
   .skeletonMetricValue {
     height: 36px;
+  }
+  
+  .pendingInsightsContainer {
+    flex-direction: column;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  
+  .generateInsightsButton {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .pendingInsightsFullContainer {
+    padding: 24px 16px;
+    min-height: 240px;
+  }
+  
+  .pendingInsightsTitle {
+    font-size: 18px;
+  }
+  
+  .pendingInsightsText {
+    font-size: 14px;
+  }
+  
+  .pendingGenerateButton {
+    width: 100%;
+    max-width: 240px;
   }
 }
 
@@ -448,21 +522,22 @@
   .filterContainer {
     margin-bottom: 12px;
   }
-  
-  /* COMMENTED OUT: Additional responsive mobile styles for insight tabs */
-  /*
-  .insightTabsWrapper {
-    margin: 16px 0 12px;
+  .pendingInsightsContainer {
+    padding: 12px;
   }
-  
-  .insightTabsContainer {
-    gap: 4px;
-    margin-bottom: 12px;
+  .pendingCount {
+    font-size: 14px;
   }
-  
-  .insightTab {
-    padding: 4px 10px;
-    font-size: 12px;
+  .generateInsightsButton {
+    font-size: 13px;
+    padding: 6px 12px;
   }
-  */
+  .pendingInsightsIcon {
+    width: 56px;
+    height: 56px;
+  }
+  .pendingGenerateButton {
+    font-size: 14px;
+    padding: 10px 20px;
+  }
 }
