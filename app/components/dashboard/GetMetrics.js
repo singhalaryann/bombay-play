@@ -12,7 +12,8 @@ const GetMetrics = ({
   specificMetricType = null, 
   readOnly = false,
   initialDateFilter = null, // NEW: Added prop to accept API date filter directly
-  hideSkeletons = false // NEW: Added prop to hide skeletons during loading
+  hideSkeletons = false, // NEW: Added prop to hide skeletons during loading
+  userIds = [] // NEW: Add userIds prop with default empty array
 }) => {
   const { userId } = useAuth();
   
@@ -366,15 +367,17 @@ const GetMetrics = ({
       console.log('GetMetrics - Fetching fresh metrics data with filter:', dateFilter);
       console.log('GetMetrics - Requesting metrics:', metricsToRequest);
       
-      // API request with date_filter and game_id
-      const requestBody = {
-        metrics: metricsToRequest,
-        date_filter: dateFilter,
-        // Only include user_id if it exists in auth context
-        ...(userId && { user_id: userId }),
-        // Include game_id as specified
-        game_id: GAME_ID
-      };
+     // API request with date_filter and game_id
+const requestBody = {
+  metrics: metricsToRequest,
+  date_filter: dateFilter,
+  // Add userIds array to the request if it has values
+  ...(userIds && userIds.length > 0 && { user_ids: userIds }),
+  // Only include user_id if it exists in auth context and userIds is empty
+  ...(userId && (!userIds || userIds.length === 0) && { user_id: userId }),
+  // Include game_id as specified
+  game_id: GAME_ID
+};
       
       console.log('GetMetrics - Full API request payload:', requestBody);
       

@@ -226,15 +226,14 @@ export default function InsightPage() {
                             <div key={metricIndex} className={styles.metricGraphWrapper}>
                               {/* REMOVED: The metric name heading */}
                               <GetMetrics 
-                                selectedTime={null}
-                                onTimeChange={() => {}}
-                                specificMetric={metric}
-                                // REMOVED: specificMetricType="line"
-                                readOnly={true}
-                                initialDateFilter={dateFilter}
-                                // ADDED: Only show skeletons for the first metric
-                                hideSkeletons={metricIndex > 0}
-                              />
+  selectedTime={null}
+  onTimeChange={() => {}}
+  specificMetric={metric}
+  readOnly={true}
+  initialDateFilter={dateFilter}
+  hideSkeletons={metricIndex > 0}
+  userIds={userIds} // Pass the userIds state to GetMetrics
+/>
                             </div>
                           ))}
                         </div>
