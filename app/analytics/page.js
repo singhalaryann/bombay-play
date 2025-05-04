@@ -4,11 +4,15 @@ import Header from "../components/layout/Header";
 import Sidebar from "../components/layout/Sidebar";
 import styles from "../../styles/Analytics.module.css";
 import GraphDisplay from "../components/analysis/GraphDisplay";
-import TabFilter from "../components/dashboard/TabFilter"; // ADDED: Import TabFilter component
-import { useAuth } from "../context/AuthContext"; // ADDED: Import Auth context for userId
+import TabFilter from "../components/dashboard/TabFilter";
+import { useAuth } from "../context/AuthContext";
 
 export default function AnalyticsPage() {
-    const { userId } = useAuth(); // ADDED: Get userId from auth context
+    const { userId } = useAuth();
+    
+    // UPDATED: Check localStorage for previously selected time filter
+    const savedTimeFilter = localStorage.getItem(`analytics_current_filter_${userId}`);
+    const [selectedTime, setSelectedTime] = useState(savedTimeFilter || "30D");
     
     // State for storing graph data received from API
     const [graphData, setGraphData] = useState([]);
@@ -16,11 +20,9 @@ export default function AnalyticsPage() {
     const [isLoading, setIsLoading] = useState(true);
     // Error state to display error messages if API call fails
     const [error, setError] = useState(null);
-    // ADDED: State for selected time filter
-    const [selectedTime, setSelectedTime] = useState("30D");
-    // ADDED: State for date filter to pass to API
+    // State for date filter to pass to API
     const [dateFilter, setDateFilter] = useState({ type: "last", days: 30 });
-    // UPDATED: Added state for metric knowledge data
+    // State for metric knowledge data
     const [metricKnowledge, setMetricKnowledge] = useState({});
 
     // Cache duration: 5 minutes in milliseconds
@@ -43,10 +45,13 @@ export default function AnalyticsPage() {
         // "d1_retention"
     ];
 
-    // ADDED: Handle time filter changes
+    // UPDATED: Handle time filter changes with localStorage persistence
     const handleTimeFilterChange = (newTime) => {
         console.log('Time filter changed to:', newTime);
         setSelectedTime(newTime);
+        
+        // Store current filter in localStorage for page reload
+        localStorage.setItem(`analytics_current_filter_${userId}`, newTime);
         
         // Convert UI time filter to API date_filter format
         let apiDateFilter = { type: "last", days: 30 }; // Default
@@ -104,7 +109,7 @@ export default function AnalyticsPage() {
         setDateFilter(apiDateFilter);
     };
 
-    // ADDED: Helper to format dates for API
+    // Helper to format dates for API
     const formatApiDate = (dateStr) => {
         try {
             // Convert from "Apr 15, 2025" to "DD-MM-YYYY" format
@@ -124,7 +129,17 @@ export default function AnalyticsPage() {
         }
     };
 
-    // UPDATED: Added function to fetch metric knowledge data
+    // ADDED: Effect to restore filter from localStorage on page reload
+    useEffect(() => {
+        // This will run once when the component mounts
+        if (userId && savedTimeFilter) {
+            console.log('Analytics - Restoring saved filter:', savedTimeFilter);
+            // Convert the saved filter to date filter format
+            handleTimeFilterChange(savedTimeFilter);
+        }
+    }, [userId]); // Only run when userId changes or on initial mount
+
+    // Function to fetch metric knowledge data
     const fetchMetricKnowledge = async () => {
         try {
             console.log('Fetching metric knowledge data');
@@ -236,7 +251,7 @@ export default function AnalyticsPage() {
 
             console.log(`Processing metric ${metric.metric_id} as ${metricType} chart`);
             
-            // UPDATED: Use knowledge data description if available
+            // Use knowledge data description if available
             const metricId = metric.metric_id || '';
             const knowledgeInfo = knowledgeData[metricId] || {};
             const description = knowledgeInfo.description || metric.description || '';
@@ -255,7 +270,7 @@ export default function AnalyticsPage() {
                     x_unit: metric.x_unit || "",
                     y_unit: metric.y_unit || "",
                     value_unit: metric.value_unit || "",
-                    status: knowledgeInfo.status || "pending" // UPDATED: Added status
+                    status: knowledgeInfo.status || "pending"
                 };
             } else {
                 return {
@@ -270,18 +285,18 @@ export default function AnalyticsPage() {
                     values: metric.values || [],
                     x_unit: metric.x_unit || "",
                     y_unit: metric.y_unit || "",
-                    status: knowledgeInfo.status || "pending" // UPDATED: Added status
+                    status: knowledgeInfo.status || "pending"
                 };
             }
         });
     };
 
-    // UPDATED: fetchMetricsData now calls fetchMetricKnowledge
+    // fetchMetricsData now calls fetchMetricKnowledge
     const fetchMetricsData = async () => {
         try {
             setIsLoading(true);
             
-            // ADDED: Create a cache key that includes the date filter
+            // Create a cache key that includes the date filter
             const cacheKey = `metrics_cache_${JSON.stringify(dateFilter)}`;
             
             // Check metrics cache first
@@ -291,7 +306,7 @@ export default function AnalyticsPage() {
                 if (Date.now() - timestamp < CACHE_DURATION) {
                     console.log('Loading metrics from cache for filter:', dateFilter);
                     
-                    // UPDATED: Fetch metric knowledge first
+                    // Fetch metric knowledge first
                     const knowledgeData = await fetchMetricKnowledge();
                     
                     // Transform cached data for graphs with knowledge data
@@ -313,7 +328,7 @@ export default function AnalyticsPage() {
             console.log('Fetching fresh metrics data from API with filter:', dateFilter);
             console.log('Requesting metrics:', metricsToRequest);
             
-            // UPDATED: API request now includes date_filter and game_id
+            // API request now includes date_filter and game_id
             const requestBody = {
                 metrics: metricsToRequest,
                 date_filter: dateFilter,
@@ -342,7 +357,7 @@ export default function AnalyticsPage() {
             const metricsData = await response.json();
             console.log('API Response:', metricsData);
             
-            // UPDATED: Fetch metric knowledge after metrics data
+            // Fetch metric knowledge after metrics data
             const knowledgeData = await fetchMetricKnowledge();
             
             // Transform data for visualization components with knowledge data
@@ -370,14 +385,14 @@ export default function AnalyticsPage() {
         }
     };
 
-    // UPDATED: Effect to fetch data when date filter changes
+    // Effect to fetch data when date filter changes
     useEffect(() => {
         fetchMetricsData();
         
         // Refresh data every 30 minutes
         const interval = setInterval(fetchMetricsData, 30 * 60 * 1000);
         return () => clearInterval(interval);
-    }, [dateFilter]); // CHANGED: Added dateFilter dependency
+    }, [dateFilter]); // Added dateFilter dependency
 
     // Skeleton for graph loading
     const renderSkeletonGraphs = () => {
@@ -404,7 +419,7 @@ export default function AnalyticsPage() {
                     <div className={styles.pageHeader}>
                         <h2 className={styles.pageTitle}>Analytics Dashboard</h2>
                         
-                        {/* ADDED: TabFilter component for time selection */}
+                        {/* TabFilter component for time selection */}
                         <div className={styles.filterContainer}>
                             <TabFilter 
                                 selected={selectedTime} 

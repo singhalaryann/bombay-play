@@ -44,8 +44,8 @@ const GetMetrics = ({
       "session_distribution_by_hour", 
       "avg_session_length", 
       // "adaptive_session_length", 
-      "geographical_breakdown", 
-      "device_os_distribution",
+      // "geographical_breakdown", 
+      // "device_os_distribution",
       "session_length_distribution",
       // "d1_retention"
     ];
@@ -55,20 +55,20 @@ const GetMetrics = ({
 
   // FIXED: Reset dateFilter when selectedTime or specificMetric changes
   useEffect(() => {
-    // Skip this effect if initialDateFilter is provided (used in Insight page)
-    if (initialDateFilter) {
-      console.log('GetMetrics - Using provided initialDateFilter:', initialDateFilter);
-      return;
-    }
-
+    // If initialDateFilter is provided and changes, use it directly
+  if (initialDateFilter) {
+    console.log('GetMetrics - Using updated initialDateFilter:', initialDateFilter);
+    setDateFilter(initialDateFilter); // ADDED: Directly update dateFilter when initialDateFilter changes
+    return;
+  }
     console.log('GetMetrics - Time filter changed to:', selectedTime);
     console.log('GetMetrics - For specific metric:', specificMetric);
     
     // FIXED: Only set a new dateFilter if selectedTime actually changes
-    if (!selectedTime) {
-      console.log('GetMetrics - No selectedTime provided, skipping filter update');
-      return;
-    }
+  if (!selectedTime) {
+    console.log('GetMetrics - No selectedTime provided, skipping filter update');
+    return;
+  }
     
     // Convert UI time filter to API date_filter format
     let apiDateFilter = { type: "last", days: 30 }; // Default
@@ -129,9 +129,9 @@ const GetMetrics = ({
     
     // CHANGED: Log more details about the date filter and specific metric
     console.log('GetMetrics - Converted to API date filter:', apiDateFilter);
-    console.log('GetMetrics - Using for specific metric:', specificMetric || 'all metrics');
-    setDateFilter(apiDateFilter);
-  }, [selectedTime, specificMetric, initialDateFilter]); // UPDATED: Added initialDateFilter as dependency
+  console.log('GetMetrics - Using for specific metric:', specificMetric || 'all metrics');
+  setDateFilter(apiDateFilter);
+}, [selectedTime, specificMetric, initialDateFilter]); // Dependencies remain the same
 
   // Helper to format dates for API
   const formatApiDate = (dateStr) => {

@@ -74,6 +74,10 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
 }
 
 /* Insights Section */
@@ -182,6 +186,24 @@
 
 .pendingIcon {
   color: #ffb800;
+}
+
+/* Failed insights container styles */
+.failedInsightsContainer {
+  background: rgba(18, 18, 18, 0.5);
+  border-radius: 12px;
+  margin-top: 20px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.failedCount {
+  font-size: 15px;
+  color: #ff4d4d;
+  margin: 0;
 }
 
 /* IMPROVED: Full-screen pending insights display (when no insights are available) */
@@ -411,6 +433,10 @@
     flex-direction: row;
     padding: 14px;
   }
+  .failedInsightsContainer {
+    flex-direction: row;
+    padding: 14px;
+  }
   .pendingInsightsFullContainer {
     padding: 30px 20px;
   }
@@ -471,6 +497,12 @@
     align-items: flex-start;
   }
   
+  .failedInsightsContainer {
+    flex-direction: column;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  
   .generateInsightsButton {
     width: 100%;
     justify-content: center;
@@ -492,6 +524,11 @@
   .pendingGenerateButton {
     width: 100%;
     max-width: 240px;
+  }
+  
+  .failedCount {
+    order: 2;
+    margin-top: 8px;
   }
 }
 
@@ -525,7 +562,13 @@
   .pendingInsightsContainer {
     padding: 12px;
   }
+  .failedInsightsContainer {
+    padding: 12px;
+  }
   .pendingCount {
+    font-size: 14px;
+  }
+  .failedCount {
     font-size: 14px;
   }
   .generateInsightsButton {
