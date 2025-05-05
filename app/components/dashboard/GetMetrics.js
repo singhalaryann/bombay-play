@@ -4,23 +4,26 @@ import styles from "../../../styles/GetMetrics.module.css";
 import GraphDisplay from "../analysis/GraphDisplay";
 import { useAuth } from "../../context/AuthContext";
 
-// UPDATED: Added new props for specific metric, metric type, readonly mode, initialDateFilter, and hideSkeletons
+// UPDATED: Added new props for prefetchedData and isDataLoading
 const GetMetrics = ({ 
   selectedTime, 
   onTimeChange, 
   specificMetric = null, 
   specificMetricType = null, 
   readOnly = false,
-  initialDateFilter = null, // NEW: Added prop to accept API date filter directly
-  hideSkeletons = false, // NEW: Added prop to hide skeletons during loading
-  userIds = [] // NEW: Add userIds prop with default empty array
+  initialDateFilter = null,
+  hideSkeletons = false,
+  userIds = [],
+  prefetchedData = null, // ADDED: New prop to accept pre-fetched metric data
+  isDataLoading = false  // ADDED: New prop to indicate if parent is loading data
 }) => {
   const { userId } = useAuth();
   
   // State for storing graph data received from API
   const [graphData, setGraphData] = useState([]);
   // Loading state to show skeleton while fetching data
-  const [isLoading, setIsLoading] = useState(true);
+  // UPDATED: Initialize isLoading based on isDataLoading prop
+  const [isLoading, setIsLoading] = useState(isDataLoading !== false);
   // Error state to display error messages if API call fails
   const [error, setError] = useState(null);
   // UPDATED: Use initialDateFilter if provided, otherwise default to 30 days
@@ -56,19 +59,19 @@ const GetMetrics = ({
   // FIXED: Reset dateFilter when selectedTime or specificMetric changes
   useEffect(() => {
     // If initialDateFilter is provided and changes, use it directly
-  if (initialDateFilter) {
-    console.log('GetMetrics - Using updated initialDateFilter:', initialDateFilter);
-    setDateFilter(initialDateFilter); // ADDED: Directly update dateFilter when initialDateFilter changes
-    return;
-  }
+    if (initialDateFilter) {
+      console.log('GetMetrics - Using updated initialDateFilter:', initialDateFilter);
+      setDateFilter(initialDateFilter); // ADDED: Directly update dateFilter when initialDateFilter changes
+      return;
+    }
     console.log('GetMetrics - Time filter changed to:', selectedTime);
     console.log('GetMetrics - For specific metric:', specificMetric);
     
     // FIXED: Only set a new dateFilter if selectedTime actually changes
-  if (!selectedTime) {
-    console.log('GetMetrics - No selectedTime provided, skipping filter update');
-    return;
-  }
+    if (!selectedTime) {
+      console.log('GetMetrics - No selectedTime provided, skipping filter update');
+      return;
+    }
     
     // Convert UI time filter to API date_filter format
     let apiDateFilter = { type: "last", days: 30 }; // Default
@@ -314,10 +317,50 @@ const GetMetrics = ({
     });
   };
 
-  // FIXED: Fetch metrics data from API with improved caching and error handling
+  // UPDATED: Function to process pre-fetched data if available
+  const processPrefetchedData = async () => {
+    if (!prefetchedData) {
+      console.log("GetMetrics - No pre-fetched data available, skipping");
+      return false;
+    }
+    
+    console.log("GetMetrics - Processing pre-fetched data:", prefetchedData);
+    
+    try {
+      // Fetch metric knowledge data
+      const knowledgeData = await fetchMetricKnowledge();
+      
+      // Process pre-fetched data
+      const singleMetricData = {
+        metrics: [prefetchedData]
+      };
+      
+      // Transform data for graphs
+      const transformedData = transformMetricsForGraphs(singleMetricData, knowledgeData);
+      console.log('GetMetrics - Transformed pre-fetched data with knowledge:', transformedData);
+      
+      // Update state
+      setGraphData(transformedData);
+      setIsLoading(false);
+      
+      return true;
+    } catch (err) {
+      console.error('GetMetrics - Error processing pre-fetched data:', err);
+      return false;
+    }
+  };
+
+  // UPDATED: Fetch metrics data from API with improved caching and error handling
   const fetchMetricsData = async () => {
     try {
       setIsLoading(true);
+      
+      // ADDED: Check if pre-fetched data was processed successfully
+      const dataProcessed = await processPrefetchedData();
+      if (dataProcessed) {
+        console.log('GetMetrics - Used pre-fetched data, skipping API call');
+        return;
+      }
       
       // FIXED: Create a more specific cache key that includes both specificMetric and dateFilter
       const dateFilterStr = JSON.stringify(dateFilter);
@@ -426,11 +469,18 @@ const requestBody = {
     }
   };
 
-  // FIXED: Effect to fetch data when date filter or specificMetric changes
+  // UPDATED: Effect to fetch data when date filter, specificMetric or prefetchedData changes
   useEffect(() => {
-    console.log('GetMetrics - Fetching data for dateFilter:', dateFilter, 'specificMetric:', specificMetric);
+    console.log('GetMetrics - Fetching data for dateFilter:', dateFilter, 'specificMetric:', specificMetric, 'prefetchedData:', prefetchedData ? 'available' : 'not available');
+    
+    // ADDED: Update loading state based on parent's isDataLoading prop
+    if (isDataLoading !== undefined) {
+      setIsLoading(isDataLoading);
+    }
+    
+    // Call fetchMetricsData which will handle prefetched data if available
     fetchMetricsData();
-  }, [dateFilter, specificMetric]); // FIXED: Added specificMetric as dependency
+  }, [dateFilter, specificMetric, prefetchedData, isDataLoading]); // UPDATED: Added prefetchedData and isDataLoading as dependencies
 
   // Skeleton for graph loading
   const renderSkeletonGraphs = () => {

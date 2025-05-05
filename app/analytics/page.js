@@ -35,12 +35,12 @@ export default function AnalyticsPage() {
         "mau", 
         "rolling_retention", 
         "total_sessions_each_day", 
-        "avg_sessions_per_day", 
+        // "avg_sessions_per_day", 
         "session_distribution_by_hour", 
         "avg_session_length", 
         // "adaptive_session_length", 
-        "geographical_breakdown", 
-        "device_os_distribution",
+        // "geographical_breakdown", 
+        // "device_os_distribution",
         "session_length_distribution",
         // "d1_retention"
     ];

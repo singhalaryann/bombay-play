@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import styles from "../../styles/LoginModal.module.css";
-import { useAuth } from "../context/AuthContext";
+import styles from "../../../styles/LoginModal.module.css";
+import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 
 const LoginModal = ({ onClose, onSuccess, redirectPath }) => {

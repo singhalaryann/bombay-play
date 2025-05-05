@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import styles from "../../../styles/Sidebar.module.css";
 // Import authentication and login modal components
 import { useAuth } from "../../context/AuthContext";
-import LoginModal from "../../components/LoginModal";
+import LoginModal from "../common/LoginModal";
 
 const Sidebar = () => {
   // Initialize routing and authentication hooks

@@ -17,7 +17,7 @@ import {
 import ReactMarkdown from "react-markdown";
 import Image from 'next/image';
 import SplitText from "./SplitText";
-import LoginModal from "../components/LoginModal";
+import LoginModal from "../components/common/LoginModal";
 import { useAuth } from "../context/AuthContext";
 
 // UPDATED: Feature card component with hover state and short/full description

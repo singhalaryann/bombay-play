@@ -51,18 +51,13 @@ const CustomPieTooltip = ({ active, payload }) => {
  return null;
 };
 
-/** Tooltip for line charts - Updated to format dates */
+/** Tooltip for line charts - UPDATED to not try formatting all values as dates */
 const LineTooltip = ({ active, payload, x_label, y_label, x_unit, y_unit }) => {
  if (active && payload && payload.length) {
-   // Format date for tooltip display with validation
-   const date = new Date(payload[0].payload.x);
-   const formattedDate = !isNaN(date) ? 
-     `${date.getDate()} ${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}` : 
-     payload[0].payload.x;
-   
+   // No longer trying to automatically convert to date
    return (
      <div className={styles.customTooltip}>
-       <p>{`${x_label}: ${formattedDate}${x_unit ? ` ${x_unit}` : ''}`}</p>
+       <p>{`${x_label}: ${payload[0].payload.x}${x_unit ? ` ${x_unit}` : ''}`}</p>
        <p>{`${y_label}: ${payload[0].payload.y}${y_unit ? ` ${y_unit}` : ''}`}</p>
      </div>
    );
@@ -121,13 +116,8 @@ const calculateTickCount = (data, zoomState, isZoomed) => {
   return Math.max(2, Math.min(Math.floor(visiblePoints / 3), 10));
 };
 
-// Helper function for date formatting with validation
-const formatDateIfValid = (value) => {
-  const date = new Date(value);
-  return !isNaN(date) ? 
-    `${date.getDate()} ${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}` : 
-    value;
-};
+// REMOVED: Helper function for date formatting with validation is no longer needed
+// We will use original data values without date conversion
 
 // Single chart component that handles its own state and effects
 const ChartContainer = ({ graph, index }) => {
@@ -495,10 +485,10 @@ const ChartContainer = ({ graph, index }) => {
                     tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
                     tickCount={tickCount}
                     tickFormatter={(index) => {
-                      // Make sure index is within bounds
+                      // UPDATED: No longer trying to format as date
                       if (index < 0 || index >= chartData.length) return '';
                       const item = chartData[Math.floor(index)];
-                      return item ? formatDateIfValid(item.x) : '';
+                      return item ? item.x : '';
                     }}
                     label={{
                       value: x_label,
@@ -599,9 +589,10 @@ const ChartContainer = ({ graph, index }) => {
                     tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
                     tickCount={tickCount}
                     tickFormatter={(index) => {
+                      // UPDATED: No longer trying to format as date
                       if (index < 0 || index >= chartData.length) return '';
                       const item = chartData[Math.floor(index)];
-                      return item ? formatDateIfValid(item.name) : '';
+                      return item ? item.name : '';
                     }}
                     label={{
                       value: x_label,
@@ -692,9 +683,10 @@ const ChartContainer = ({ graph, index }) => {
                     tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
                     tickCount={tickCount}
                     tickFormatter={(index) => {
+                      // UPDATED: No longer trying to format as date
                       if (index < 0 || index >= chartData.length) return '';
                       const item = chartData[Math.floor(index)];
-                      return item ? formatDateIfValid(item.category) : '';
+                      return item ? item.category : '';
                     }}
                     label={{
                       value: graph.x_label || '',
