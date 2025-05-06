@@ -72,12 +72,12 @@ export default function InsightPage() {
     fetchInsightData();
   }, [userId, searchParams, router]);
 
-  // Handle Analyse Board click
-  const handleAnalyseClick = () => {
-    const insightId = searchParams.get('id');
-    console.log('Navigating to ideas with insight:', insightId);
-    router.push(`/ideas?insight=${insightId}`);
-  };
+// Handle Analyse Board click
+const handleAnalyseClick = () => {
+  const insightId = searchParams.get('id');
+  console.log('Navigating to experiments with insight:', insightId);
+  router.push(`/z_experiment?insight=${insightId}`);
+};
 
   // Toggle visibility of graphs for a specific lens
   const toggleGraphVisibility = (lensIndex) => {
@@ -221,23 +221,21 @@ export default function InsightPage() {
                       </button>
                       
                       {visibleGraphs[index] && lens.metrics_examined && lens.metrics_examined.length > 0 && (
-                        <div className={styles.graphsContainer}>
-                          {lens.metrics_examined.map((metric, metricIndex) => (
-                            <div key={metricIndex} className={styles.metricGraphWrapper}>
-                              {/* REMOVED: The metric name heading */}
-                              <GetMetrics 
-  selectedTime={null}
-  onTimeChange={() => {}}
-  specificMetric={metric}
-  readOnly={true}
-  initialDateFilter={dateFilter}
-  hideSkeletons={metricIndex > 0}
-  userIds={userIds} // Pass the userIds state to GetMetrics
-/>
-                            </div>
-                          ))}
-                        </div>
-                      )}
+  <div className={styles.graphsContainer}>
+    {/* UPDATED: No longer mapping over each metric - pass entire array instead */}
+    <div className={styles.metricGraphWrapper}>
+      <GetMetrics 
+        selectedTime={null}
+        onTimeChange={() => {}}
+        specificMetric={lens.metrics_examined} // UPDATED: Pass entire metrics array instead of individual metrics
+        readOnly={true}
+        initialDateFilter={dateFilter}
+        hideSkeletons={false}
+        userIds={userIds}
+      />
+    </div>
+  </div>
+)}
                     </div>
                   ))}
                 </div>

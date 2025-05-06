@@ -58,147 +58,6 @@
   background: linear-gradient(90deg, #82FF83, transparent);
 }
 
-/* Wrapper for graph components */
-.graphsWrapper {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 24px;
-  width: 100%;
-}
-
-/* Glass Box Styles - For error states and no data states */
-.glassBox {
-  width: 100%;
-  background: rgba(18, 18, 18, 0.5);
-  border-radius: 12px;
-  padding: 24px;
-  position: relative;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  display: flex;
-  flex-direction: column;
-  transition: all 0.3s ease;
-}
-
-.glassBox:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-
-/* Outer glow border */
-.glassBox::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  padding: 1px;
-  background: linear-gradient(
-    -100deg,
-    rgba(255, 255, 255, 0.2),
-    rgba(255, 255, 255, 0.05)
-  );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
-
-/* Adds margin to elements */
-.marginTop {
-  margin-top: 24px;
-}
-
-/* Error State styling */
-.errorState {
-  width: 100%;
-  text-align: center;
-  padding: 32px;
-  color: rgba(255, 100, 100, 0.7);
-  font-size: 16px;
-  background: rgba(255, 0, 0, 0.05);
-  border-radius: 12px;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  min-height: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(255, 0, 0, 0.1);
-}
-
-/* No Data State styling */
-.noDataState {
-  width: 100%;
-  text-align: center;
-  padding: 32px;
-  color: rgba(130, 255, 131, 0.6);
-  font-size: 16px;
-  background: rgba(18, 18, 18, 0.5);
-  border-radius: 12px;
-  min-height: 180px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(130, 255, 131, 0.1);
-}
-
-/* Dashboard-style Skeleton Animation */
-@keyframes skeletonPulse {
-  0% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 0.7;
-  }
-  100% {
-    opacity: 0.5;
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -1000px 0;
-  }
-  100% {
-    background-position: 1000px 0;
-  }
-}
-
-/* Skeleton styles for graphs */
-.skeletonGraph {
-  min-height: 300px;
-  display: flex;
-  flex-direction: column;
-  background: rgba(18, 18, 18, 0.5);
-  border-radius: 12px;
-  padding: 24px;
-  position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-/* Skeleton graph title placeholder */
-.skeletonGraphTitle {
-  height: 24px;
-  width: 180px;
-  background: linear-gradient(to right, rgba(255, 255, 255, 0.05) 8%, rgba(255, 255, 255, 0.1) 18%, rgba(255, 255, 255, 0.05) 33%);
-  background-size: 2000px 100%;
-  animation: shimmer 2s infinite linear;
-  border-radius: 4px;
-  margin-bottom: 20px;
-}
-
-/* Skeleton graph content placeholder */
-.skeletonGraphContent {
-  height: 240px;
-  background: linear-gradient(to right, rgba(255, 255, 255, 0.05) 8%, rgba(255, 255, 255, 0.1) 18%, rgba(255, 255, 255, 0.05) 33%);
-  background-size: 2000px 100%;
-  animation: shimmer 2s infinite linear;
-  border-radius: 8px;
-  position: relative;
-  overflow: hidden;
-}
-
 /* Custom Scrollbar */
 .mainContent::-webkit-scrollbar {
   width: 6px;
@@ -232,13 +91,6 @@
     align-items: flex-start;
     gap: 12px;
   }
-  .skeletonGraphTitle {
-    height: 22px;
-    width: 160px;
-  }
-  .graphsWrapper {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  }
 }
 
 /* Responsive Design - Medium screens */
@@ -255,16 +107,6 @@
     align-items: flex-start;
     gap: 10px;
   }
-  .skeletonGraphTitle {
-    height: 20px;
-    width: 140px;
-  }
-  .graphsWrapper {
-    grid-template-columns: 1fr;
-  }
-  .skeletonGraphContent {
-    height: 220px;
-  }
 }
 
 /* Responsive Design - Small screens */
@@ -279,17 +121,10 @@
   .pageHeader {
     margin-bottom: 16px;
   }
-  .skeletonGraphTitle {
-    height: 18px;
-    width: 120px;
-  }
   .pageHeader {
     padding-right: 0;
   }
   .filterContainer {
     right: 0;
-  }
-  .skeletonGraphContent {
-    height: 200px;
   }
 }

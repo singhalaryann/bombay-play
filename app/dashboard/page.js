@@ -334,12 +334,10 @@ export default function Dashboard() {
             setGeneratingInsights(true);
             setGenerationStep(parsedGenState.step || 0);
             
-            // Resume polling if generation was in progress
-            if (parsedGenState.step < TECHNIQUES_SEQUENCE.length) {
-              startGenerationPolling(parsedGenState.step);
-            }
+            // UPDATED: Use the parallel polling method instead of sequential
+            startPollingForAllTechniques();
             
-            console.log('Resuming insight generation process at step:', parsedGenState.step);
+            console.log('Resuming insight generation process');
           }
         }
         
@@ -489,23 +487,25 @@ export default function Dashboard() {
     }
   };
   
-  // Function to generate insights with the first technique
-  const generateInsights = async () => {
-    try {
-      // Set state to show generation is in progress
-      setGeneratingInsights(true);
-      setGenerationStep(0);
-      setGenerationError(null);
-      
-      // Cache the generation state
-      localStorage.setItem(`dashboard_generation_state_${userId}`, JSON.stringify({
-        inProgress: true,
-        step: 0,
-        timestamp: Date.now()
-      }));
-      
-      // Call the API with the first technique
-      const response = await fetch(
+// Function to generate insights with all techniques in parallel
+const generateInsights = async () => {
+  try {
+    // Set state to show generation is in progress
+    setGeneratingInsights(true);
+    setGenerationStep(0);
+    setGenerationError(null);
+    
+    // Cache the generation state
+    localStorage.setItem(`dashboard_generation_state_${userId}`, JSON.stringify({
+      inProgress: true,
+      step: 0,
+      timestamp: Date.now()
+    }));
+    
+    // Create an array of promises for all three technique API calls
+    const techniquePromises = TECHNIQUES_SEQUENCE.map(technique => {
+      console.log(`Starting generation with technique: ${technique}`);
+      return fetch(
         "https://generate-insight-bulk-nrosabqhla-uc.a.run.app",
         {
           method: "POST",
@@ -516,7 +516,55 @@ export default function Dashboard() {
             game_id: GAME_ID,
             date_filter: globalDateFilter,
             metric_sets: ["engagement", "balance", "progression"],
-            techniques: [TECHNIQUES_SEQUENCE[0]] // Start with the first technique
+            techniques: [technique]
+          }),
+        }
+      );
+    });
+    
+    // Execute all API calls in parallel
+    const responses = await Promise.all(techniquePromises);
+    
+    // Check if any responses were not OK
+    for (let i = 0; i < responses.length; i++) {
+      if (!responses[i].ok) {
+        console.error(`Error with technique ${TECHNIQUES_SEQUENCE[i]}: ${responses[i].status}`);
+      } else {
+        console.log(`Successfully started generation with technique: ${TECHNIQUES_SEQUENCE[i]}`);
+      }
+    }
+    
+    // Start a single polling process to check all techniques
+    startPollingForAllTechniques();
+    
+  } catch (error) {
+    console.error('Error starting insight generation:', error);
+    setGeneratingInsights(false);
+    setGenerationError('Failed to start insight generation. Please try again later.');
+    
+    // Clear the generation state
+    localStorage.removeItem(`dashboard_generation_state_${userId}`);
+  }
+};
+
+// Function to poll for all techniques at once
+const startPollingForAllTechniques = () => {
+  console.log('Starting polling for all techniques');
+  
+  // Set an interval to poll for status
+  const pollingId = setInterval(async () => {
+    try {
+      // Check if any new pending insights have completed
+      const response = await fetch(
+        "https://get-insights-nrosabqhla-uc.a.run.app",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            game_id: GAME_ID,
+            date_filter: globalDateFilter
           }),
         }
       );
@@ -525,129 +573,50 @@ export default function Dashboard() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      console.log(`Started generation with technique: ${TECHNIQUES_SEQUENCE[0]}`);
+      const data = await response.json();
       
-      // Start polling to check generation status
-      startGenerationPolling(0);
-      
-    } catch (error) {
-      console.error('Error starting insight generation:', error);
-      setGeneratingInsights(false);
-      setGenerationError('Failed to start insight generation. Please try again later.');
-      
-      // Clear the generation state
-      localStorage.removeItem(`dashboard_generation_state_${userId}`);
-    }
-  };
-  
-  // Function to start polling for insight generation status
-  const startGenerationPolling = (step) => {
-    const currentTechnique = TECHNIQUES_SEQUENCE[step];
-    console.log(`Starting polling for technique: ${currentTechnique} (step ${step + 1}/${TECHNIQUES_SEQUENCE.length})`);
-    
-    // Set an interval to poll for status
-    const pollingId = setInterval(async () => {
-      try {
-        // Check if any new pending insights have completed
-        const response = await fetch(
-          "https://get-insights-nrosabqhla-uc.a.run.app",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              game_id: GAME_ID,
-              date_filter: globalDateFilter
-            }),
-          }
-        );
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        // Count pending insights
-        let pendingCount = 0;
-        if (data.insights && data.insights.length > 0) {
-          pendingCount = data.insights.filter(item => item.status === "pending").length;
-        }
-        
-        console.log(`Polling check: ${pendingCount} insights still pending`);
-        
-        // If no more pending insights, move to the next technique
-        if (pendingCount === 0) {
-          // Clear this polling interval
-          clearInterval(pollingId);
-          
-          // Refresh the insights data
-          fetchInsightsData();
-          
-          // If there are more techniques to process
-          if (step < TECHNIQUES_SEQUENCE.length - 1) {
-            // Move to the next technique
-            const nextStep = step + 1;
-            setGenerationStep(nextStep);
-            
-            // Update the generation state in localStorage
-            localStorage.setItem(`dashboard_generation_state_${userId}`, JSON.stringify({
-              inProgress: true,
-              step: nextStep,
-              timestamp: Date.now()
-            }));
-            
-            // Call the API with the next technique
-            const nextResponse = await fetch(
-              "https://generate-insight-bulk-nrosabqhla-uc.a.run.app",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  game_id: GAME_ID,
-                  date_filter: globalDateFilter,
-                  metric_sets: ["engagement", "balance", "progression"],
-                  techniques: [TECHNIQUES_SEQUENCE[nextStep]]
-                }),
-              }
-            );
-            
-            if (!nextResponse.ok) {
-              throw new Error(`HTTP error starting next technique! status: ${nextResponse.status}`);
-            }
-            
-            console.log(`Started generation with technique: ${TECHNIQUES_SEQUENCE[nextStep]}`);
-            
-            // Start polling for the next technique
-            startGenerationPolling(nextStep);
-          } else {
-            // All techniques completed
-            console.log('All insight generation techniques completed successfully');
-            setGeneratingInsights(false);
-            
-            // Clear the generation state
-            localStorage.removeItem(`dashboard_generation_state_${userId}`);
-            
-            // Final refresh of insights data
-            fetchInsightsData();
-          }
-        }
-      } catch (error) {
-        console.error('Error during generation polling:', error);
-        clearInterval(pollingId);
-        setGenerationError('An error occurred during insight generation. Some insights may be incomplete.');
-        
-        // Don't stop the process completely, just show the error
-        // We'll still try to complete the remaining steps
+      // Count pending insights
+      let pendingCount = 0;
+      if (data.insights && data.insights.length > 0) {
+        pendingCount = data.insights.filter(item => item.status === "pending").length;
       }
-    }, POLLING_INTERVAL);
-    
-    // Store the interval ID to clear it if the component unmounts
-    return pollingId;
-  };
+      
+      console.log(`Polling check: ${pendingCount} insights still pending`);
+      
+      // If no more pending insights, all techniques are complete
+      if (pendingCount === 0) {
+        // Clear this polling interval
+        clearInterval(pollingId);
+        
+        // Refresh the insights data
+        fetchInsightsData();
+        
+        // All techniques completed
+        console.log('All insight generation techniques completed successfully');
+        setGeneratingInsights(false);
+        
+        // Clear the generation state
+        localStorage.removeItem(`dashboard_generation_state_${userId}`);
+      } else {
+        // Refresh insights data anyway to show progress
+        fetchInsightsData();
+      }
+    } catch (error) {
+      console.error('Error during generation polling:', error);
+      clearInterval(pollingId);
+      setGenerationError('An error occurred during insight generation. Some insights may be incomplete.');
+      
+      // Don't stop the process completely, just show the error
+      // We'll still try to complete monitoring
+    }
+  }, POLLING_INTERVAL);
+  
+  // Store the interval ID to clear it if the component unmounts
+  return pollingId;
+};
+
+// REMOVED: The startGenerationPolling function has been removed as it's no longer needed
+// with the parallel implementation.
   
   // Effect to clean up polling intervals on unmount
   useEffect(() => {
@@ -779,15 +748,16 @@ export default function Dashboard() {
   );
 
   // Render generate insights button with proper state
+  // UPDATED: Removed step counter since we're now using parallel processing
   const renderGenerateButton = () => {
     if (generatingInsights) {
       return (
-          <button 
+        <button 
           className={`${styles.generateInsightsButton} ${styles.generating}`}
           disabled={true}
         >
           <Loader2 className={styles.loadingSpinner} size={16} />
-          <span>Generating... ({generationStep + 1}/{TECHNIQUES_SEQUENCE.length})</span>
+          <span>Generating insights...</span>
         </button>
       );
     }
@@ -822,91 +792,55 @@ export default function Dashboard() {
                 key={`${insight.insight_id || index}-${index}`}
                 description={insight.insight_text || "No description available"}
                 insight_id={insight.insight_id || `insight-${index}`}
-              />
-            ))}
-          </div>
-          
-          <div className={styles.errorMessageContainer}>
-            <p className={styles.errorMessage}>{generationError}</p>
-            {!generatingInsights && renderGenerateButton()}
-          </div>
+            />
+          ))}
         </div>
-      );
-    }
+        
+        <div className={styles.errorMessageContainer}>
+          <p className={styles.errorMessage}>{generationError}</p>
+          {!generatingInsights && renderGenerateButton()}
+        </div>
+      </div>
+    );
+  }
 
-    // Case 1 - All Pending (no successful insights, only pending)
-    if (insights.length === 0 && pendingInsightsCount > 0 && failedInsightsCount === 0) {
-      return (
-        <div className={styles.insightsSection}>
-          <div className={styles.pendingInsightsFullContainer}>
-            <div className={styles.pendingInsightsIcon}>
-            <Clock size={32} className={styles.pendingIcon} />
-            </div>
-            <h3 className={styles.pendingInsightsTitle}>Insights in Progress</h3>
-            <p className={styles.pendingInsightsText}>
-              {pendingInsightsCount} {pendingInsightsCount === 1 ? 'insight' : 'insights'} pending analysis.
-            </p>
-            {/* No Generate button when all are pending */}
+  // Case 1 - All Pending (no successful insights, only pending)
+  if (insights.length === 0 && pendingInsightsCount > 0 && failedInsightsCount === 0) {
+    return (
+      <div className={styles.insightsSection}>
+        <div className={styles.pendingInsightsFullContainer}>
+          <div className={styles.pendingInsightsIcon}>
+          <Clock size={32} className={styles.pendingIcon} />
           </div>
+          <h3 className={styles.pendingInsightsTitle}>Insights in Progress</h3>
+          <p className={styles.pendingInsightsText}>
+            {pendingInsightsCount} {pendingInsightsCount === 1 ? 'insight' : 'insights'} pending analysis.
+          </p>
+          {/* No Generate button when all are pending */}
         </div>
-      );
-    }
-    
-    // Case 3 - No Insights at all (empty data)
-    if (insights.length === 0 && pendingInsightsCount === 0 && failedInsightsCount === 0) {
-      return (
-        <div className={styles.insightsSection}>
-          <div className={styles.noData}>
-            <p>No insights available</p>
-            {/* Show Generate button when no insights at all */}
-            {renderGenerateButton()}
-          </div>
+      </div>
+    );
+  }
+  
+  // Case 3 - No Insights at all (empty data)
+  if (insights.length === 0 && pendingInsightsCount === 0 && failedInsightsCount === 0) {
+    return (
+      <div className={styles.insightsSection}>
+        <div className={styles.noData}>
+          <p>No insights available</p>
+          {/* Show Generate button when no insights at all */}
+          {renderGenerateButton()}
         </div>
-      );
-    }
-    
-    // Case 2 - Some or All Failed (with or without successful insights)
-    if (failedInsightsCount > 0) {
-      return (
-        <div className={styles.insightsSection}>
-          {/* Show successful insights if any */}
-          {insights.length > 0 && (
-            <div className={styles.insightsList}>
-              {insights.map((insight, index) => (
-                <InsightCard
-                  key={`${insight.insight_id || index}-${index}`}
-                  description={insight.insight_text || "No description available"}
-                  insight_id={insight.insight_id || `insight-${index}`}
-                />
-              ))}
-            </div>
-          )}
-          
-          {/* Show pending message if any pending */}
-          {pendingInsightsCount > 0 && (
-            <div className={styles.pendingInsightsContainer}>
-              <div className={styles.pendingInsightsHeader}>
-                <Clock size={20} className={styles.pendingHeaderIcon} />
-                <span className={styles.pendingCount}>{pendingInsightsCount} insights pending</span>
-              </div>
-            </div>
-          )}
-          
-          {/* Always show Generate button when there are failed insights */}
-          <div className={styles.failedInsightsContainer}>
-            {renderGenerateButton()}
-            {failedInsightsCount > 0 && (
-              <p className={styles.failedCount}>{failedInsightsCount} failed insight{failedInsightsCount > 1 ? 's' : ''}</p>
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    // Case 4 - Some Pending, Some Success, No Failed
-    if (insights.length > 0 && pendingInsightsCount > 0 && failedInsightsCount === 0) {
-      return (
-        <div className={styles.insightsSection}>
+      </div>
+    );
+  }
+  
+  // Case 2 - Some or All Failed (with or without successful insights)
+  if (failedInsightsCount > 0) {
+    return (
+      <div className={styles.insightsSection}>
+        {/* Show successful insights if any */}
+        {insights.length > 0 && (
           <div className={styles.insightsList}>
             {insights.map((insight, index) => (
               <InsightCard
@@ -916,20 +850,31 @@ export default function Dashboard() {
               />
             ))}
           </div>
-          
-          {/* Show pending message without Generate button */}
+        )}
+        
+        {/* Show pending message if any pending */}
+        {pendingInsightsCount > 0 && (
           <div className={styles.pendingInsightsContainer}>
             <div className={styles.pendingInsightsHeader}>
               <Clock size={20} className={styles.pendingHeaderIcon} />
               <span className={styles.pendingCount}>{pendingInsightsCount} insights pending</span>
             </div>
-            {/* No Generate button when only pending, no failed */}
           </div>
+        )}
+        
+        {/* Always show Generate button when there are failed insights */}
+        <div className={styles.failedInsightsContainer}>
+          {renderGenerateButton()}
+          {failedInsightsCount > 0 && (
+            <p className={styles.failedCount}>{failedInsightsCount} failed insight{failedInsightsCount > 1 ? 's' : ''}</p>
+          )}
         </div>
-      );
-    }
-    
-    // Case 5 - All Success (no pending, no failed)
+      </div>
+    );
+  }
+
+  // Case 4 - Some Pending, Some Success, No Failed
+  if (insights.length > 0 && pendingInsightsCount > 0 && failedInsightsCount === 0) {
     return (
       <div className={styles.insightsSection}>
         <div className={styles.insightsList}>
@@ -941,65 +886,90 @@ export default function Dashboard() {
             />
           ))}
         </div>
-        {/* No Generate button when all are success */}
-      </div>
-    );
-  };
-
-  // Render insights content 
-  const renderInsightsContent = () => {
-    // Show loading indicator for initial load only
-    if (loading && isInitialRender) {
-      return (
-        <>
-          {renderSkeletonInsights()}
-        </>
-      );
-    }
-
-    // Otherwise render insights section with its own loading state
-    return (
-      <>
-        {renderInsights()}
-      </>
-    );
-  };
-
-  // Main render
-  return (
-    <div className={styles.container}>
-      <Header />
-      <div className={styles.mainLayout}>
-        <Sidebar />
-        <main className={styles.mainContent}>
-          <div className={styles.filterSection}>
-            <div className={styles.tabsContainer}>
-              <DashboardTabs
-                activeTab={activeTab}
-                onTabChange={handleTabChange}
-                experimentContent={<ExperimentContent userId={userId} />}
-                selectedTime={selectedTime}
-                apiDateFilter={apiDateFilter}
-                globalDateFilter={globalDateFilter} // ADDED: Pass globalDateFilter to DashboardTabs
-              >
-                {activeTab === "insights" && (
-                  <>
-                    {renderInsightsContent()}
-                  </>
-                )}
-              </DashboardTabs>
-            </div>
-            <div className={styles.filterContainer}>
-              <TabFilter 
-                selected={selectedTime} 
-                onChange={handleTimeChange} 
-                disabled={activeTab !== "overview"}
-                readOnly={activeTab === "insights"}
-              />
-            </div>
+        
+        {/* Show pending message without Generate button */}
+        <div className={styles.pendingInsightsContainer}>
+          <div className={styles.pendingInsightsHeader}>
+            <Clock size={20} className={styles.pendingHeaderIcon} />
+            <span className={styles.pendingCount}>{pendingInsightsCount} insights pending</span>
           </div>
-        </main>
+          {/* No Generate button when only pending, no failed */}
+        </div>
       </div>
+    );
+  }
+  
+  // Case 5 - All Success (no pending, no failed)
+  return (
+    <div className={styles.insightsSection}>
+      <div className={styles.insightsList}>
+        {insights.map((insight, index) => (
+          <InsightCard
+            key={`${insight.insight_id || index}-${index}`}
+            description={insight.insight_text || "No description available"}
+            insight_id={insight.insight_id || `insight-${index}`}
+          />
+        ))}
+      </div>
+      {/* No Generate button when all are success */}
     </div>
   );
+};
+
+// Render insights content 
+const renderInsightsContent = () => {
+  // Show loading indicator for initial load only
+  if (loading && isInitialRender) {
+    return (
+      <>
+        {renderSkeletonInsights()}
+      </>
+    );
+  }
+
+  // Otherwise render insights section with its own loading state
+  return (
+    <>
+      {renderInsights()}
+    </>
+  );
+};
+
+// Main render
+return (
+  <div className={styles.container}>
+    <Header />
+    <div className={styles.mainLayout}>
+      <Sidebar />
+      <main className={styles.mainContent}>
+        <div className={styles.filterSection}>
+          <div className={styles.tabsContainer}>
+            <DashboardTabs
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+              experimentContent={<ExperimentContent userId={userId} />}
+              selectedTime={selectedTime}
+              apiDateFilter={apiDateFilter}
+              globalDateFilter={globalDateFilter} // ADDED: Pass globalDateFilter to DashboardTabs
+            >
+              {activeTab === "insights" && (
+                <>
+                  {renderInsightsContent()}
+                </>
+              )}
+            </DashboardTabs>
+          </div>
+          <div className={styles.filterContainer}>
+            <TabFilter 
+              selected={selectedTime} 
+              onChange={handleTimeChange} 
+              disabled={activeTab !== "overview"}
+              readOnly={activeTab === "insights"}
+            />
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+);
 }
