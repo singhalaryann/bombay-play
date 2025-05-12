@@ -184,20 +184,23 @@ const metricsToRequest = Array.isArray(specificMetric)
           status: knowledgeInfo.status || "pending"
         };
       } else {
-        return {
-          metric_id: metricId || `metric-${Math.random().toString(36).substr(2, 9)}`,
-          metric_type: metricType,
-          title: metric.name || "Untitled Metric",
-          description: description,
-          columns: [
-            metric.x_label || "Date", 
-            metric.y_label || "Value"
-          ],
-          values: metric.values || [],
-          x_unit: metric.x_unit || "",
-          y_unit: metric.y_unit || "",
-          status: knowledgeInfo.status || "pending"
-        };
+// In the transformMetricsForGraphs function in GetMetrics.js, modify the non-multiline section:
+return {
+  metric_id: metricId || `metric-${Math.random().toString(36).substr(2, 9)}`,
+  metric_type: metricType,
+  title: metric.name || "Untitled Metric",
+  description: description,
+  columns: [
+    metric.x_label || "Date", 
+    metric.y_label || "Value"
+  ],
+  values: metric.values || [],
+  categories: metric.categories || [], // Add this line to pass categories
+  x_unit: metric.x_unit || "",
+  y_unit: metric.y_unit || "",
+  value_unit: metric.value_unit || "",
+  status: knowledgeInfo.status || "pending"
+};
       }
     });
   };

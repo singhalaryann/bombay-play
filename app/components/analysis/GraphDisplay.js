@@ -22,21 +22,29 @@ import { RotateCcw } from 'lucide-react';
 const COLORS = ['#82FF83', '#FF6B6B', '#94A3B8', '#FFB86C'];
 
 /** Tooltip for bar charts */
-const CustomTooltip = ({ active, payload, label, valueUnit }) => {
+const CustomTooltip = ({ active, payload, label, valueUnit, y_label, x_label }) => {
   if (active && payload && payload.length) {
+    // Get actual category name from payload
+    let displayLabel = label;
+    if (payload[0] && payload[0].payload && payload[0].payload.name) {
+      displayLabel = payload[0].payload.name;
+    }
+    
+    // Use the x_label and y_label (from props) or provide defaults
+    const xAxisLabel = x_label || "Category";
+    const yAxisLabel = y_label || "Value";
+    
     return (
       <div className={styles.customTooltip}>
-        <p className={styles.tooltipLabel}>{label}</p>
-        <p className={styles.tooltipValue}>
-          {`${payload[0].value}${valueUnit ? ` ${valueUnit}` : ''}`}
-        </p>
+        <p>{`${xAxisLabel}: ${displayLabel}`}</p>
+        <p>{`${yAxisLabel}: ${payload[0].value}${valueUnit ? ` ${valueUnit}` : ''}`}</p>
       </div>
     );
   }
   return null;
- };
+};
 
-/** Tooltip for pie charts */
+ /** Tooltip for pie charts */
 const CustomPieTooltip = ({ active, payload }) => {
  if (active && payload && payload.length) {
    return (
@@ -51,7 +59,7 @@ const CustomPieTooltip = ({ active, payload }) => {
  return null;
 };
 
-/** Tooltip for line charts - UPDATED to not try formatting all values as dates */
+// Tooltip for line charts - UPDATED to not try formatting all values as dates
 const LineTooltip = ({ active, payload, x_label, y_label, x_unit, y_unit }) => {
  if (active && payload && payload.length) {
    // No longer trying to automatically convert to date
@@ -63,6 +71,32 @@ const LineTooltip = ({ active, payload, x_label, y_label, x_unit, y_unit }) => {
    );
  }
  return null;
+};
+
+// UPDATED: Custom tooltip for multiline charts using actual axis label and value_unit
+const MultilineTooltip = ({ active, payload, label, x_label, value_unit }) => {
+  if (active && payload && payload.length) {
+    // Get the full date from the chart data using the category field
+    let displayDate = label;
+    if (payload[0] && payload[0].payload && payload[0].payload.category) {
+      displayDate = payload[0].payload.category;
+    }
+    
+    // Use the x_label from props or default to "Date"
+    const xAxisLabel = x_label || "Date";
+    
+    return (
+      <div className={styles.customTooltip}>
+        <p className={styles.tooltipLabel}>{`${xAxisLabel}: ${displayDate}`}</p>
+        {payload.map((entry, index) => (
+          <p key={`item-${index}`} style={{ color: entry.color }}>
+            {`${entry.name}: ${entry.value}${value_unit || ''}`}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
 };
 
 // ADDED: Component to display metric description
@@ -162,21 +196,25 @@ const ChartContainer = ({ graph, index }) => {
           originalIndex: index
         }));
       }
-    } else if (metric_type === 'bar' || metric_type === 'hist') {
-      if (typeof values[0] === 'number') {
-        processedData = values.map((value, index) => ({
-          name: index.toString(),
-          value: value,
-          originalIndex: index
-        }));
-      } else if (Array.isArray(values[0])) {
-        processedData = values.map(([cat, val], index) => ({
-          name: cat,
-          value: parseFloat(val),
-          originalIndex: index
-        }));
-      }
-    } else if (metric_type === 'pie') {
+    }
+// In the useEffect for chartData preparation
+else if (metric_type === 'bar' || metric_type === 'hist') {
+  if (typeof values[0] === 'number') {
+    // UPDATED: Use categories array if available, otherwise use index
+    processedData = values.map((value, index) => ({
+      name: categories && categories[index] ? categories[index] : index.toString(),
+      value: value,
+      originalIndex: index
+    }));
+  } else if (Array.isArray(values[0])) {
+    processedData = values.map(([cat, val], index) => ({
+      name: cat,
+      value: parseFloat(val),
+      originalIndex: index
+    }));
+  }
+}
+     else if (metric_type === 'pie') {
       if (typeof values[0] === 'number') {
         processedData = values.map((value, index) => ({
           name: `Region ${index + 1}`,
@@ -589,11 +627,15 @@ const ChartContainer = ({ graph, index }) => {
                     tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
                     tickCount={tickCount}
                     tickFormatter={(index) => {
-                      // UPDATED: No longer trying to format as date
-                      if (index < 0 || index >= chartData.length) return '';
-                      const item = chartData[Math.floor(index)];
-                      return item ? item.name : '';
-                    }}
+  // UPDATED: No longer trying to format as date
+  if (index < 0 || index >= chartData.length) return '';
+  const item = chartData[Math.floor(index)];
+  // Truncate long category names to prevent overlap
+  if (item && item.name) {
+    return item.name.length > 12 ? item.name.substring(0, 10) + '...' : item.name;
+  }
+  return '';
+}}
                     label={{
                       value: x_label,
                       position: 'bottom',
@@ -615,11 +657,11 @@ const ChartContainer = ({ graph, index }) => {
                     allowDataOverflow
                     scale="linear"
                   />
-                  <Tooltip
-                    content={(props) => (
-                      <CustomTooltip {...props} valueUnit={value_unit} />
-                    )}
-                  />             
+                 <Tooltip
+  content={(props) => (
+    <CustomTooltip {...props} valueUnit={value_unit} y_label={y_label} x_label={x_label} />
+  )}
+/>       
                   <Bar 
                     dataKey="value" 
                     fill="#82FF83" 
@@ -709,8 +751,13 @@ const ChartContainer = ({ graph, index }) => {
                     allowDataOverflow
                     scale="linear"
                   />
-                  <Tooltip />
-                  {/* FIXED: Added onClick handler for the Legend component */}
+<Tooltip content={(props) => (
+  <MultilineTooltip 
+    {...props} 
+    x_label={graph.x_label || "Cohort Date"} 
+    value_unit={value_unit}
+  />
+)} />                  {/* FIXED: Added onClick handler for the Legend component */}
                   <Legend onClick={handleLegendClick} />
                   {series && Array.isArray(series) && series.map((s, i) => (
                     // FIXED: Always render all lines but use CSS class to control visibility
