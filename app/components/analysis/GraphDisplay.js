@@ -21,6 +21,12 @@ import { RotateCcw } from 'lucide-react';
 
 const COLORS = ['#82FF83', '#FF6B6B', '#94A3B8', '#FFB86C'];
 
+// Add this after the COLORS constant
+const formatValue = (value) => {
+  if (typeof value !== 'number') return value;
+  return Number.isInteger(value) ? value : value.toFixed(2);
+};
+
 /** Tooltip for bar charts */
 const CustomTooltip = ({ active, payload, label, valueUnit, y_label, x_label }) => {
   if (active && payload && payload.length) {
@@ -37,21 +43,21 @@ const CustomTooltip = ({ active, payload, label, valueUnit, y_label, x_label }) 
     return (
       <div className={styles.customTooltip}>
         <p>{`${xAxisLabel}: ${displayLabel}`}</p>
-        <p>{`${yAxisLabel}: ${payload[0].value}${valueUnit ? ` ${valueUnit}` : ''}`}</p>
+        <p>{`${yAxisLabel}: ${formatValue(payload[0].value)}${valueUnit ? ` ${valueUnit}` : ''}`}</p>
       </div>
     );
   }
   return null;
 };
 
- /** Tooltip for pie charts */
+/** Tooltip for pie charts */
 const CustomPieTooltip = ({ active, payload }) => {
  if (active && payload && payload.length) {
    return (
      <div className={styles.customTooltip}>
        <p className={styles.tooltipLabel}>{payload[0].name}</p>
        <p className={styles.tooltipValue}>
-         {`${payload[0].value}${payload[0].payload.unit ? ` ${payload[0].payload.unit}` : ''}`}
+         {`${formatValue(payload[0].value)}${payload[0].payload.unit ? ` ${payload[0].payload.unit}` : ''}`}
        </p>
      </div>
    );
@@ -66,7 +72,7 @@ const LineTooltip = ({ active, payload, x_label, y_label, x_unit, y_unit }) => {
    return (
      <div className={styles.customTooltip}>
        <p>{`${x_label}: ${payload[0].payload.x}${x_unit ? ` ${x_unit}` : ''}`}</p>
-       <p>{`${y_label}: ${payload[0].payload.y}${y_unit ? ` ${y_unit}` : ''}`}</p>
+       <p>{`${y_label}: ${formatValue(payload[0].payload.y)}${y_unit ? ` ${y_unit}` : ''}`}</p>
      </div>
    );
  }
@@ -90,7 +96,7 @@ const MultilineTooltip = ({ active, payload, label, x_label, value_unit }) => {
         <p className={styles.tooltipLabel}>{`${xAxisLabel}: ${displayDate}`}</p>
         {payload.map((entry, index) => (
           <p key={`item-${index}`} style={{ color: entry.color }}>
-            {`${entry.name}: ${entry.value}${value_unit || ''}`}
+            {`${entry.name}: ${formatValue(entry.value)}${value_unit || ''}`}
           </p>
         ))}
       </div>
