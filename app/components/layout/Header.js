@@ -10,20 +10,22 @@ const Header = () => {
   const { userId, logout } = useAuth();
   const router = useRouter();
   
-  const handleLogout = () => {
-    logout();
-    router.push("/ideationchat");
-  };
+  // COMMENTED: Logout functionality
+  // const handleLogout = () => {
+  //   logout();
+  //   router.push("/ideationchat");
+  // };
   
-  const handleAIChat = () => {
-    router.push("/ideationchat");
-  };
-  
+  // COMMENTED: AI Chat functionality
+  // const handleAIChat = () => {
+  //   router.push("/ideationchat");
+  // };
+
   // const handleKnowledgebase = () => {
   // // Add this new handler
   // router.push("/knowledgebase");
   // };
-  
+
   return (
     <header className={styles.header}>
       <div className={styles.leftSection}>
@@ -38,34 +40,24 @@ const Header = () => {
         </div>
       </div>
       <div className={styles.rightSection}>
-        {/* + AI Chat button */}
-        <button onClick={handleAIChat} className={styles.aiChatButton}>
+        {/* REMOVED: AI Chat button */}
+        
+        {/* <button
+          onClick={handleKnowledgebase}
+          className={styles.knowledgebaseButton}
+        >
           <Image
-            src="/ai_chat.svg"
-            alt="AI Chat"
+            src="/kb_icon.svg"
+            alt="Knowledgebase"
             width={20}
             height={20}
-            className={styles.aiIcon}
+            className={styles.kbIcon}
           />
-          <span>AI Chat</span>
-        </button>
-        {/* <button
-         onClick={handleKnowledgebase}
-         className={styles.knowledgebaseButton}
-        >
-         <Image
-         src="/kb_icon.svg"
-         alt="Knowledgebase"
-         width={20}
-         height={20}
-         className={styles.kbIcon}
-         />
-         <span>Knowledgebase</span>
+          <span>Knowledgebase</span>
         </button>{" "} */}
         
-        {/* CHANGED: User block with conditional logout button */}
+        {/* User block with hardcoded ID */}
         <div className={styles.userBlock}>
-          {/* Using Image component for user_icon.svg */}
           <Image
             src="/user_icon.svg"
             alt="User"
@@ -73,14 +65,13 @@ const Header = () => {
             height={24}
             className={styles.userIcon}
           />
-          <span className={styles.userId}>{userId || "Guest"}</span>
-          
-          {/* CHANGED: Only show logout button if user is logged in */}
-          {userId && (
+          <span className={styles.userId}>a724a284-dd80-4ff2-8d0a-b36bff0fa426</span>
+          {/* COMMENTED: Logout button */}
+          {/* {userId && (
             <button onClick={handleLogout} className={styles.logoutButton}>
               <LogOut size={20} />
             </button>
-          )}
+          )} */}
         </div>
       </div>
     </header>
