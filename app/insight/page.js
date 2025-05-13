@@ -1,12 +1,12 @@
 // app/insight/page.js
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 import Header from "../components/layout/Header";
 import Sidebar from "../components/layout/Sidebar";
 import GetMetrics from "../components/dashboard/GetMetrics";
-import { Calendar, ChevronDown, ChevronUp, BarChart2 } from "lucide-react";
+import { Calendar, ChevronDown, ChevronUp, BarChart2, Info, X } from "lucide-react";
 import Image from "next/image";
 import styles from "../../styles/Insight.module.css";
 
@@ -22,6 +22,13 @@ export default function InsightPage() {
 
   // State to track which insights have their graphs visible
   const [visibleGraphs, setVisibleGraphs] = useState({});
+  
+  // State to track which info modal is visible
+  const [visibleInfo, setVisibleInfo] = useState(null);
+  
+  // State for modal animation
+  const [isClosing, setIsClosing] = useState(false);
+  const closeTimerRef = useRef(null);
 
   useEffect(() => {
     const fetchInsightData = async () => {
@@ -73,6 +80,13 @@ export default function InsightPage() {
       }
     };
     fetchInsightData();
+    
+    // Clear any lingering close timers when component unmounts
+    return () => {
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current);
+      }
+    };
   }, [userId, searchParams, router]);
 
   // Handle Analyse Board click
@@ -89,6 +103,48 @@ export default function InsightPage() {
       ...prev,
       [lensIndex]: !prev[lensIndex],
     }));
+  };
+  
+  // Toggle visibility of info modal for a specific lens
+  const toggleInfoVisibility = (lensIndex) => {
+    console.log("Toggling info visibility for lens:", lensIndex);
+    
+    // If we're currently closing a modal, cancel that operation
+    if (isClosing) {
+      setIsClosing(false);
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
+      }
+    }
+    
+    // If the same lens is clicked or modal is already open, start closing animation
+    if (visibleInfo === lensIndex) {
+      closeModalWithAnimation();
+    } else {
+      // Open the new modal
+      setVisibleInfo(lensIndex);
+    }
+  };
+  
+  // Start the closing animation and then hide the modal
+  const closeModalWithAnimation = () => {
+    // Start the closing animation
+    setIsClosing(true);
+    
+    // After animation completes, hide the modal
+    closeTimerRef.current = setTimeout(() => {
+      setVisibleInfo(null);
+      setIsClosing(false);
+    }, 200); // 200ms matches the CSS animation duration
+  };
+  
+  // Close info modal when clicking outside
+  const closeInfoModal = (e) => {
+    // Only close if clicking the backdrop (not the modal content)
+    if (e.target.classList.contains(styles.infoModalBackdrop)) {
+      closeModalWithAnimation();
+    }
   };
 
   // Format date filter for display
@@ -153,6 +209,58 @@ export default function InsightPage() {
       </div>
     </div>
   );
+  
+  // Global modal that appears at the root level of the app
+  const renderGlobalInfoModal = () => {
+    if (visibleInfo === null && !isClosing) return null;
+    
+    // Get the lens data for the visible info modal
+    const lens = insight?.insight_payload?.detailed_insights_by_lens?.[visibleInfo];
+    if (!lens && !isClosing) return null;
+    
+    return (
+      <div 
+        className={`${styles.infoModalBackdrop} ${isClosing ? styles.fadeOut : styles.fadeIn}`} 
+        onClick={closeInfoModal}
+      >
+        <div className={`${styles.infoModal} ${isClosing ? styles.slideOut : styles.slideIn}`}>
+          <div className={styles.infoModalHeader}>
+            <h3 className={styles.infoModalTitle}>Insight Details</h3>
+            <button 
+              className={styles.closeModalButton}
+              onClick={closeModalWithAnimation}
+              aria-label="Close modal"
+            >
+              <X size={20} />
+            </button>
+          </div>
+          
+          <div className={styles.infoModalContent}>
+            {lens?.hidden_signal && (
+              <div className={styles.infoSection}>
+                <h4 className={styles.infoSectionTitle}>Hidden Signal</h4>
+                <p className={styles.infoSectionText}>{lens.hidden_signal}</p>
+              </div>
+            )}
+            
+            {lens?.ground_facts && (
+              <div className={styles.infoSection}>
+                <h4 className={styles.infoSectionTitle}>Ground Facts</h4>
+                <p className={styles.infoSectionText}>{lens.ground_facts}</p>
+              </div>
+            )}
+            
+            {lens?.insight && (
+              <div className={styles.infoSection}>
+                <h4 className={styles.infoSectionTitle}>Insight</h4>
+                <p className={styles.infoSectionText}>{lens.insight}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className={styles.container}>
@@ -214,11 +322,22 @@ export default function InsightPage() {
                       (lens, index) => (
                         <div key={index} className={styles.insightItem}>
                           <div className={styles.insightItemHeader}>
-                            {/* CHANGED: Show simplified_one_liner instead of hidden_signal */}
                             <h3 className={styles.insightItemTitle}>
                               {lens.simplified_one_liner}
                             </h3>
+                            
+                            {/* Move info button to top right corner of card */}
+                            {(lens.hidden_signal || lens.ground_facts || lens.insight) && (
+                              <button 
+                                className={styles.infoButtonTopRight}
+                                onClick={() => toggleInfoVisibility(index)}
+                                aria-label="Show insight details"
+                              >
+                                <Info size={18} className={styles.infoIcon} />
+                              </button>
+                            )}
                           </div>
+                          
                           <p className={styles.insightItemText}>
                             {lens.simplified_one_liner_explanation}
                           </p>
@@ -245,16 +364,16 @@ export default function InsightPage() {
                               />
                             )}
                           </button>
+                          
                           {visibleGraphs[index] &&
                             lens.metrics_examined &&
                             lens.metrics_examined.length > 0 && (
                               <div className={styles.graphsContainer}>
-                                {/* UPDATED: No longer mapping over each metric - pass entire array instead */}
                                 <div className={styles.metricGraphWrapper}>
                                   <GetMetrics
                                     selectedTime={null}
                                     onTimeChange={() => {}}
-                                    specificMetric={lens.metrics_examined} // UPDATED: Pass entire metrics array instead of individual metrics
+                                    specificMetric={lens.metrics_examined}
                                     readOnly={true}
                                     initialDateFilter={dateFilter}
                                     hideSkeletons={false}
@@ -272,6 +391,9 @@ export default function InsightPage() {
           )}
         </main>
       </div>
+      
+      {/* Render the global modal at the root level */}
+      {renderGlobalInfoModal()}
     </div>
   );
 }

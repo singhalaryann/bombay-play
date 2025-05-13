@@ -1,3 +1,4 @@
+/* styles/Insight.module.css */
 .container {
   min-height: 100vh;
   display: flex;
@@ -189,8 +190,14 @@
   pointer-events: none;
 }
 
+/* Position the info button in the top right corner of the insight card */
 .insightItemHeader {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 14px;
+  width: 100%;
 }
 
 .insightItemTitle {
@@ -200,6 +207,30 @@
   margin: 0;
   line-height: 1.4;
   letter-spacing: -0.01em;
+  width: calc(100% - 40px); /* Leave space for the info button */
+}
+
+.infoButtonTopRight {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.infoButtonTopRight:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.infoIcon {
+  color: #94A3B8;
 }
 
 .insightItemText {
@@ -243,13 +274,151 @@
   padding-top: 20px;
 }
 
-/* .metricGraphWrapper {
-  margin-bottom: 32px;
-  background: rgba(24, 24, 24, 0.6);
-  border-radius: 10px;
-  padding: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-} */
+/* Info Modal Animation Classes */
+.fadeIn {
+  animation: fadeIn 0.2s ease-in-out forwards;
+}
+
+.fadeOut {
+  animation: fadeOut 0.2s ease-in-out forwards;
+}
+
+.slideIn {
+  animation: slideIn 0.2s ease-in-out forwards;
+}
+
+.slideOut {
+  animation: slideOut 0.2s ease-in-out forwards;
+}
+
+/* Info Modal Styles - FIXED */
+.infoModalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999; /* Ensure it's above everything */
+  backdrop-filter: blur(2px);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.infoModal {
+  background-color: #121212;
+  border-radius: 12px;
+  width: 92%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+}
+
+.infoModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: #121212;
+}
+
+.infoModalTitle {
+  color: #CDCDCB;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.closeModalButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  color: #94A3B8;
+  border-radius: 50%;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.closeModalButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+}
+
+.infoModalContent {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background-color: #121212;
+}
+
+.infoSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.infoSectionTitle {
+  color: #82FF83;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.infoSectionText {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
 
 /* No Insight Found State */
 .noInsight {
@@ -451,6 +620,21 @@
   margin-top: 12px;
 }
 
+.skeletonTagsRow {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.skeletonTag {
+  height: 28px;
+  width: 100px;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.05) 8%, rgba(255, 255, 255, 0.1) 18%, rgba(255, 255, 255, 0.05) 33%);
+  background-size: 2000px 100%;
+  animation: shimmer 2s infinite linear;
+  border-radius: 6px;
+}
+
 /* Hidden loading state */
 .hiddenLoading {
   display: none;
@@ -472,6 +656,25 @@
 }
 
 .mainContent::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Custom scrollbar for modal */
+.infoModal::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.infoModal::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.infoModal::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.infoModal::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
 }
 
@@ -546,6 +749,11 @@
   .insightItem {
     padding: 20px;
   }
+  
+  .infoModal {
+    width: 95%;
+    max-width: none;
+  }
 }
 
 @media (max-width: 768px) {
@@ -560,9 +768,17 @@
   .insightItem {
     padding: 20px;
   }
-
-  .metricGraphWrapper {
-    padding: 12px;
+  
+  .infoModalContent {
+    padding: 16px;
+  }
+  
+  .infoSectionTitle {
+    font-size: 13px;
+  }
+  
+  .infoSectionText {
+    font-size: 13px;
   }
 }
 
@@ -604,10 +820,5 @@
   
   .insightItemText {
     font-size: 13px;
-  }
-
-  .metricGraphWrapper {
-    padding: 10px;
-    margin-bottom: 24px;
   }
 }
