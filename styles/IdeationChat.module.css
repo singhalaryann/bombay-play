@@ -1,8 +1,9 @@
+/* Main container and layout */
 .container {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #111111;
+  background: #050505;
   overflow: hidden;
 }
 
@@ -17,6 +18,8 @@
   padding: 20px;
   height: 100%;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .chatContainer {
@@ -24,25 +27,19 @@
   display: flex;
 }
 
-/* Main chat interface */
+/* Glass wrapper - main chat interface */
 .glassWrapper {
   width: 100%;
   height: 100%;
-  background: #1A1A1A;
+  background: rgba(17, 18, 17, 0.8);
   border-radius: 16px;
   padding: 24px;
   position: relative;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  border: 1px solid #2A2A2A;
-  animation: fadeIn 0.5s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(48, 48, 48, 0.6);
 }
 
 .messagesArea {
@@ -51,14 +48,14 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding-right: 10px;
-  margin-bottom: 16px;
+  padding-right: 12px;
+  margin-bottom: 20px;
   scrollbar-width: thin;
-  scrollbar-color: #333 transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 }
 
 .messagesArea::-webkit-scrollbar {
-  width: 5px;
+  width: 6px;
 }
 
 .messagesArea::-webkit-scrollbar-track {
@@ -66,12 +63,12 @@
 }
 
 .messagesArea::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
 }
 
 .messagesArea::-webkit-scrollbar-thumb:hover {
-  background: #444;
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* Welcome Content Styles */
@@ -79,198 +76,112 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   width: 100%;
-  min-height: 400px;
-  padding: 20px 0;
-  animation: fadeIn 0.6s ease-in-out;
+  padding: 40px 0;
+  animation: fadeIn 0.5s ease-in-out;
 }
 
-.welcomeAnimation {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 40px;
-}
-
-.welcomeCircle {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #1E1E1E 0%, #2A2A2A 100%);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  margin-bottom: 30px;
-  position: relative;
-  overflow: hidden;
-  animation: pulse 6s infinite ease-in-out;
-}
-
-.welcomeCircle::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background: linear-gradient(135deg, rgba(130, 255, 131, 0.05) 0%, rgba(130, 255, 131, 0.2) 100%);
-  border-radius: 50%;
-  z-index: 1;
-  animation: rotate 8s infinite linear;
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-
-@keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .welcomeHeading {
   color: #FFFFFF;
-  font-size: 36px;
-  font-weight: 600;
-  margin-bottom: 10px;
-  text-align: center;
-  animation: fadeInUp 0.8s ease-out 0.2s both;
-}
-
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.topicsLabel {
-  color: #AAA;
-  font-size: 18px;
-  margin-bottom: 16px;
-  text-align: center;
-  animation: fadeIn 0.8s ease-out 0.4s both;
-}
-
-.exampleTopicsContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  animation: fadeIn 0.8s ease-out 0.6s both;
-}
-
-.exampleTopics {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 10px;
-}
-
-.exampleTopic {
-  display: flex;
-  align-items: center;
-  padding: 12px 20px;
-  background: #222;
-  border-radius: 12px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  border: 1px solid #333;
-  gap: 10px;
-}
-
-.exampleTopic:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-  border-color: #444;
-}
-
-.exampleTopicIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  margin-right: 4px;
-}
-
-.exampleTopic span {
-  color: #E0E0E0;
-  font-size: 15px;
+  font-size: 32px;
   font-weight: 500;
+  margin-bottom: 40px;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Input Area Styles */
-.inputWrapper {
+/* Search Input and File Upload Styles */
+.searchWrapper {
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto 40px;
   position: relative;
-  margin-top: auto;
 }
 
-.inputContainer {
-  background: #242424;
-  border-radius: 12px;
-  padding: 12px 16px;
+/* UPDATED: Changed searchContainer from rounded (30px) to match second image (12px) */
+.searchContainer {
+  background: rgba(30, 32, 30, 0.8);
+  border-radius: 12px; /* Changed from 30px to 12px */
+  padding: 10px 14px; /* Adjusted padding to match second image */
   display: flex;
   align-items: center;
-  gap: 10px;
-  border: 1px solid #333;
+  border: 1px solid rgba(48, 48, 48, 0.9);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
-.inputContainer:focus-within {
-  border-color: #82FF83;
-  box-shadow: 0 4px 20px rgba(130, 255, 131, 0.15);
-}
-
-.input {
+.searchInput {
   flex: 1;
   background: transparent;
   border: none;
   color: #FFFFFF;
-  font-size: 16px;
+  font-size: 15px;
   outline: none;
-  /* padding: 8px 10px; */
+  padding: 12px 0;
   line-height: 1.5;
-  font-family: inherit;
-  min-height: 40px;
-  max-height: 120px;
-  resize: none;
-  overflow: auto;
+  min-width: 0; /* This prevents overflow issues */
 }
 
-.input::placeholder {
-  color: #777;
+.searchContainer:focus-within {
+  box-shadow: 0 4px 16px rgba(130, 255, 131, 0.15);
+  border-color: rgba(130, 255, 131, 0.3);
 }
 
-.input:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.searchInput::placeholder {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .fileInput {
   display: none;
 }
 
-/* Button Styles */
-.fileButton {
-  background: #333;
-  border: none;
-  border-radius: 10px;
-  width: 40px;
-  height: 40px;
+.plusButton, .arrowButton, .fileButton {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: none;
   cursor: pointer;
+  font-size: 18px;
+  margin-left: 8px;
   transition: all 0.2s ease;
-  color: #CCC;
 }
 
+/* UPDATED: Changed plusButton to transparent background to match FileText icon in second image */
+.plusButton {
+  background: transparent; /* Changed from rgba(48, 48, 48, 0.8) to transparent */
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* UPDATED: Simplified hover effect for plusButton, removed background change */
+.plusButton:hover {
+  color: #82FF83; /* Kept the color change on hover */
+  transform: scale(1.05); /* Kept the scale transform */
+}
+
+/* UPDATED: Changed fileButton to transparent background to match second image */
+.fileButton {
+  background: transparent; /* Changed from rgba(48, 48, 48, 0.8) to transparent */
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* UPDATED: Simplified hover effect for fileButton, removed background change */
 .fileButton:hover:not(:disabled) {
-  background: #444;
-  transform: translateY(-2px);
+  transform: scale(1.05); /* Kept the scale transform */
+  color: #82FF83; /* Kept the color change on hover */
 }
 
 .fileButton:disabled {
@@ -278,71 +189,81 @@
   cursor: not-allowed;
 }
 
-.sendButton {
-  background: rgba(130, 255, 131, 0.15);
-  border: none;
-  border-radius: 10px;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
+/* UPDATED: Changed arrowButton to transparent background to match Send icon in second image */
+.arrowButton {
+  background: transparent; /* Changed from rgba(130, 255, 131, 0.15) to transparent */
   color: #82FF83;
 }
 
-.sendButton:hover:not(:disabled) {
-  background: rgba(130, 255, 131, 0.25);
-  transform: translateY(-2px);
+/* UPDATED: Simplified hover effect for arrowButton, removed background change */
+.arrowButton:hover:not(:disabled) {
+  transform: scale(1.05); /* Kept the scale transform */
 }
 
-.sendButton:disabled {
+.arrowButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-/* Uploaded Files Styles */
+/* UPDATED: New uploadedFilesContainer for horizontal scrolling */
 .uploadedFilesContainer {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   width: 100%;
-  background: #222;
-  border-radius: 12px;
-  border: 1px solid #333;
+  background: rgba(25, 27, 25, 0.9);
+  border-radius: 8px;
+  border: 1px solid rgba(48, 48, 48, 0.9);
   animation: slideDown 0.3s ease-out;
 }
 
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
+/* UPDATED: Changed uploadedFiles to horizontal scrolling */
 .uploadedFiles {
   padding: 12px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  flex-direction: row;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 }
 
+/* UPDATED: Added horizontal scrollbar styling */
+.uploadedFiles::-webkit-scrollbar {
+  height: 4px;
+  width: 4px;
+}
+
+.uploadedFiles::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.uploadedFiles::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.uploadedFiles::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* UPDATED: Changed fileItem for horizontal layout */
 .fileItem {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 14px;
-  background: #2A2A2A;
-  border-radius: 8px;
-  min-width: 160px;
+  padding: 8px 12px;
+  background: rgba(35, 37, 35, 0.8);
+  border-radius: 6px;
+  transition: background 0.2s ease;
+  min-width: 150px;
   max-width: 220px;
-  border: 1px solid #333;
-  transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .fileItem:hover {
-  transform: translateY(-2px);
-  border-color: #444;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: rgba(40, 42, 40, 0.9);
 }
 
+/* UPDATED: Added fileContent container */
 .fileContent {
   display: flex;
   align-items: center;
@@ -352,12 +273,13 @@
 
 .fileIcon {
   color: #82FF83;
-  margin-right: 10px;
+  margin-right: 8px;
 }
 
+/* UPDATED: Modified fileName style */
 .fileName {
   font-size: 14px;
-  color: #DDD;
+  color: rgba(255, 255, 255, 0.9);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -367,123 +289,279 @@
 .removeFileBtn {
   background: transparent;
   border: none;
-  color: #AAA;
+  color: rgba(255, 255, 255, 0.6);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  width: 22px;
-  height: 22px;
   transition: all 0.2s ease;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
 }
 
 .removeFileBtn:hover {
-  color: #FF6B6B;
+  color: #ff6b6b;
   background: rgba(255, 107, 107, 0.1);
+}
+
+/* UPDATED: Updated animation for slideDown */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Feature Grid Styles */
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.featureCard {
+  background: rgba(30, 32, 30, 0.8);
+  border-radius: 12px;
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  position: relative;
+  border: 1px solid rgba(48, 48, 48, 0.9);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.featureCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(130, 255, 131, 0), transparent);
+  transition: all 0.3s ease;
+  opacity: 0;
+}
+
+.featureCard:hover {
+  background: rgba(35, 38, 35, 0.95);
+  border-color: rgba(130, 255, 131, 0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.featureCard:hover::before {
+  background: linear-gradient(90deg, transparent, rgba(130, 255, 131, 0.7), transparent);
+  opacity: 1;
+}
+
+.featureCard:active {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.cardIcon {
+  margin-bottom: 16px;
+  color: #82FF83;
+  opacity: 0.9;
+  transition: transform 0.3s ease;
+}
+
+.featureCard:hover .cardIcon {
+  transform: scale(1.1);
+}
+
+.cardTitle {
+  font-size: 18px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 12px 0;
+  transition: color 0.3s ease;
+}
+
+.featureCard:hover .cardTitle {
+  color: #82FF83;
+}
+
+.cardDescription {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
 }
 
 /* Message Styles */
 .message {
-  padding: 16px 18px;
+  padding: 14px 18px;
   border-radius: 12px;
-  max-width: 85%;
+  max-width: 90%;
   word-wrap: break-word;
   font-size: 15px;
   line-height: 1.5;
   animation: messageIn 0.3s ease-out;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 @keyframes messageIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .userMessage {
-  background: #202020;
-  color: #E0E0E0;
+  background: #0F110F;
+  color: #B3B3B3;
   align-self: flex-end;
   border-bottom-right-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
 }
 
 .aiMessage {
-  background: #2C2C2C;
-  color: #E5E5E5;
+  background: rgba(40, 42, 40, 0.8);
+  color: rgba(255, 255, 255, 0.9);
   align-self: flex-start;
   border-bottom-left-radius: 4px;
-  border-left: 3px solid #82FF83;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
 }
 
 .loadingMessage {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px 18px;
-  background: #2C2C2C;
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba(40, 42, 40, 0.8);
   border-radius: 12px;
-  color: #CCC;
+  color: rgba(255, 255, 255, 0.7);
   align-self: flex-start;
-  border-left: 3px solid #82FF83;
   animation: pulse 1.5s infinite alternate;
 }
 
 @keyframes pulse {
-  from { opacity: 0.8; }
-  to { opacity: 1; }
+  from {
+    opacity: 0.7;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .loadingIcon {
   animation: spin 1s linear infinite;
-  color: #82FF83;
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-/* Markdown Styles */
-.messageContent {
-  width: 100%;
+/* Input Area */
+.inputWrapper {
+  position: relative;
+  margin-top: auto;
+  padding-top: 8px;
 }
 
-.message p {
-  margin: 0 0 10px 0;
+/* UPDATED: Adjusted inputContainer padding and gap to match second image */
+.inputContainer {
+  background: rgba(30, 32, 30, 0.8);
+  border-radius: 12px;
+  padding: 10px 14px; /* Changed from 14px to 10px 14px to match second image */
+  display: flex;
+  gap: 8px; /* Changed from 12px to 8px to match second image spacing */
+  position: relative;
+  border: 1px solid rgba(48, 48, 48, 0.9);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.inputContainer:focus-within {
+  box-shadow: 0 4px 16px rgba(130, 255, 131, 0.15);
+  border-color: rgba(130, 255, 131, 0.3);
+}
+
+.input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 15px;
+  outline: none;
+  padding: 10px 14px;
   line-height: 1.5;
 }
 
-.message p:last-child {
-  margin-bottom: 0;
+.input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* UPDATED: Changed sendButton to transparent background to match second image */
+.sendButton {
+  background: transparent; /* Changed from rgba(130, 255, 131, 0.15) to transparent */
+  border: none;
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #82FF83;
+  z-index: 1;
+}
+
+/* UPDATED: Simplified hover effect for sendButton, removed background change */
+.sendButton:hover:not(:disabled) {
+  transform: scale(1.05); /* Kept the scale transform */
+}
+
+.sendButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Markdown Styles */
+.message p {
+  margin: 0;
+  line-height: 1.5;
+  color: inherit;
 }
 
 .message pre {
-  background: #191919;
+  background: rgba(18, 18, 18, 0.6);
   padding: 16px;
   border-radius: 8px;
   overflow-x: auto;
-  border: 1px solid #333;
+  border: 1px solid rgba(130, 255, 131, 0.1);
   margin: 12px 0;
-  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.2);
-}
-.messageImages {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-top: 12px;
 }
 
-.messageImage {
-  max-width: 100%;
-  border-radius: 8px;
-  border: 1px solid #333;
-  background: #1A1A1A;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
 .message code {
   background: rgba(130, 255, 131, 0.1);
-  padding: 3px 5px;
+  padding: 3px 6px;
   border-radius: 4px;
   font-family: monospace;
   font-size: 14px;
@@ -493,123 +571,117 @@
 .message a {
   color: #82FF83;
   text-decoration: none;
+  border-bottom: 1px solid rgba(130, 255, 131, 0.3);
   transition: all 0.2s ease;
 }
 
 .message a:hover {
-  text-decoration: underline;
-}
-
-.message ul, .message ol {
-  margin: 10px 0;
-  padding-left: 24px;
-}
-
-.message li {
-  margin-bottom: 6px;
-}
-
-.message strong {
-  color: #FFFFFF;
-  font-weight: 600;
-}
-
-.message em {
-  font-style: italic;
-  color: #DDD;
-}
-
-.message blockquote {
-  border-left: 3px solid #444;
-  padding: 2px 0 2px 16px;
-  margin: 12px 0;
-  color: #BBB;
-}
-
-.message h1, .message h2, .message h3, .message h4, .message h5 {
-  margin: 16px 0 10px;
-  color: #FFFFFF;
-}
-
-.message h1 {
-  font-size: 22px;
-  padding-bottom: 4px;
-  border-bottom: 1px solid #333;
-}
-
-.message h2 {
-  font-size: 20px;
-}
-
-.message h3 {
-  font-size: 18px;
+  border-bottom-color: #82FF83;
 }
 
 /* Responsive Breakpoints */
-@media (max-width: 768px) {
-  .mainContent {
-    padding: 16px;
-  }
-  
-  .message {
-    max-width: 90%;
-    font-size: 14px;
+@media (max-width: 1200px) {
+  .featureGrid {
+    gap: 20px;
   }
   
   .welcomeHeading {
     font-size: 28px;
+    margin-bottom: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .message {
+    max-width: 95%;
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  .inputContainer {
+    padding: 12px;
+  }
+
+  .input {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  .featureGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .searchWrapper {
+    margin-bottom: 30px;
   }
   
-  .welcomeCircle {
-    width: 100px;
-    height: 100px;
+  .welcomeHeading {
+    font-size: 24px;
     margin-bottom: 24px;
   }
   
-  .exampleTopics {
-    gap: 10px;
-  }
-  
-  .exampleTopic {
-    padding: 10px 16px;
+  /* UPDATED: Modified mobile styling for file items */
+  .fileItem {
+    min-width: 120px;
+    max-width: 180px;
   }
 }
 
 @media (max-width: 480px) {
   .mainContent {
     padding: 12px;
+    margin: 0 8px;
   }
-  
+
   .message {
-    max-width: 95%;
-    padding: 14px 16px;
+    max-width: 98%;
   }
-  
-  .glassWrapper {
-    padding: 16px;
+
+  .featureGrid {
+    gap: 12px;
+  }
+
+  .featureCard {
+    padding: 20px;
+  }
+
+  .cardTitle {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .cardDescription {
+    font-size: 13px;
   }
   
   .welcomeHeading {
-    font-size: 24px;
-  }
-  
-  .welcomeCircle {
-    width: 80px;
-    height: 80px;
+    font-size: 22px;
     margin-bottom: 20px;
   }
   
-  .exampleTopic {
-    padding: 8px 12px;
+  .searchContainer {
+    padding: 6px 6px 6px 16px;
   }
-  
-  .exampleTopic span {
+  .searchInput {
     font-size: 14px;
+    padding: 8px 0;
   }
   
-  .exampleTopics {
-    flex-direction: column;
-    width: 100%;
-    max-width: 200px;
+  .plusButton, .arrowButton {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+  
+  /* UPDATED: Further modified mobile styling for file items */
+  .fileItem {
+    min-width: 100px;
+    max-width: 160px;
+    padding: 6px 10px;
+  }
+  
+  .fileName {
+    font-size: 13px;
   }
 }

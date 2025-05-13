@@ -6,16 +6,46 @@ import Header from "../components/layout/Header";
 import Sidebar from "../components/layout/Sidebar";
 import { 
   Send, 
-  Loader,
+  Loader, 
+  Brain,        
+  BarChart2,    
+  MessageCircle,
+  Store,        
   FileText, 
-  X,
-  Gamepad2,
-  Code,
-  Palette
+  X 
 } from 'lucide-react';
 import ReactMarkdown from "react-markdown";
+import Image from 'next/image';
+import SplitText from "./SplitText";
+import { useAuth } from "../context/AuthContext";
+import LoginModal from "../components/common/LoginModal";
 
-// File item component for displaying uploaded files
+// UPDATED: Feature card component with hover state and short/full description
+const FeatureCard = ({ icon: Icon, title, description, shortDescription, onClick }) => {
+  // State to track hover interaction
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div 
+      className={styles.featureCard}
+      // UPDATED: Added hover state management
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onClick={onClick}
+    >
+      <div className={styles.cardIcon}>
+        <Icon size={24} />
+      </div>
+      <h3 className={styles.cardTitle}>{title}</h3>
+      <p className={styles.cardDescription}>
+        {/* UPDATED: Conditionally render short or full description */}
+        {isHovered ? description : shortDescription}
+      </p>
+    </div>
+  );
+};
+
+// UPDATED: FileItem component with new structure for horizontal layout
 const FileItem = ({ file, onRemove }) => (
   <div className={styles.fileItem}>
     <div className={styles.fileContent}>
@@ -28,34 +58,87 @@ const FileItem = ({ file, onRemove }) => (
   </div>
 );
 
-// Example topic component for welcome screen
-const ExampleTopic = ({ icon: Icon, text, color }) => (
-  <div className={styles.exampleTopic}>
-    <div className={styles.exampleTopicIcon} style={{ backgroundColor: color }}>
-      <Icon size={20} />
-    </div>
-    <span>{text}</span>
-  </div>
-);
-
 export default function IdeationChat() {
-  // State management
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [isFileUploadOpen, setIsFileUploadOpen] = useState(false);
   
+  // UPDATED: Added states for login modal and prompt tracking
+  const [promptCount, setPromptCount] = useState(0);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const router = useRouter();
+  const { userId } = useAuth();
 
-  // Auto-scroll to the bottom of the chat when new messages appear
+  // UPDATED: New feature cards with short descriptions
+  const featureCards = [
+    {
+      icon: Brain,
+      title: "AI LiveOps",
+      // UPDATED: Added short description for initial view
+      shortDescription: "Optimize game events with AI",
+      description: "Smarter Events. Deeper Engagement. Automate and optimize your LiveOps with generative AI. From event planning to segmentation and deploying offers or bundles, drive better player engagement and monetization, without the grind.",
+      // UPDATED: Added click handler to open login modal
+      onClick: () => {
+        if (!userId) {
+          setShowLoginModal(true);
+        }
+      }
+    },
+    {
+      icon: BarChart2,
+      title: "Competitive Analysis",
+      // UPDATED: Added short description for initial view
+      shortDescription: "Analyze market competition quickly",
+      description: "Know Your Market Before You Build. Upload design docs or concepts and instantly get a deconstructed view of your top competitors. Analyze across core metrics and export insights in shareable formats.",
+      // UPDATED: Added click handler to open login modal
+      onClick: () => {
+        if (!userId) {
+          setShowLoginModal(true);
+        }
+      }
+    },
+    {
+      icon: MessageCircle,
+      title: "Reddit Sentiment",
+      // UPDATED: Added short description for initial view
+      shortDescription: "Track community pulse in real-time",
+      description: "Tap Into the Pulse of Your Community. Monitor Reddit threads and communities around your game. Understand how players feel, what they're saying, and whether you're even on their radar.",
+      // UPDATED: Added click handler to open login modal
+      onClick: () => {
+        if (!userId) {
+          setShowLoginModal(true);
+        }
+      }
+    },
+    {
+      icon: Store,
+      title: "Store Analysis",
+      // UPDATED: Added short description for initial view
+      shortDescription: "Decode app store trends instantly",
+      description: "Decode App Store & Play Store Trends. Get focused insights from the App Store and Play Store. Track rankings, reviews, and critical metrics to position your game more effectively.",
+      // UPDATED: Added click handler to open login modal
+      onClick: () => {
+        if (!userId) {
+          setShowLoginModal(true);
+        }
+      }
+    }
+  ];
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // File upload handling functions
+  // UPDATED: Handler for successful login
+  const handleLoginSuccess = () => {
+    setShowLoginModal(false);
+  };
+
   const handleFileUploadClick = () => {
     fileInputRef.current.click();
   };
@@ -73,84 +156,55 @@ export default function IdeationChat() {
     }
   };
 
-  // Example topics for the welcome screen
-  const exampleTopics = [
-    { icon: Gamepad2, text: "Gaming", color: "rgba(130, 255, 131, 0.2)" },
-    { icon: Code, text: "Development", color: "rgba(120, 144, 255, 0.2)" },
-    { icon: Palette, text: "Design", color: "rgba(255, 130, 180, 0.2)" }
-  ];
-
-  // IMPORTANT: This function handles sending messages to your API endpoint
   const handleSend = async () => {
+    // UPDATED: Added login modal trigger after certain number of prompts
     if ((!input.trim() && uploadedFiles.length === 0) || isLoading) return;
+
+    const newPromptCount = promptCount + 1;
+    setPromptCount(newPromptCount);
     
-    const userMessage = input.trim();
-    
-    // Clear input field and show loading state
-    setInput("");
-    setIsLoading(true);
-    
-    // Display user's message in the chat
-    setMessages(prev => [...prev, { 
-      content: userMessage + (uploadedFiles.length > 0 ? 
+    // UPDATED: Show login modal after 2 prompts if not logged in
+    if (newPromptCount >= 2 && !userId) {
+      setShowLoginModal(true);
+      return;
+    }
+
+    const formData = new FormData();
+    uploadedFiles.forEach(file => {
+      formData.append('files', file);
+    });
+    formData.append('message', input);
+
+    setMessages((prev) => [...prev, { 
+      content: input + (uploadedFiles.length > 0 ? 
         `\n\n*Uploaded ${uploadedFiles.length} file(s): ${uploadedFiles.map(f => f.name).join(', ')}*` : 
         ''), 
-      role: "user" 
+      sender: "human" 
     }]);
+    
+    setIsLoading(true);
 
     try {
-      // Create FormData instance to handle files
-      const formData = new FormData();
-      
-      // Add the message text
-      formData.append('message', userMessage);
-      
-      // Add userId if needed
-      formData.append('userId', 'default');
-      
-      // Add all files with unique keys
-      if (uploadedFiles.length > 0) {
-        uploadedFiles.forEach((file, index) => {
-          const safeFile = new File([file], file.name, { type: file.type });
-          formData.append(`file${index+1}`, safeFile);
-        });
-      }
-      
-      // Call your API endpoint with FormData (for files)
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        body: formData, // Using FormData instead of JSON
+      const response = await fetch("https://generate-direct-flnr5jia5q-uc.a.run.app", {
+        method: "POST",
+        body: formData,
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.chat_id) {
+          router.push(`/analysis?chat=${data.chat_id}`);
+        }
+      } else {
+        console.error("Network response not OK:", response.status);
       }
-
-      const data = await response.json();
-      
-      if (data.error) {
-        throw new Error(data.error);
-      }
-      
-     // Add the assistant's response to the chat
-setMessages(prev => [...prev, {
-  content: data.response,
-  role: "assistant",
-  images: data.images || [] // Store any images that came with the response
-}]);
-    } catch (error) {
-      console.error("Error in chat process:", error);
-      
-      // Add an error message to the chat
-      setMessages(prev => [...prev, {
-        content: "Sorry, I encountered an error processing your request. Please try again.",
-        role: "assistant"
-      }]);
+    } catch (err) {
+      console.error("Error in handleSend:", err);
     } finally {
-      // Reset loading state and clear uploaded files
-      setIsLoading(false);
+      setInput("");
       setUploadedFiles([]);
       setIsFileUploadOpen(false);
+      setIsLoading(false);
     }
   };
 
@@ -165,51 +219,94 @@ setMessages(prev => [...prev, {
               <div className={styles.messagesArea}>
                 {messages.length === 0 && (
                   <div className={styles.welcomeContent}>
-                    <div className={styles.welcomeAnimation}>
-                      <div className={styles.welcomeCircle}></div>
-                      <h1 className={styles.welcomeHeading}>What can I help with?</h1>
+                    <SplitText
+                      className={styles.welcomeHeading}
+                      text="What can we help with?"
+                      fontSize="text-xl"
+                      fontWeight="font-semibold"
+                      textCenter={true}
+                      delay={50}
+                      animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
+                      animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+                      easing="easeOutCubic"
+                      threshold={0.2}
+                      rootMargin="-50px"
+                      duration={0.3}
+                    />
+                    
+                    <div className={styles.searchWrapper}>
+                      {/* UPDATED: Moved uploadedFilesContainer ABOVE the searchContainer */}
+                      {isFileUploadOpen && (
+                        <div className={styles.uploadedFilesContainer}>
+                          <div className={styles.uploadedFiles}>
+                            {uploadedFiles.map((file, idx) => (
+                              <FileItem key={idx} file={file} onRemove={removeFile} />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className={styles.searchContainer}>
+                        <input
+                          type="text"
+                          value={input}
+                          onChange={(e) => setInput(e.target.value)}
+                          placeholder="What would you like to explore?"
+                          className={styles.searchInput}
+                          onKeyPress={(e) => e.key === "Enter" && handleSend()}
+                          disabled={isLoading}
+                        />
+                        <button 
+                          className={styles.plusButton} 
+                          onClick={handleFileUploadClick}
+                        >
+                          <FileText size={18} />
+                        </button>
+                        <input
+                          type="file"
+                          multiple
+                          ref={fileInputRef}
+                          onChange={handleFileChange}
+                          className={styles.fileInput}
+                        />
+                        <button
+                          onClick={handleSend}
+                          className={styles.arrowButton}
+                          disabled={(!input.trim() && uploadedFiles.length === 0) || isLoading}
+                        >
+                          <Send size={18} />
+                        </button>
+                      </div>
                     </div>
                     
-                    <div className={styles.exampleTopicsContainer}>
-                      <p className={styles.topicsLabel}>Ask me about:</p>
-                      <div className={styles.exampleTopics}>
-                        {exampleTopics.map((topic, index) => (
-                          <ExampleTopic 
-                            key={index} 
-                            icon={topic.icon} 
-                            text={topic.text} 
-                            color={topic.color}
-                          />
-                        ))}
-                      </div>
+                    {/* UPDATED: Feature grid with new cards and hover interactions */}
+                    <div className={styles.featureGrid}>
+                      {featureCards.map((card, idx) => (
+                        <FeatureCard
+                          key={idx}
+                          icon={card.icon}
+                          title={card.title}
+                          description={card.description}
+                          shortDescription={card.shortDescription}
+                          onClick={card.onClick}
+                        />
+                      ))}
                     </div>
                   </div>
                 )}
 
                 {messages.map((msg, idx) => (
-  <div
-    key={idx}
-    className={`${styles.message} ${
-      msg.role === "user" ? styles.userMessage : styles.aiMessage
-    }`}
-  >
-    <div className={styles.messageContent}>
-      <ReactMarkdown>{msg.content}</ReactMarkdown>
-      {msg.images && msg.images.length > 0 && (
-        <div className={styles.messageImages}>
-          {msg.images.map((imgSrc, imgIdx) => (
-            <img
-              key={imgIdx}
-              src={imgSrc}
-              alt={`Generated chart ${imgIdx + 1}`}
-              className={styles.messageImage}
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  </div>
-))}
+                  <div
+                    key={idx}
+                    className={`${styles.message} ${
+                      msg.sender === "human" ? styles.userMessage : styles.aiMessage
+                    }`}
+                  >
+                    <div className={styles.messageContent}>
+                      <ReactMarkdown>{msg.content}</ReactMarkdown>
+                    </div>
+                  </div>
+                ))}
 
                 {isLoading && (
                   <div className={styles.loadingMessage}>
@@ -220,67 +317,65 @@ setMessages(prev => [...prev, {
                 <div ref={messagesEndRef} />
               </div>
 
-              <div className={styles.inputWrapper}>
-                {/* File upload display area */}
-                {isFileUploadOpen && (
-                  <div className={styles.uploadedFilesContainer}>
-                    <div className={styles.uploadedFiles}>
-                      {uploadedFiles.map((file, idx) => (
-                        <FileItem key={idx} file={file} onRemove={removeFile} />
-                      ))}
+              {messages.length > 0 && (
+                <div className={styles.inputWrapper}>
+                  {/* UPDATED: Moved uploadedFilesContainer ABOVE the inputContainer */}
+                  {isFileUploadOpen && (
+                    <div className={styles.uploadedFilesContainer}>
+                      <div className={styles.uploadedFiles}>
+                        {uploadedFiles.map((file, idx) => (
+                          <FileItem key={idx} file={file} onRemove={removeFile} />
+                        ))}
+                      </div>
                     </div>
+                  )}
+                  
+                  <div className={styles.inputContainer}>
+                    <input
+                      type="text"
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      placeholder="What's on your mind? Share your thoughts..."
+                      className={styles.input}
+                      onKeyPress={(e) => e.key === "Enter" && handleSend()}
+                      disabled={isLoading}
+                    />
+                    <button 
+                      className={styles.fileButton} 
+                      onClick={handleFileUploadClick}
+                      disabled={isLoading}
+                    >
+                      <FileText size={18} />
+                    </button>
+                    <input
+                      type="file"
+                      multiple
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      className={styles.fileInput}
+                    />
+                    <button
+                      onClick={handleSend}
+                      className={styles.sendButton}
+                      disabled={(!input.trim() && uploadedFiles.length === 0) || isLoading}
+                    >
+                      <Send size={18} />
+                    </button>
                   </div>
-                )}
-                
-                {/* Input area */}
-                <div className={styles.inputContainer}>
-                <textarea
-  value={input}
-  onChange={(e) => {
-    setInput(e.target.value);
-    // Auto-resize the textarea
-    e.target.style.height = 'auto';
-    e.target.style.height = e.target.scrollHeight + 'px';
-  }}
-  placeholder="Ask anything..."
-  className={styles.input}
-  onKeyPress={(e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  }}
-  disabled={isLoading}
-  rows="1"
-  style={{ resize: "none", overflow: "auto" }}
-/>
-                  <button 
-                    className={styles.fileButton} 
-                    onClick={handleFileUploadClick}
-                    disabled={isLoading}
-                  >
-                    <FileText size={18} />
-                  </button>
-                  <input
-                    type="file"
-                    multiple
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    className={styles.fileInput}
-                  />
-                  <button
-                    onClick={handleSend}
-                    className={styles.sendButton}
-                    disabled={(!input.trim() && uploadedFiles.length === 0) || isLoading}
-                  >
-                    <Send size={18} />
-                  </button>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </main>
       </div>
+      
+      {/* UPDATED: Login modal with new handling */}
+      {showLoginModal && (
+        <LoginModal
+          onClose={() => setShowLoginModal(false)} 
+          onSuccess={handleLoginSuccess}
+        />
+      )}
     </div>
   );
 }
