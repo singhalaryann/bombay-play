@@ -1,14 +1,14 @@
 // app/insight/page.js
-'use client';
-import React, { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from '../context/AuthContext';
-import Header from '../components/layout/Header';
-import Sidebar from '../components/layout/Sidebar';
-import GetMetrics from '../components/dashboard/GetMetrics';
-import { Calendar, ChevronDown, ChevronUp, BarChart2 } from 'lucide-react';
-import Image from 'next/image';
-import styles from '../../styles/Insight.module.css';
+"use client";
+import React, { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useAuth } from "../context/AuthContext";
+import Header from "../components/layout/Header";
+import Sidebar from "../components/layout/Sidebar";
+import GetMetrics from "../components/dashboard/GetMetrics";
+import { Calendar, ChevronDown, ChevronUp, BarChart2 } from "lucide-react";
+import Image from "next/image";
+import styles from "../../styles/Insight.module.css";
 
 export default function InsightPage() {
   const router = useRouter();
@@ -17,44 +17,47 @@ export default function InsightPage() {
   const [loading, setLoading] = useState(true);
   const [insight, setInsight] = useState(null);
   const [dateFilter, setDateFilter] = useState(null);
-  const [gameId, setGameId] = useState('ludogoldrush');
+  const [gameId, setGameId] = useState("ludogoldrush");
   const [userIds, setUserIds] = useState([]);
-  
+
   // State to track which insights have their graphs visible
   const [visibleGraphs, setVisibleGraphs] = useState({});
 
   useEffect(() => {
     const fetchInsightData = async () => {
-      const insightId = searchParams.get('id');
-      console.log('🔍 Fetching insight for id:', insightId);
+      const insightId = searchParams.get("id");
+      console.log("🔍 Fetching insight for id:", insightId);
       if (!userId || !insightId) {
-        console.log('⚠️ Missing userId or insightId, redirecting to dashboard');
-        router.push('/dashboard');
+        console.log("⚠️ Missing userId or insightId, redirecting to dashboard");
+        router.push("/dashboard");
         return;
       }
       setLoading(true);
       try {
-        const response = await fetch('https://get-insight-data-nrosabqhla-uc.a.run.app', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            // user_id: userId,
-            game_id: 'ludogoldrush',
-            insight_ids: [insightId],
-          }),
-        });
+        const response = await fetch(
+          "https://get-insight-data-nrosabqhla-uc.a.run.app",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              // user_id: userId,
+              game_id: "ludogoldrush",
+              insight_ids: [insightId],
+            }),
+          }
+        );
         const data = await response.json();
-        console.log('✅ API response:', data);
+        console.log("✅ API response:", data);
         if (data.insights && data.insights.length > 0) {
           const selectedInsight = data.insights[0];
-          console.log('Insight data:', selectedInsight);
+          console.log("Insight data:", selectedInsight);
           setInsight(selectedInsight);
-          
+
           // Extract query information
           if (selectedInsight.query) {
-            console.log('Query data:', selectedInsight.query);
+            console.log("Query data:", selectedInsight.query);
             setDateFilter(selectedInsight.query.date_filter || null);
-            setGameId(selectedInsight.query.game_id || 'ludogoldrush');
+            setGameId(selectedInsight.query.game_id || "ludogoldrush");
             setUserIds(selectedInsight.query.user_ids || []);
           }
         } else {
@@ -62,7 +65,7 @@ export default function InsightPage() {
           setDateFilter(null);
         }
       } catch (error) {
-        console.error('❌ Error fetching insight data:', error);
+        console.error("❌ Error fetching insight data:", error);
         setInsight(null);
         setDateFilter(null);
       } finally {
@@ -72,34 +75,35 @@ export default function InsightPage() {
     fetchInsightData();
   }, [userId, searchParams, router]);
 
-// Handle Analyse Board click
-const handleAnalyseClick = () => {
-  const insightId = searchParams.get('id');
-  console.log('Navigating to experiments with insight:', insightId);
-  router.push(`/z_experiment?insight=${insightId}`);
-};
+  // Handle Analyse Board click
+  const handleAnalyseClick = () => {
+    const insightId = searchParams.get("id");
+    console.log("Navigating to experiments with insight:", insightId);
+    router.push(`/z_experiment?insight=${insightId}`);
+  };
 
   // Toggle visibility of graphs for a specific lens
   const toggleGraphVisibility = (lensIndex) => {
-    console.log('Toggling graph visibility for lens:', lensIndex);
-    setVisibleGraphs(prev => ({
+    console.log("Toggling graph visibility for lens:", lensIndex);
+    setVisibleGraphs((prev) => ({
       ...prev,
-      [lensIndex]: !prev[lensIndex]
+      [lensIndex]: !prev[lensIndex],
     }));
   };
 
   // Format date filter for display
   const formatDateFilter = (filter) => {
-    if (!filter) return '';
-    
-    if (filter.type === 'last') {
-      if (filter.days === 0) return 'Today';
-      if (filter.days === 1) return 'Yesterday';
+    if (!filter) return "";
+
+    if (filter.type === "last") {
+      if (filter.days === 0) return "Today";
+      if (filter.days === 1) return "Yesterday";
       return `Last ${filter.days} days`;
     }
-    if (filter.type === 'yesterday') return 'Yesterday';
-    if (filter.type === 'between') return `${filter.start_date} - ${filter.end_date}`;
-    if (filter.type === 'since') return `Since ${filter.start_date}`;
+    if (filter.type === "yesterday") return "Yesterday";
+    if (filter.type === "between")
+      return `${filter.start_date} - ${filter.end_date}`;
+    if (filter.type === "since") return `Since ${filter.start_date}`;
     return JSON.stringify(filter);
   };
 
@@ -113,7 +117,7 @@ const handleAnalyseClick = () => {
             <div className={styles.insightSkeletonFilter}></div>
           </div>
         </div>
-        
+
         <div className={styles.actionRow}>
           <div className={styles.skeletonSubText}></div>
           <div className={styles.skeletonButton}>
@@ -140,9 +144,9 @@ const handleAnalyseClick = () => {
       <div className={styles.noInsightContent}>
         <h3>No insight found</h3>
         <p>The requested insight could not be found or is unavailable.</p>
-        <button 
-          className={styles.returnButton} 
-          onClick={() => router.push('/dashboard')}
+        <button
+          className={styles.returnButton}
+          onClick={() => router.push("/dashboard")}
         >
           Return to Dashboard
         </button>
@@ -165,7 +169,9 @@ const handleAnalyseClick = () => {
               <div className={styles.insightSection}>
                 <div className={styles.insightHeader}>
                   <div className={styles.insightTitleContainer}>
-                    <h2 className={styles.insightTitle}>{insight.headline || insight.insight_text}</h2>
+                    <h2 className={styles.insightTitle}>
+                      {insight.headline || insight.insight_text}
+                    </h2>
                     {dateFilter && (
                       <div className={styles.filterContainer}>
                         <div className={styles.dateFilterButton}>
@@ -179,9 +185,13 @@ const handleAnalyseClick = () => {
 
                 <div className={styles.actionRow}>
                   <p className={styles.subText}>
-                    Uncover actionable insights for each metric and enhance your strategies effortlessly.
+                    Uncover actionable insights for each metric and enhance your
+                    strategies effortlessly.
                   </p>
-                  <button className={styles.analyseButton} onClick={handleAnalyseClick}>
+                  <button
+                    className={styles.analyseButton}
+                    onClick={handleAnalyseClick}
+                  >
                     <span>Analyse Board</span>
                     <div className={styles.iconWrapper}>
                       <Image
@@ -197,49 +207,67 @@ const handleAnalyseClick = () => {
                 </div>
               </div>
 
-              {insight.insight_payload && insight.insight_payload.detailed_insights_by_lens && (
-                <div className={styles.insightsList}>
-                  {insight.insight_payload.detailed_insights_by_lens.map((lens, index) => (
-                    <div key={index} className={styles.insightItem}>
-                      <div className={styles.insightItemHeader}>
-                        {/* CHANGED: Show hidden_signal instead of lens_name */}
-                        <h3 className={styles.insightItemTitle}>{lens.hidden_signal}</h3>
-                      </div>
-                      <p className={styles.insightItemText}>{lens.insight}</p>
-                      
-                      <button 
-                        className={styles.showGraphsButton}
-                        onClick={() => toggleGraphVisibility(index)}
-                      >
-                        <BarChart2 size={18} className={styles.graphIcon} />
-                        <span>{visibleGraphs[index] ? 'Hide Graphs' : 'Show Graphs'}</span>
-                        {visibleGraphs[index] ? (
-                          <ChevronUp size={16} className={styles.chevronIcon} />
-                        ) : (
-                          <ChevronDown size={16} className={styles.chevronIcon} />
-                        )}
-                      </button>
-                      
-                      {visibleGraphs[index] && lens.metrics_examined && lens.metrics_examined.length > 0 && (
-  <div className={styles.graphsContainer}>
-    {/* UPDATED: No longer mapping over each metric - pass entire array instead */}
-    <div className={styles.metricGraphWrapper}>
-      <GetMetrics 
-        selectedTime={null}
-        onTimeChange={() => {}}
-        specificMetric={lens.metrics_examined} // UPDATED: Pass entire metrics array instead of individual metrics
-        readOnly={true}
-        initialDateFilter={dateFilter}
-        hideSkeletons={false}
-        userIds={userIds}
-      />
-    </div>
-  </div>
-)}
-                    </div>
-                  ))}
-                </div>
-              )}
+              {insight.insight_payload &&
+                insight.insight_payload.detailed_insights_by_lens && (
+                  <div className={styles.insightsList}>
+                    {insight.insight_payload.detailed_insights_by_lens.map(
+                      (lens, index) => (
+                        <div key={index} className={styles.insightItem}>
+                          <div className={styles.insightItemHeader}>
+                            {/* CHANGED: Show simplified_one_liner instead of hidden_signal */}
+                            <h3 className={styles.insightItemTitle}>
+                              {lens.simplified_one_liner}
+                            </h3>
+                          </div>
+                          <p className={styles.insightItemText}>
+                            {lens.simplified_one_liner_explanation}
+                          </p>
+
+                          <button
+                            className={styles.showGraphsButton}
+                            onClick={() => toggleGraphVisibility(index)}
+                          >
+                            <BarChart2 size={18} className={styles.graphIcon} />
+                            <span>
+                              {visibleGraphs[index]
+                                ? "Hide Graphs"
+                                : "Show Graphs"}
+                            </span>
+                            {visibleGraphs[index] ? (
+                              <ChevronUp
+                                size={16}
+                                className={styles.chevronIcon}
+                              />
+                            ) : (
+                              <ChevronDown
+                                size={16}
+                                className={styles.chevronIcon}
+                              />
+                            )}
+                          </button>
+                          {visibleGraphs[index] &&
+                            lens.metrics_examined &&
+                            lens.metrics_examined.length > 0 && (
+                              <div className={styles.graphsContainer}>
+                                {/* UPDATED: No longer mapping over each metric - pass entire array instead */}
+                                <div className={styles.metricGraphWrapper}>
+                                  <GetMetrics
+                                    selectedTime={null}
+                                    onTimeChange={() => {}}
+                                    specificMetric={lens.metrics_examined} // UPDATED: Pass entire metrics array instead of individual metrics
+                                    readOnly={true}
+                                    initialDateFilter={dateFilter}
+                                    hideSkeletons={false}
+                                    userIds={userIds}
+                                  />
+                                </div>
+                              </div>
+                            )}
+                        </div>
+                      )
+                    )}
+                  </div>
+                )}
             </>
           )}
         </main>

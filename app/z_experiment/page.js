@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/layout/Header';
 import Sidebar from '../components/layout/Sidebar';
-import { ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, Loader2, Info } from 'lucide-react';
 import styles from '../../styles/z_Experiment.module.css';
 
 export default function ExperimentPage() {
@@ -277,6 +277,29 @@ export default function ExperimentPage() {
     </div>
   );
 
+  // NEW: Render explanation section with toggle functionality
+  const renderExplanationSection = (title, content, explanation) => {
+    if (!content && !explanation) return null;
+    
+    return (
+      <div className={styles.detailItem}>
+        <h4 className={styles.detailTitle}>{title}</h4>
+        {content && <p className={styles.detailText}>{content}</p>}
+        
+        {/* NEW: Added explanation section */}
+        {explanation && (
+          <div className={styles.explanationContainer}>
+            <div className={styles.explanationHeader}>
+              <Info size={16} className={styles.infoIcon} />
+              <span className={styles.explanationTitle}>Explanation</span>
+            </div>
+            <p className={styles.explanationText}>{explanation}</p>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className={styles.container}>
       <Header />
@@ -311,6 +334,8 @@ export default function ExperimentPage() {
                       <button 
                         className={styles.expandButton}
                         onClick={() => toggleCardExpansion(index)}
+                        aria-expanded={expandedCards[index] ? "true" : "false"}
+                        aria-label={expandedCards[index] ? "Collapse experiment details" : "Expand experiment details"}
                       >
                         {expandedCards[index] ? (
                           <ChevronUp size={20} className={styles.chevronIcon} />
@@ -322,7 +347,20 @@ export default function ExperimentPage() {
                     
                     {/* Initial visible content */}
                     <div className={styles.experimentItemMain}>
-                      <p className={styles.experimentItemText}>{experiment.hypothesis}</p>
+                      <div className={styles.hypothesisContainer}>
+                        <p className={styles.experimentItemText}>{experiment.hypothesis}</p>
+                        
+                        {/* NEW: Added hypothesis explanation toggler if available */}
+                        {experiment.hypothesis_explanation && (
+                          <div className={styles.hypothesisExplanationContainer}>
+                            <div className={styles.hypothesisExplanationToggle}>
+                              <Info size={16} className={styles.infoIcon} />
+                              <span className={styles.explanationTitle}>Why This Matters</span>
+                            </div>
+                            <p className={styles.hypothesisExplanation}>{experiment.hypothesis_explanation}</p>
+                          </div>
+                        )}
+                      </div>
                       
                       <div className={styles.tagsRow}>
                         <div className={`${styles.tag} ${getImpactClass(experiment.impact)}`}>
@@ -336,28 +374,36 @@ export default function ExperimentPage() {
                       </div>
                     </div>
                     
-                    {/* Expanded details */}
+                    {/* Expanded details with new explanation fields */}
                     {expandedCards[index] && (
                       <div className={styles.expandedDetails}>
-                        <div className={styles.detailItem}>
-                          <h4 className={styles.detailTitle}>Test Design</h4>
-                          <p className={styles.detailText}>{experiment.test_design}</p>
-                        </div>
+                        {/* Test Design with Explanation */}
+                        {renderExplanationSection(
+                          "Test Design", 
+                          experiment.test_design, 
+                          experiment.test_design_explanation
+                        )}
                         
-                        <div className={styles.detailItem}>
-                          <h4 className={styles.detailTitle}>Success Guardrail Metrics</h4>
-                          <p className={styles.detailText}>{experiment.success_guardrail_metrics}</p>
-                        </div>
+                        {/* Success Guardrail Metrics with Explanation */}
+                        {renderExplanationSection(
+                          "Success Guardrail Metrics", 
+                          experiment.success_guardrail_metrics, 
+                          experiment.success_guardrail_metrics_explanation
+                        )}
                         
-                        <div className={styles.detailItem}>
-                          <h4 className={styles.detailTitle}>Data Rationale</h4>
-                          <p className={styles.detailText}>{experiment.data_rationale}</p>
-                        </div>
+                        {/* Data Rationale with Explanation */}
+                        {renderExplanationSection(
+                          "Data Rationale", 
+                          experiment.data_rationale, 
+                          experiment.data_rationale_explanation
+                        )}
                         
-                        <div className={styles.detailItem}>
-                          <h4 className={styles.detailTitle}>Math & Statistical Notes</h4>
-                          <p className={styles.detailText}>{experiment.math_stat_notes}</p>
-                        </div>
+                        {/* Math & Statistical Notes with Explanation */}
+                        {renderExplanationSection(
+                          "Math & Statistical Notes", 
+                          experiment.math_stat_notes, 
+                          experiment.math_stat_notes_explanation
+                        )}
                       </div>
                     )}
                   </div>
