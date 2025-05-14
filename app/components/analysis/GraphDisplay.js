@@ -551,7 +551,7 @@ else if (metric_type === 'bar' || metric_type === 'hist') {
                       fill: 'rgba(255,255,255,0.6)',
                       fontSize: 12
                     }}
-                    domain={yDomainFinal}
+                   domain={[0, yDomainFinal[1]]}
                     allowDataOverflow
                     scale="linear"
                   />
@@ -659,7 +659,7 @@ else if (metric_type === 'bar' || metric_type === 'hist') {
                       fill: 'rgba(255,255,255,0.6)',
                       fontSize: 12
                     }}
-                    domain={yDomainFinal}
+                   domain={[0, yDomainFinal[1]]}
                     allowDataOverflow
                     scale="linear"
                   />
@@ -753,7 +753,7 @@ else if (metric_type === 'bar' || metric_type === 'hist') {
                       fill: 'rgba(255,255,255,0.6)',
                       fontSize: 12
                     }}
-                    domain={yDomainFinal}
+                   domain={[0, yDomainFinal[1]]}
                     allowDataOverflow
                     scale="linear"
                   />
