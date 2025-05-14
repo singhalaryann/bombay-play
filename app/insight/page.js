@@ -292,8 +292,8 @@ export default function InsightPage() {
                 </div>
 
                 <div className={styles.actionRow}>
-                  <p className={styles.subText}>
-  {insight?.insight_payload?.synthesis || insight?.synthesis || "Uncover actionable insights for each metric and enhance your strategies effortlessly."}
+               <p className={styles.subText}>
+  {insight?.insight_payload?.segment_snapshot?.description || "Uncover actionable insights for each metric and enhance your strategies effortlessly."}
 </p>
                   <button
                     className={styles.analyseButton}
