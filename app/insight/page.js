@@ -36,6 +36,7 @@ export default function InsightPage() {
       console.log("🔍 Fetching insight for id:", insightId);
       if (!userId || !insightId) {
         console.log("⚠️ Missing userId or insightId, redirecting to dashboard");
+        setLoading(false); // Ensure loading state is reset before redirect
         router.push("/dashboard");
         return;
       }
