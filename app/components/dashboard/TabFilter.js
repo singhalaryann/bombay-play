@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from '../../../styles/TabFilter.module.css';
 
-// Updated to accept readOnly prop for displaying filter in disabled state
+// Update/d to accept readOnly prop for displaying filter in disabled state
 const TabFilter = ({ selected, onChange, disabled, readOnly }) => {
   // Early return with simplified read-only view if in readOnly mode
   if (readOnly) {
