@@ -51,15 +51,16 @@ export async function POST(request) {
       console.log("🛠️ Creating assistant...");
       const assistant = await openai.beta.assistants.create({
         name: "Chat Helper",
+        // UPDATED: Enhanced instructions to handle data format without questioning
         instructions:
-          "You are a helpful assistant that can write code to solve problems with code_interpreter. When CSV files are uploaded, use code_interpreter to analyze the data and create visualizations. For questions about user metrics like DAU/WAU/MAU, IMMEDIATELY use the get_metrics function without asking for confirmation. Always be direct and helpful.",
+            "You are a helpful assistant that can write code to solve problems with code_interpreter. When CSV files are uploaded, use code_interpreter to analyze the data and create visualizations. For questions about user metrics like DAU/WAU/MAU, IMMEDIATELY use the bq_tool function without asking for confirmation. When you receive data from bq_tool function, always interpret it as the correct metric data and create beautiful visualizations. If data comes as [{date, value}] format, treat 'value' as the metric requested (e.g., for DAU it's daily users, for retention it's retention percentage). Never question the data format - always present it in the most user-friendly way with charts and clear explanations. Always be direct and helpful.",
         model: "gpt-4o",
         tools: [
           { type: "code_interpreter" },
           { 
             type: "function",
             function: {
-              name: "get_metrics",
+              name: "bq_tool",
               description: "Get user metrics like DAU, WAU, MAU, and other statistics from our database",
               parameters: {
                 type: "object",
@@ -84,6 +85,11 @@ export async function POST(request) {
       console.log("✅ Assistant created:", assistantId);
     } else {
       console.log("✅ Using existing assistant:", assistantId);
+      // ADDED: Update existing assistant with new instructions
+      await openai.beta.assistants.update(assistantId, {
+        instructions: "You are a helpful assistant that can write code to solve problems with code_interpreter. When CSV files are uploaded, use code_interpreter to analyze the data and create visualizations. For questions about user metrics like DAU/WAU/MAU, IMMEDIATELY use the bq_tool function without asking for confirmation. When you receive data from bq_tool function, always interpret it as the correct metric data and create beautiful visualizations. If data comes as [{date, value}] format, treat 'value' as the metric requested (e.g., for DAU it's daily users, for retention it's retention percentage). Never question the data format - always present it in the most user-friendly way with charts and clear explanations. Always be direct and helpful."
+      });
+      console.log("✅ Assistant instructions updated");
     }
 
     // 4. Create/reuse thread
@@ -282,27 +288,29 @@ export async function POST(request) {
                       // Send function call notification to client
                       const functionChunk = JSON.stringify({
                         type: 'function_call',
-                        content: `Fetching ${args.metric_type} data...`,
+                        // UPDATED: Added fallback for metric_type
+                        content: `Fetching ${args.metric_type || 'user'} data...`,
                         isComplete: false
                       }) + '\n';
                       
                       controller.enqueue(new TextEncoder().encode(functionChunk));
                       
-// Call the BQ tool API with timeout
-console.log("🔍 Attempting to call Python API...");
-console.log("🔍 URL:", "http://0.0.0.0:8696/run_bq_tool");
-console.log("🔍 Payload:", {question: `Get ${args.metric_type} data ${args.time_period ? 'for ' + args.time_period : ''}`});
+                      // Call the BQ tool API with timeout
+                      console.log("🔍 Attempting to call Python API...");
+                      console.log("🔍 URL:", "http://0.0.0.0:8696/run_bq_tool");
+                      // UPDATED: Handle both question and metric_type parameters
+                      console.log("🔍 Payload:", {question: args.question || `Get ${args.metric_type || 'user'} data ${args.time_period ? 'for ' + args.time_period : ''}`});
 
-const bqResponse = await axios.post("http://0.0.0.0:8696/run_bq_tool", {
-  question: `Get ${args.metric_type} data ${args.time_period ? 'for ' + args.time_period : ''}`
-}, {
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  timeout: 10000 // 10 seconds timeout
-});
+                      const bqResponse = await axios.post("http://0.0.0.0:8696/run_bq_tool", {
+                        question: args.question || `Get ${args.metric_type || 'user'} data ${args.time_period ? 'for ' + args.time_period : ''}`
+                      }, {
+                        headers: {
+                          'Content-Type': 'application/json'
+                        },
+                        timeout: 10000 // 10 seconds timeout
+                      });
 
-console.log("📊 BQ API Response:", JSON.stringify(bqResponse.data));                      
+                      console.log("📊 BQ API Response:", JSON.stringify(bqResponse.data));                      
                       // Add the response to tool outputs
                       toolOutputs.push({
                         tool_call_id: toolCall.id,
@@ -321,12 +329,44 @@ console.log("📊 BQ API Response:", JSON.stringify(bqResponse.data));
                 // Submit the tool outputs back to continue the run
                 if (toolOutputs.length > 0) {
                   console.log("🔄 Submitting tool outputs:", JSON.stringify(toolOutputs));
-                  await openai.beta.threads.runs.submitToolOutputs(
+                  
+                  // CHANGE: Submit outputs with stream:true to continue receiving events
+                  const continuedRun = await openai.beta.threads.runs.submitToolOutputs(
                     threadId,
                     event.data.id,
-                    { tool_outputs: toolOutputs }
+                    { 
+                      tool_outputs: toolOutputs,
+                      stream: true  // ADDED: Enable streaming for continued response
+                    }
                   );
+                  
+                  // ADDED: Continue processing the stream after tool submission
+                  for await (const continuedEvent of continuedRun) {
+                    console.log(`📡 Continued stream event: ${continuedEvent.event}`);
+                    
+                    // Process continued events same as before
+                    if (continuedEvent.event === 'thread.message.delta') {
+                      if (continuedEvent.data.delta.content) {
+                        for (const contentDelta of continuedEvent.data.delta.content) {
+                          if (contentDelta.type === 'text' && contentDelta.text?.value) {
+                            const textChunk = contentDelta.text.value;
+                            responseText += textChunk;
+                            
+                            const chunk = JSON.stringify({
+                              type: 'text',
+                              content: textChunk,
+                              isComplete: false
+                            }) + '\n';
+                            
+                            controller.enqueue(new TextEncoder().encode(chunk));
+                          }
+                        }
+                      }
+                    }
+                    // Handle other continued events...
+                  }
                 }
+                // REMOVED: break statement so main loop can continue
                 break;
 
               case 'thread.run.completed':
