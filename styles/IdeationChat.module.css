@@ -101,111 +101,84 @@
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Search Input and File Upload Styles */
-.searchWrapper {
-  width: 100%;
-  max-width: 700px;
-  margin: 0 auto 40px;
-  position: relative;
+/* Welcome Animation Styles */
+.welcomeAnimation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40px;
 }
 
-/* UPDATED: Changed searchContainer from rounded (30px) to match second image (12px) */
-.searchContainer {
-  background: rgba(30, 32, 30, 0.8);
-  border-radius: 12px; /* Changed from 30px to 12px */
-  padding: 10px 14px; /* Adjusted padding to match second image */
+.welcomeCircle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #82FF83, #60FF60);
+  margin-bottom: 20px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+/* Example Topics Styles */
+.exampleTopicsContainer {
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+}
+
+.topicsLabel {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.exampleTopics {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.exampleTopic {
   display: flex;
   align-items: center;
-  border: 1px solid rgba(48, 48, 48, 0.9);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba(30, 32, 30, 0.8);
+  border-radius: 20px;
+  border: 1px solid rgba(48, 48, 48, 0.6);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
-.searchInput {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: #FFFFFF;
-  font-size: 15px;
-  outline: none;
-  padding: 12px 0;
-  line-height: 1.5;
-  min-width: 0; /* This prevents overflow issues */
-}
-
-.searchContainer:focus-within {
-  box-shadow: 0 4px 16px rgba(130, 255, 131, 0.15);
+.exampleTopic:hover {
+  background: rgba(35, 37, 35, 0.9);
   border-color: rgba(130, 255, 131, 0.3);
+  transform: translateY(-2px);
 }
 
-.searchInput::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.fileInput {
-  display: none;
-}
-
-.plusButton, .arrowButton, .fileButton {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+.exampleTopicIcon {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: none;
-  cursor: pointer;
-  font-size: 18px;
-  margin-left: 8px;
-  transition: all 0.2s ease;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
 }
 
-/* UPDATED: Changed plusButton to transparent background to match FileText icon in second image */
-.plusButton {
-  background: transparent; /* Changed from rgba(48, 48, 48, 0.8) to transparent */
-  color: rgba(255, 255, 255, 0.7);
-}
-
-/* UPDATED: Simplified hover effect for plusButton, removed background change */
-.plusButton:hover {
-  color: #82FF83; /* Kept the color change on hover */
-  transform: scale(1.05); /* Kept the scale transform */
-}
-
-/* UPDATED: Changed fileButton to transparent background to match second image */
-.fileButton {
-  background: transparent; /* Changed from rgba(48, 48, 48, 0.8) to transparent */
-  color: rgba(255, 255, 255, 0.7);
-}
-
-/* UPDATED: Simplified hover effect for fileButton, removed background change */
-.fileButton:hover:not(:disabled) {
-  transform: scale(1.05); /* Kept the scale transform */
-  color: #82FF83; /* Kept the color change on hover */
-}
-
-.fileButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* UPDATED: Changed arrowButton to transparent background to match Send icon in second image */
-.arrowButton {
-  background: transparent; /* Changed from rgba(130, 255, 131, 0.15) to transparent */
-  color: #82FF83;
-}
-
-/* UPDATED: Simplified hover effect for arrowButton, removed background change */
-.arrowButton:hover:not(:disabled) {
-  transform: scale(1.05); /* Kept the scale transform */
-}
-
-.arrowButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* UPDATED: New uploadedFilesContainer for horizontal scrolling */
+/* Uploaded Files Container */
 .uploadedFilesContainer {
   margin-bottom: 12px;
   width: 100%;
@@ -215,7 +188,6 @@
   animation: slideDown 0.3s ease-out;
 }
 
-/* UPDATED: Changed uploadedFiles to horizontal scrolling */
 .uploadedFiles {
   padding: 12px;
   display: flex;
@@ -226,7 +198,6 @@
   scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 }
 
-/* UPDATED: Added horizontal scrollbar styling */
 .uploadedFiles::-webkit-scrollbar {
   height: 4px;
   width: 4px;
@@ -245,7 +216,6 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* UPDATED: Changed fileItem for horizontal layout */
 .fileItem {
   display: flex;
   align-items: center;
@@ -263,7 +233,6 @@
   background: rgba(40, 42, 40, 0.9);
 }
 
-/* UPDATED: Added fileContent container */
 .fileContent {
   display: flex;
   align-items: center;
@@ -274,9 +243,9 @@
 .fileIcon {
   color: #82FF83;
   margin-right: 8px;
+  flex-shrink: 0;
 }
 
-/* UPDATED: Modified fileName style */
 .fileName {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.9);
@@ -298,6 +267,7 @@
   border-radius: 50%;
   width: 20px;
   height: 20px;
+  flex-shrink: 0;
 }
 
 .removeFileBtn:hover {
@@ -305,7 +275,6 @@
   background: rgba(255, 107, 107, 0.1);
 }
 
-/* UPDATED: Updated animation for slideDown */
 @keyframes slideDown {
   from {
     opacity: 0;
@@ -315,89 +284,6 @@
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-/* Feature Grid Styles */
-.featureGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.featureCard {
-  background: rgba(30, 32, 30, 0.8);
-  border-radius: 12px;
-  padding: 24px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-  position: relative;
-  border: 1px solid rgba(48, 48, 48, 0.9);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.featureCard::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(130, 255, 131, 0), transparent);
-  transition: all 0.3s ease;
-  opacity: 0;
-}
-
-.featureCard:hover {
-  background: rgba(35, 38, 35, 0.95);
-  border-color: rgba(130, 255, 131, 0.3);
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-}
-
-.featureCard:hover::before {
-  background: linear-gradient(90deg, transparent, rgba(130, 255, 131, 0.7), transparent);
-  opacity: 1;
-}
-
-.featureCard:active {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-}
-
-.cardIcon {
-  margin-bottom: 16px;
-  color: #82FF83;
-  opacity: 0.9;
-  transition: transform 0.3s ease;
-}
-
-.featureCard:hover .cardIcon {
-  transform: scale(1.1);
-}
-
-.cardTitle {
-  font-size: 18px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
-  margin: 0 0 12px 0;
-  transition: color 0.3s ease;
-}
-
-.featureCard:hover .cardTitle {
-  color: #82FF83;
-}
-
-.cardDescription {
-  font-size: 14px;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.7);
-  margin: 0;
 }
 
 /* Message Styles */
@@ -436,6 +322,26 @@
   align-self: flex-start;
   border-bottom-left-radius: 4px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.messageContent {
+  width: 100%;
+}
+
+/* Message Images Styles */
+.messageImages {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.messageImage {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid rgba(48, 48, 48, 0.6);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .loadingMessage {
@@ -479,13 +385,13 @@
   padding-top: 8px;
 }
 
-/* UPDATED: Adjusted inputContainer padding and gap to match second image */
 .inputContainer {
   background: rgba(30, 32, 30, 0.8);
   border-radius: 12px;
-  padding: 10px 14px; /* Changed from 14px to 10px 14px to match second image */
+  padding: 10px 14px;
   display: flex;
-  gap: 8px; /* Changed from 12px to 8px to match second image spacing */
+  align-items: center;
+  gap: 8px;
   position: relative;
   border: 1px solid rgba(48, 48, 48, 0.9);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -504,8 +410,12 @@
   color: rgba(255, 255, 255, 0.9);
   font-size: 15px;
   outline: none;
-  padding: 10px 14px;
+  padding: 10px 0;
   line-height: 1.5;
+  resize: none;
+  overflow: hidden;
+  min-height: 20px;
+  max-height: 120px;
 }
 
 .input::placeholder {
@@ -517,9 +427,13 @@
   cursor: not-allowed;
 }
 
-/* UPDATED: Changed sendButton to transparent background to match second image */
-.sendButton {
-  background: transparent; /* Changed from rgba(130, 255, 131, 0.15) to transparent */
+.fileInput {
+  display: none;
+}
+
+/* UPDATED: All buttons now have transparent backgrounds */
+.fileButton, .sendButton {
+  background: transparent;
   border: none;
   border-radius: 8px;
   width: 40px;
@@ -529,13 +443,26 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: #82FF83;
-  z-index: 1;
+  color: rgba(255, 255, 255, 0.7);
+  flex-shrink: 0;
 }
 
-/* UPDATED: Simplified hover effect for sendButton, removed background change */
+.fileButton:hover:not(:disabled) {
+  color: #82FF83;
+  transform: scale(1.05);
+}
+
+.fileButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sendButton {
+  color: #82FF83;
+}
+
 .sendButton:hover:not(:disabled) {
-  transform: scale(1.05); /* Kept the scale transform */
+  transform: scale(1.05);
 }
 
 .sendButton:disabled {
@@ -581,13 +508,13 @@
 
 /* Responsive Breakpoints */
 @media (max-width: 1200px) {
-  .featureGrid {
-    gap: 20px;
-  }
-  
   .welcomeHeading {
     font-size: 28px;
     margin-bottom: 30px;
+  }
+  
+  .exampleTopics {
+    gap: 12px;
   }
 }
 
@@ -603,78 +530,71 @@
   }
 
   .input {
-    padding: 8px 12px;
+    padding: 8px 0;
     font-size: 14px;
   }
 
-  .featureGrid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .searchWrapper {
-    margin-bottom: 30px;
-  }
-  
   .welcomeHeading {
     font-size: 24px;
     margin-bottom: 24px;
   }
   
-  /* UPDATED: Modified mobile styling for file items */
+  .exampleTopics {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .exampleTopic {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+  
   .fileItem {
     min-width: 120px;
     max-width: 180px;
+  }
+  
+  .fileButton, .sendButton {
+    width: 36px;
+    height: 36px;
   }
 }
 
 @media (max-width: 480px) {
   .mainContent {
     padding: 12px;
-    margin: 0 8px;
+  }
+
+  .glassWrapper {
+    padding: 16px;
   }
 
   .message {
     max-width: 98%;
-  }
-
-  .featureGrid {
-    gap: 12px;
-  }
-
-  .featureCard {
-    padding: 20px;
-  }
-
-  .cardTitle {
-    font-size: 16px;
-    margin-bottom: 8px;
-  }
-
-  .cardDescription {
+    padding: 10px 14px;
     font-size: 13px;
   }
-  
+
   .welcomeHeading {
     font-size: 22px;
     margin-bottom: 20px;
   }
   
-  .searchContainer {
-    padding: 6px 6px 6px 16px;
+  .welcomeCircle {
+    width: 50px;
+    height: 50px;
   }
-  .searchInput {
+  
+  .inputContainer {
+    padding: 8px 10px;
+  }
+  
+  .input {
     font-size: 14px;
-    padding: 8px 0;
+    padding: 6px 0;
   }
   
-  .plusButton, .arrowButton {
-    width: 32px;
-    height: 32px;
-    font-size: 16px;
-  }
-  
-  /* UPDATED: Further modified mobile styling for file items */
   .fileItem {
     min-width: 100px;
     max-width: 160px;
@@ -683,5 +603,10 @@
   
   .fileName {
     font-size: 13px;
+  }
+  
+  .fileButton, .sendButton {
+    width: 32px;
+    height: 32px;
   }
 }

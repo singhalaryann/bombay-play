@@ -1,55 +1,35 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import styles from "../../../styles/Sidebar.module.css";
-// Import authentication and login modal components
-import { useAuth } from "../../context/AuthContext";
-import LoginModal from "../common/LoginModal";
+// REMOVED: Authentication and login modal imports - not needed anymore
 
 const Sidebar = () => {
-  // Initialize routing and authentication hooks
+  // Initialize routing hooks
   const router = useRouter();
   const pathname = usePathname();
-  const { userId } = useAuth();
-  
-  // State management for login modal and redirection
-  // COMMENTED: Login modal state management
-  // const [showLoginModal, setShowLoginModal] = useState(false);
-  // const [redirectPath, setRedirectPath] = useState(null);
-  
+  // REMOVED: Authentication hook - not needed
+
+  // REMOVED: All login modal state management
+
   // Determine active page for menu item highlighting
   const isDashboardActive = pathname === "/dashboard";
   const isAnalyticsActive = pathname === "/analytics";
-  
-  // Handle navigation with authentication check
+
+  // SIMPLIFIED: Handle navigation without any authentication checks
   const handleNavigation = (path) => {
     // Validate path input
     if (typeof path !== "string") {
       console.error("Invalid path:", path);
       return;
     }
-    
-    // COMMENTED: Auth check for navigation
-    // if (!userId) {
-    //   // If not logged in, show login modal and store intended path
-    //   setRedirectPath(path);
-    //   setShowLoginModal(true);
-    // } else {
-    //   // If logged in, proceed with navigation
-    //   router.push(path);
-    // }
-    
-    // Direct navigation without auth check
+    // Direct navigation without any auth checks
     router.push(path);
   };
-  
-  // COMMENTED: Login success handler
-  // const handleLoginSuccess = () => {
-  //   // Reset redirect path to keep user on current page
-  //   setRedirectPath(null);
-  // };
-  
+
+  // REMOVED: Login success handler - not needed
+
   return (
     <aside className={styles.sidebar}>
       <div className={styles.glassEffect}>
@@ -75,7 +55,7 @@ const Sidebar = () => {
             <span className={styles.menuText}>Liveops</span>
           </div>
         </div>
-        
+
         {/* User Analytics Menu Item */}
         <div className={styles.menuItem}>
           <div
@@ -99,15 +79,7 @@ const Sidebar = () => {
           </div>
         </div>
       </div>
-      
-      {/* COMMENTED: Login Modal */}
-      {/* {showLoginModal && (
-        <LoginModal
-          onClose={() => setShowLoginModal(false)}
-          onSuccess={handleLoginSuccess}
-          redirectPath={redirectPath}
-        />
-      )} */}
+      {/* REMOVED: All login modal code - completely cleaned up */}
     </aside>
   );
 };

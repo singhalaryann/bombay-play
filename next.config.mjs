@@ -4,14 +4,11 @@ const nextConfig = {
     return [
       {
         source: '/',
-        destination: '/dashboard',
+        // CHANGED: Route to ideationchat instead of dashboard
+        destination: '/ideationchat',
         permanent: true,
       },
-      {
-        source: '/ideationchat',
-        destination: '/dashboard',
-        permanent: false,
-      }
+      // REMOVED: The redirect from ideationchat to dashboard since we want ideationchat to work
     ];
   },
 };
