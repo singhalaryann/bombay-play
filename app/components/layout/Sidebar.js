@@ -1,9 +1,10 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import styles from "../../../styles/Sidebar.module.css";
 import { useAuth } from "../../context/AuthContext";
+import { X, MoreVertical, Pencil, Trash2 } from "lucide-react";
 
 const Sidebar = ({
   chatThreads = [],
@@ -32,6 +33,10 @@ const Sidebar = ({
     router.push(path);
   };
 
+  const [menuOpen, setMenuOpen] = useState(null); // Which thread's menu is open
+  const [renamingId, setRenamingId] = useState(null); // Which thread is being renamed
+  const [renameValue, setRenameValue] = useState(""); // Rename input value
+
   return (
     <aside className={styles.sidebar}>
       <div className={styles.glassEffect}>
@@ -43,18 +48,95 @@ const Sidebar = ({
             <button className={styles.chatButton} onClick={handleNewChat}>
               + New Chat
             </button>
-            <select
-              className={styles.chatSelect}
-              value={selectedThreadId || ''}
-              onChange={e => handleSelectThread(e.target.value)}
-            >
-              <option value='' disabled>Select a chat</option>
+            <div className={styles.threadList}>
+              {chatThreads.length === 0 && (
+                <div className={styles.emptyThreads}>No chats yet</div>
+              )}
               {[...chatThreads].reverse().map(tid => (
-                <option key={tid} value={tid}>
-                  {tid}
-                </option>
+                <div
+                  key={tid}
+                  className={`${styles.threadItem} ${selectedThreadId === tid ? styles.selectedThread : ""}`}
+                  onClick={() => handleSelectThread(tid)}
+                  onMouseLeave={() => setMenuOpen(null)}
+                >
+                  {renamingId === tid ? (
+                    <input
+                      className={styles.renameInput}
+                      value={renameValue}
+                      autoFocus
+                      onChange={e => setRenameValue(e.target.value)}
+                      onClick={e => e.stopPropagation()}
+                      onBlur={() => {
+                        // Save rename
+                        if (renameValue.trim() && typeof window !== 'undefined') {
+                          const stored = JSON.parse(localStorage.getItem('chatThreads') || '[]');
+                          const updated = stored.map(id => id === tid ? renameValue.trim() : id);
+                          localStorage.setItem('chatThreads', JSON.stringify(updated));
+                          localStorage.setItem(`chatHistory_${renameValue.trim()}`, localStorage.getItem(`chatHistory_${tid}`));
+                          localStorage.removeItem(`chatHistory_${tid}`);
+                          if (localStorage.getItem('threadId') === tid) {
+                            localStorage.setItem('threadId', renameValue.trim());
+                          }
+                          setRenamingId(null);
+                          setMenuOpen(null);
+                          window.location.reload();
+                        } else {
+                          setRenamingId(null);
+                          setMenuOpen(null);
+                        }
+                      }}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') e.target.blur();
+                        if (e.key === 'Escape') { setRenamingId(null); setMenuOpen(null); }
+                      }}
+                    />
+                  ) : (
+                    <span className={styles.threadText}>{tid}</span>
+                  )}
+                  {/* 3-dot menu, only visible on hover */}
+                  <div
+                    className={styles.moreMenuWrapper}
+                    onClick={e => { e.stopPropagation(); setMenuOpen(menuOpen === tid ? null : tid); }}
+                  >
+                    <MoreVertical className={styles.moreMenuIcon} />
+                    {menuOpen === tid && (
+                      <div className={styles.threadMenu} onClick={e => e.stopPropagation()}>
+                        <button
+                          className={styles.menuItemBtn}
+                          onClick={() => {
+                            setRenamingId(tid);
+                            setRenameValue(tid);
+                            setMenuOpen(null);
+                          }}
+                        >
+                          <Pencil size={15} className={styles.menuIcon} /> Rename
+                        </button>
+                        <button
+                          className={styles.menuItemBtn + ' ' + styles.deleteMenuBtn}
+                          onClick={() => {
+                            if (window.confirm("Delete this conversation?")) {
+                              if (typeof window !== 'undefined') {
+                                const stored = JSON.parse(localStorage.getItem('chatThreads') || '[]');
+                                const updated = stored.filter(id => id !== tid);
+                                localStorage.setItem('chatThreads', JSON.stringify(updated));
+                                if (localStorage.getItem('threadId') === tid) {
+                                  localStorage.removeItem('threadId');
+                                }
+                                localStorage.removeItem(`chatHistory_${tid}`);
+                                setMenuOpen(null);
+                                window.location.reload();
+                              }
+                            }
+                          }}
+                        >
+                          <Trash2 size={15} className={styles.menuIcon + ' ' + styles.binIcon} /> Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
               ))}
-            </select>
+            </div>
           </div>
         ) : (
           <>
