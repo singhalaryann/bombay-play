@@ -52,14 +52,14 @@ const Sidebar = ({
               {chatThreads.length === 0 && (
                 <div className={styles.emptyThreads}>No chats yet</div>
               )}
-              {[...chatThreads].reverse().map(tid => (
+              {[...chatThreads].reverse().map(thread => (
                 <div
-                  key={tid}
-                  className={`${styles.threadItem} ${selectedThreadId === tid ? styles.selectedThread : ""}`}
-                  onClick={() => handleSelectThread(tid)}
+                  key={thread.threadId}
+                  className={`${styles.threadItem} ${selectedThreadId === thread.threadId ? styles.selectedThread : ""}`}
+                  onClick={() => handleSelectThread(thread.threadId)}
                   onMouseLeave={() => setMenuOpen(null)}
                 >
-                  {renamingId === tid ? (
+                  {renamingId === thread.threadId ? (
                     <input
                       className={styles.renameInput}
                       value={renameValue}
@@ -70,13 +70,12 @@ const Sidebar = ({
                         // Save rename
                         if (renameValue.trim() && typeof window !== 'undefined') {
                           const stored = JSON.parse(localStorage.getItem('chatThreads') || '[]');
-                          const updated = stored.map(id => id === tid ? renameValue.trim() : id);
+                          const updated = stored.map(t => 
+                            t.threadId === thread.threadId 
+                              ? { ...t, name: renameValue.trim() }
+                              : t
+                          );
                           localStorage.setItem('chatThreads', JSON.stringify(updated));
-                          localStorage.setItem(`chatHistory_${renameValue.trim()}`, localStorage.getItem(`chatHistory_${tid}`));
-                          localStorage.removeItem(`chatHistory_${tid}`);
-                          if (localStorage.getItem('threadId') === tid) {
-                            localStorage.setItem('threadId', renameValue.trim());
-                          }
                           setRenamingId(null);
                           setMenuOpen(null);
                           window.location.reload();
@@ -91,21 +90,21 @@ const Sidebar = ({
                       }}
                     />
                   ) : (
-                    <span className={styles.threadText}>{tid}</span>
+                    <span className={styles.threadText}>{thread.name || thread.threadId}</span>
                   )}
                   {/* 3-dot menu, only visible on hover */}
                   <div
                     className={styles.moreMenuWrapper}
-                    onClick={e => { e.stopPropagation(); setMenuOpen(menuOpen === tid ? null : tid); }}
+                    onClick={e => { e.stopPropagation(); setMenuOpen(menuOpen === thread.threadId ? null : thread.threadId); }}
                   >
                     <MoreVertical className={styles.moreMenuIcon} />
-                    {menuOpen === tid && (
+                    {menuOpen === thread.threadId && (
                       <div className={styles.threadMenu} onClick={e => e.stopPropagation()}>
                         <button
                           className={styles.menuItemBtn}
                           onClick={() => {
-                            setRenamingId(tid);
-                            setRenameValue(tid);
+                            setRenamingId(thread.threadId);
+                            setRenameValue(thread.name || thread.threadId);
                             setMenuOpen(null);
                           }}
                         >
@@ -117,12 +116,12 @@ const Sidebar = ({
                             if (window.confirm("Delete this conversation?")) {
                               if (typeof window !== 'undefined') {
                                 const stored = JSON.parse(localStorage.getItem('chatThreads') || '[]');
-                                const updated = stored.filter(id => id !== tid);
+                                const updated = stored.filter(t => t.threadId !== thread.threadId);
                                 localStorage.setItem('chatThreads', JSON.stringify(updated));
-                                if (localStorage.getItem('threadId') === tid) {
+                                if (localStorage.getItem('threadId') === thread.threadId) {
                                   localStorage.removeItem('threadId');
                                 }
-                                localStorage.removeItem(`chatHistory_${tid}`);
+                                localStorage.removeItem(`chatHistory_${thread.threadId}`);
                                 setMenuOpen(null);
                                 window.location.reload();
                               }

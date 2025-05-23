@@ -55,11 +55,12 @@ export default function IdeationChat() {
   const router = useRouter();
 
   // Utility to add threadId to storage
-  const addThreadIdToStorage = (tid) => {
+  const addThreadIdToStorage = (tid, name = null) => {
     if (!tid) return;
     const stored = JSON.parse(localStorage.getItem('chatThreads') || '[]');
-    if (!stored.includes(tid)) {
-      const updated = [...stored, tid];
+    const newThread = { threadId: tid, name: name || tid };
+    if (!stored.some(t => t.threadId === tid)) {
+      const updated = [...stored, newThread];
       localStorage.setItem('chatThreads', JSON.stringify(updated));
       setChatThreads(updated);
     } else {
@@ -130,10 +131,27 @@ export default function IdeationChat() {
     }
   };
 
+  // New function for renaming chats
+  const handleRenameChat = (tid, newName) => {
+    const stored = JSON.parse(localStorage.getItem('chatThreads') || '[]');
+    const updated = stored.map(thread => 
+      thread.threadId === tid ? { ...thread, name: newName } : thread
+    );
+    localStorage.setItem('chatThreads', JSON.stringify(updated));
+    setChatThreads(updated);
+  };
+
   // Initial load effect
   useEffect(() => {
     const storedThreads = JSON.parse(localStorage.getItem('chatThreads') || '[]');
-    setChatThreads(storedThreads);
+    // Convert old format to new format if needed
+    const updatedThreads = storedThreads.map(thread => 
+      typeof thread === 'string' 
+        ? { threadId: thread, name: thread }
+        : thread
+    );
+    setChatThreads(updatedThreads);
+    localStorage.setItem('chatThreads', JSON.stringify(updatedThreads));
 
     const storedThreadId = localStorage.getItem('threadId');
     if (storedThreadId) {
