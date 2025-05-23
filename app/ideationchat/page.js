@@ -71,6 +71,38 @@ export default function IdeationChat() {
   // Function to handle new chat
   const handleNewChat = async () => {
     try {
+      // Check if ANY chat is empty by checking messages array directly
+      const hasEmptyChat = chatThreads.some(thread => {
+        const chatHistory = localStorage.getItem(`chatHistory_${thread.threadId}`);
+        if (!chatHistory) return true;
+        try {
+          const messages = JSON.parse(chatHistory);
+          return !messages || messages.length === 0;
+        } catch {
+          return true;
+        }
+      });
+
+      // If any chat is empty, don't create a new one
+      if (hasEmptyChat) {
+        // Find the empty chat and select it
+        const emptyThread = chatThreads.find(thread => {
+          const chatHistory = localStorage.getItem(`chatHistory_${thread.threadId}`);
+          if (!chatHistory) return true;
+          try {
+            const messages = JSON.parse(chatHistory);
+            return !messages || messages.length === 0;
+          } catch {
+            return true;
+          }
+        });
+        
+        if (emptyThread) {
+          handleSelectThread(emptyThread.threadId);
+        }
+        return;
+      }
+
       // Create new thread on the server
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -90,12 +122,12 @@ export default function IdeationChat() {
 
       // Update state and storage
       setThreadId(newThreadId);
-      setMessages([]);
+      setMessages([]); // Clear messages for new thread
       localStorage.setItem('threadId', newThreadId);
       addThreadIdToStorage(newThreadId);
       
-      // Clear current chat history
-      localStorage.removeItem(`chatHistory_${newThreadId}`);
+      // Initialize empty chat history for new thread
+      localStorage.setItem(`chatHistory_${newThreadId}`, JSON.stringify([]));
     } catch (error) {
       console.error('Error creating new chat:', error);
     }
@@ -112,7 +144,14 @@ export default function IdeationChat() {
       // First try to load from localStorage
       const storedChat = localStorage.getItem(`chatHistory_${tid}`);
       if (storedChat) {
-        setMessages(JSON.parse(storedChat));
+        try {
+          const messages = JSON.parse(storedChat);
+          setMessages(messages);
+        } catch {
+          // If parsing fails, initialize empty messages
+          setMessages([]);
+          localStorage.setItem(`chatHistory_${tid}`, JSON.stringify([]));
+        }
         return;
       }
       
@@ -125,9 +164,16 @@ export default function IdeationChat() {
         setMessages(data.messages);
         // Save to localStorage for future use
         localStorage.setItem(`chatHistory_${tid}`, JSON.stringify(data.messages));
+      } else {
+        // Initialize empty messages if none exist
+        setMessages([]);
+        localStorage.setItem(`chatHistory_${tid}`, JSON.stringify([]));
       }
     } catch (error) {
       console.error('Error loading chat:', error);
+      // Initialize empty messages on error
+      setMessages([]);
+      localStorage.setItem(`chatHistory_${tid}`, JSON.stringify([]));
     }
   };
 
@@ -320,6 +366,16 @@ export default function IdeationChat() {
             if (data.type === 'text') {
               // FIXED: Append text content for real-time typing effect
               fullContent += data.content;
+
+              // Extract image URLs from markdown and add to images array
+              const imageUrls = [];
+              const regex = /!\[.*?\]\((.*?)\)/g;
+              let match;
+              while ((match = regex.exec(data.content))) {
+                if (!images.includes(match[1])) {
+                  images.push(match[1]);
+                }
+              }
               
               // Update the specific message at the tracked index
               setMessages(prev => {
@@ -327,7 +383,8 @@ export default function IdeationChat() {
                 if (newMessages[messageIndex]) {
                   newMessages[messageIndex] = {
                     ...newMessages[messageIndex],
-                    content: fullContent
+                    content: fullContent,
+                    images: [...images]
                   };
                 }
                 return newMessages;
@@ -443,6 +500,7 @@ export default function IdeationChat() {
           selectedThreadId={threadId}
           handleSelectThread={handleSelectThread}
           handleNewChat={handleNewChat}
+          isLoading={isLoading}
         />
         <main className={styles.mainContent}>
           <div className={styles.chatContainer}>

@@ -11,6 +11,7 @@ const Sidebar = ({
   selectedThreadId = null,
   handleSelectThread = () => {},
   handleNewChat = () => {},
+  isLoading = false
 }) => {
   // Initialize routing and authentication hooks
   const router = useRouter();
@@ -45,7 +46,12 @@ const Sidebar = ({
           // Only show chat section
           <div className={styles.chatSection}>
             <div className={styles.chatLabel}>Chats</div>
-            <button className={styles.chatButton} onClick={handleNewChat}>
+            <button 
+              className={styles.chatButton}
+              onClick={handleNewChat}
+              style={{ cursor: isLoading ? 'not-allowed' : 'pointer' }}
+              disabled={isLoading}
+            >
               + New Chat
             </button>
             <div className={styles.threadList}>
@@ -55,8 +61,11 @@ const Sidebar = ({
               {[...chatThreads].reverse().map(thread => (
                 <div
                   key={thread.threadId}
-                  className={`${styles.threadItem} ${selectedThreadId === thread.threadId ? styles.selectedThread : ""}`}
-                  onClick={() => handleSelectThread(thread.threadId)}
+                  className={`${styles.threadItem} ${
+                    selectedThreadId === thread.threadId ? styles.selectedThread : ""
+                  }`}
+                  onClick={() => !isLoading && handleSelectThread(thread.threadId)}
+                  style={{ cursor: isLoading ? 'not-allowed' : 'pointer' }}
                   onMouseLeave={() => setMenuOpen(null)}
                 >
                   {renamingId === thread.threadId ? (
