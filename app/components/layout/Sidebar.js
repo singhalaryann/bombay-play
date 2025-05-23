@@ -3,32 +3,34 @@ import React from "react";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import styles from "../../../styles/Sidebar.module.css";
-// REMOVED: Authentication and login modal imports - not needed anymore
+import { useAuth } from "../../context/AuthContext";
 
-const Sidebar = () => {
-  // Initialize routing hooks
+const Sidebar = ({
+  chatThreads = [],
+  selectedThreadId = null,
+  handleSelectThread = () => {},
+  handleNewChat = () => {},
+}) => {
+  // Initialize routing and authentication hooks
   const router = useRouter();
   const pathname = usePathname();
-  // REMOVED: Authentication hook - not needed
-
-  // REMOVED: All login modal state management
+  const { userId } = useAuth();
 
   // Determine active page for menu item highlighting
   const isDashboardActive = pathname === "/dashboard";
   const isAnalyticsActive = pathname === "/analytics";
 
-  // SIMPLIFIED: Handle navigation without any authentication checks
+  // Handle navigation with authentication check
   const handleNavigation = (path) => {
     // Validate path input
     if (typeof path !== "string") {
       console.error("Invalid path:", path);
       return;
     }
-    // Direct navigation without any auth checks
+    
+    // Direct navigation without auth check
     router.push(path);
   };
-
-  // REMOVED: Login success handler - not needed
 
   return (
     <aside className={styles.sidebar}>
@@ -55,7 +57,7 @@ const Sidebar = () => {
             <span className={styles.menuText}>Liveops</span>
           </div>
         </div>
-
+        
         {/* User Analytics Menu Item */}
         <div className={styles.menuItem}>
           <div
@@ -78,8 +80,27 @@ const Sidebar = () => {
             <span className={styles.menuText}>User Analytics</span>
           </div>
         </div>
+
+        {/* Chat Threads Section */}
+        <div className={styles.chatSection}>
+          <div className={styles.chatLabel}>Chats</div>
+          <button className={styles.chatButton} onClick={handleNewChat}>
+            + New Chat
+          </button>
+          <select
+            className={styles.chatSelect}
+            value={selectedThreadId || ''}
+            onChange={e => handleSelectThread(e.target.value)}
+          >
+            <option value='' disabled>Select a chat</option>
+            {[...chatThreads].reverse().map(tid => (
+              <option key={tid} value={tid}>
+                {tid}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
-      {/* REMOVED: All login modal code - completely cleaned up */}
     </aside>
   );
 };
