@@ -14,7 +14,7 @@ import {
   Palette
 } from 'lucide-react';
 import ReactMarkdown from "react-markdown";
-import { useAuth } from "../context/AuthContext";addThreadIdToStorage
+import { useAuth } from "../context/AuthContext";
 
 // File item component for displaying uploaded files
 const FileItem = ({ file, onRemove }) => (
