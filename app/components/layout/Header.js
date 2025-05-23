@@ -29,16 +29,17 @@ const Header = () => {
   return (
     <header className={styles.header}>
       <div className={styles.leftSection}>
-        <div className={styles.logo}>
-          <Image
-            src="/logo-XG.svg"
-            alt="XG Gaming"
-            width={120}
-            height={36}
-            className={styles.logoImage}
-          />
-        </div>
-      </div>
+      <div className={styles.logo} onClick={() => router.push("/dashboard")} style={{ cursor: "pointer" }}>
+    <Image
+      src="/logo-XG.svg"
+      alt="XG Gaming"
+      width={120}
+      height={36}
+      className={styles.logoImage}
+    />
+  </div>
+</div>
+
 
       <div className={styles.rightSection}>
         {/* ADDED: AI Chat button - now active and visible */}

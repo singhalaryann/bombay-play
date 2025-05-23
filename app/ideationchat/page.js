@@ -14,6 +14,7 @@ import {
   Palette
 } from 'lucide-react';
 import ReactMarkdown from "react-markdown";
+import { useAuth } from "../context/AuthContext";
 
 // File item component for displaying uploaded files
 const FileItem = ({ file, onRemove }) => (
@@ -45,34 +46,128 @@ export default function IdeationChat() {
   const [isLoading, setIsLoading] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [isFileUploadOpen, setIsFileUploadOpen] = useState(false);
-  
+  const [chatThreads, setChatThreads] = useState([]);
+  const [threadId, setThreadId] = useState(null);
+  const { userId } = useAuth();
+
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const router = useRouter();
 
-    // Load chat history from localStorage on component mount
-  // useEffect(() => {
-  //   const savedMessages = localStorage.getItem('chat-messages-default');
-  //   if (savedMessages) {
-  //     try {
-  //       setMessages(JSON.parse(savedMessages));
-  //     } catch (error) {
-  //       console.error('Error loading saved messages:', error);
-  //     }
-  //   }
-  // }, []);
+  // Utility to add threadId to storage
+  const addThreadIdToStorage = (tid) => {
+    if (!tid) return;
+    const stored = JSON.parse(localStorage.getItem('chatThreads') || '[]');
+    if (!stored.includes(tid)) {
+      const updated = [...stored, tid];
+      localStorage.setItem('chatThreads', JSON.stringify(updated));
+      setChatThreads(updated);
+    } else {
+      setChatThreads(stored);
+    }
+  };
 
-  // // Save messages to localStorage whenever messages change
-  // useEffect(() => {
-  //   if (messages.length > 0) {
-  //     localStorage.setItem('chat-messages-default', JSON.stringify(messages));
-  //   }
-  // }, [messages]);
+  // Function to handle new chat
+  const handleNewChat = async () => {
+    try {
+      // Create new thread on the server
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'create_thread',
+          userId: userId
+        })
+      });
 
-  // Auto-scroll to the bottom of the chat when new messages appear
+      if (!response.ok) throw new Error('Failed to create new thread');
+      
+      const data = await response.json();
+      const newThreadId = data.threadId;
+
+      // Update state and storage
+      setThreadId(newThreadId);
+      setMessages([]);
+      localStorage.setItem('threadId', newThreadId);
+      addThreadIdToStorage(newThreadId);
+      
+      // Clear current chat history
+      localStorage.removeItem(`chatHistory_${newThreadId}`);
+    } catch (error) {
+      console.error('Error creating new chat:', error);
+    }
+  };
+
+  // Function to handle thread selection
+  const handleSelectThread = async (tid) => {
+    if (!tid) return;
+    
+    setThreadId(tid);
+    localStorage.setItem('threadId', tid);
+    
+    try {
+      // First try to load from localStorage
+      const storedChat = localStorage.getItem(`chatHistory_${tid}`);
+      if (storedChat) {
+        setMessages(JSON.parse(storedChat));
+        return;
+      }
+      
+      // If not in localStorage, load from server
+      const response = await fetch(`/api/chat?threadId=${tid}&userId=${userId}`);
+      if (!response.ok) throw new Error('Failed to load chat');
+      
+      const data = await response.json();
+      if (data.messages) {
+        setMessages(data.messages);
+        // Save to localStorage for future use
+        localStorage.setItem(`chatHistory_${tid}`, JSON.stringify(data.messages));
+      }
+    } catch (error) {
+      console.error('Error loading chat:', error);
+    }
+  };
+
+  // Initial load effect
+  useEffect(() => {
+    const storedThreads = JSON.parse(localStorage.getItem('chatThreads') || '[]');
+    setChatThreads(storedThreads);
+
+    const storedThreadId = localStorage.getItem('threadId');
+    if (storedThreadId) {
+      handleSelectThread(storedThreadId);
+    }
+  }, []);
+
+  // Message persistence effect
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    
+    if (threadId && messages.length > 0) {
+      try {
+        // Save messages with thread ID
+        localStorage.setItem(`chatHistory_${threadId}`, JSON.stringify(messages));
+        
+        // Also save to server
+        fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'save_messages',
+            threadId: threadId,
+            userId: userId,
+            messages: messages
+          })
+        }).catch(error => console.error('Error saving messages to server:', error));
+      } catch (error) {
+        console.error('Failed to save chat history:', error);
+      }
+    }
+  }, [messages, threadId, userId]);
 
   // File upload handling functions
   const handleFileUploadClick = () => {
@@ -125,7 +220,10 @@ export default function IdeationChat() {
       formData.append('message', userMessage);
       
       // Add userId if needed
-      formData.append('userId', 'default');
+      formData.append('userId', userId);
+      
+      // Add threadId if needed
+      formData.append('threadId', threadId);
       
       // Add all files with unique keys
       if (uploadedFiles.length > 0) {
@@ -298,7 +396,12 @@ export default function IdeationChat() {
     <div className={styles.container}>
       <Header />
       <div className={styles.mainLayout}>
-        <Sidebar />
+        <Sidebar 
+          chatThreads={chatThreads}
+          selectedThreadId={threadId}
+          handleSelectThread={handleSelectThread}
+          handleNewChat={handleNewChat}
+        />
         <main className={styles.mainContent}>
           <div className={styles.chatContainer}>
             <div className={styles.glassWrapper}>

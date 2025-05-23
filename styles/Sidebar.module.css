@@ -224,3 +224,110 @@
     background: rgba(255, 255, 255, 0.05);
   }
 }
+
+/* --- Chat Section Styles --- */
+.chatSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: none;
+  border: none;
+}
+
+.chatLabel {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  letter-spacing: 0.2px;
+}
+
+.chatButton {
+  background: linear-gradient(90deg, #82FF83 0%, #60FF60 100%);
+  color: #191C17;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 0;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(130, 255, 131, 0.08);
+  width: 100%;
+}
+
+.chatButton:hover, .chatButton:focus {
+  background: linear-gradient(90deg, #98FF98 0%, #82FF83 100%);
+  color: #191C17;
+  box-shadow: 0 4px 16px rgba(130, 255, 131, 0.15);
+}
+
+.chatSelect {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(25, 28, 23, 0.92);
+  color: #fff;
+  font-size: 15px;
+  margin-bottom: 4px;
+  outline: none;
+  transition: box-shadow 0.2s, background 0.2s;
+  box-shadow: 0 1px 4px rgba(130, 255, 131, 0.04);
+}
+
+.chatSelect:focus {
+  background: rgba(25, 28, 23, 1);
+  box-shadow: 0 0 0 2px #82FF83;
+}
+
+.chatSelect option {
+  background: #191C17;
+  color: #fff;
+}
+
+@media (max-width: 1024px) {
+  .chatSection {
+    padding-top: 16px;
+    gap: 12px;
+  }
+  .chatButton {
+    padding: 8px 0;
+    font-size: 14px;
+  }
+  .chatSelect {
+    font-size: 14px;
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .chatSection {
+    padding-top: 10px;
+    gap: 10px;
+  }
+  .chatButton {
+    padding: 7px 0;
+    font-size: 13px;
+  }
+  .chatSelect {
+    font-size: 13px;
+    padding: 7px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chatSection {
+    padding-top: 6px;
+    gap: 8px;
+  }
+  .chatButton {
+    padding: 6px 0;
+    font-size: 12px;
+  }
+  .chatSelect {
+    font-size: 12px;
+    padding: 6px 6px;
+  }
+}
