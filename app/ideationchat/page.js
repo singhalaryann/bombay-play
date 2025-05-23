@@ -213,6 +213,30 @@ export default function IdeationChat() {
     }]);
 
     try {
+      // Ensure we have a valid threadId
+      let currentThreadId = threadId;
+      if (!currentThreadId) {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'create_thread',
+            userId: userId
+          })
+        });
+        
+        if (!response.ok) throw new Error('Failed to create new thread');
+        const data = await response.json();
+        currentThreadId = data.threadId;
+        
+        // Update state and storage
+        setThreadId(currentThreadId);
+        localStorage.setItem('threadId', currentThreadId);
+        addThreadIdToStorage(currentThreadId);
+      }
+
       // Create FormData instance to handle files
       const formData = new FormData();
       
@@ -223,7 +247,7 @@ export default function IdeationChat() {
       formData.append('userId', userId);
       
       // Add threadId if needed
-      formData.append('threadId', threadId);
+      formData.append('threadId', currentThreadId);
       
       // Add all files with unique keys
       if (uploadedFiles.length > 0) {
