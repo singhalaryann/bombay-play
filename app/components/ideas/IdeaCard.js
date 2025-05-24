@@ -13,7 +13,7 @@
 //   const CACHE_DURATION = 5 * 60 * 1000;
   
 //   // Game ID constant
-//   const GAME_ID = "ludogoldrush";
+//   const GAME_ID = "blockheads";
   
 //   const handleViewIdea = async () => {
 //     console.log("🖱️ View idea clicked for idea:", ideaId);

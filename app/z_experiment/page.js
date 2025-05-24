@@ -15,7 +15,7 @@ export default function ExperimentPage() {
   const [loading, setLoading] = useState(true);
   const [experiments, setExperiments] = useState([]);
   const [insightId, setInsightId] = useState(null);
-  const [gameId, setGameId] = useState('ludogoldrush');
+  const [gameId, setGameId] = useState('blockheads');
   
   // State to track which experiment cards are expanded
   const [expandedCards, setExpandedCards] = useState({});

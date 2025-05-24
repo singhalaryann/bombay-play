@@ -43,7 +43,7 @@ const metricsToRequest = Array.isArray(specificMetric)
       "session_length_distribution",
     ];
 
-  const GAME_ID = "ludogoldrush";
+  const GAME_ID = "blockheads";
 
   useEffect(() => {
     if (initialDateFilter) {

@@ -17,7 +17,7 @@ export default function InsightPage() {
   const [loading, setLoading] = useState(true);
   const [insight, setInsight] = useState(null);
   const [dateFilter, setDateFilter] = useState(null);
-  const [gameId, setGameId] = useState("ludogoldrush");
+  const [gameId, setGameId] = useState("blockheads");
   const [userIds, setUserIds] = useState([]);
 
   // State to track which insights have their graphs visible
@@ -49,7 +49,7 @@ export default function InsightPage() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               // user_id: userId,
-              game_id: "ludogoldrush",
+              game_id: "blockheads",
               insight_ids: [insightId],
             }),
           }
@@ -65,7 +65,7 @@ export default function InsightPage() {
           if (selectedInsight.query) {
             console.log("Query data:", selectedInsight.query);
             setDateFilter(selectedInsight.query.date_filter || null);
-            setGameId(selectedInsight.query.game_id || "ludogoldrush");
+            setGameId(selectedInsight.query.game_id || "blockheads");
             setUserIds(selectedInsight.query.user_ids || []);
           }
         } else {

@@ -23,7 +23,7 @@
 //   const [isInitialRender, setIsInitialRender] = useState(true);
   
 //   // Fixed game ID for ideas as provided
-//   const GAME_ID = "ludogoldrush";
+//   const GAME_ID = "blockheads";
 
 //   useEffect(() => {
 //     const fetchIdeas = async () => {

@@ -20,7 +20,7 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => { // UPD
   const [graphsLoading, setGraphsLoading] = useState(true);
   
   // Game ID constant
-  const GAME_ID = "ludogoldrush";
+  const GAME_ID = "blockheads";
   
   // Cache duration: 5 minutes in milliseconds
   const CACHE_DURATION = 5 * 60 * 1000;

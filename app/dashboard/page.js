@@ -116,7 +116,7 @@ export default function Dashboard() {
   const [generationError, setGenerationError] = useState(null);
 
   // Fixed game ID for insights as provided
-  const GAME_ID = "ludogoldrush";
+  const GAME_ID = "blockheads";
 
   // Cache duration in milliseconds (e.g., 5 minutes)
   const CACHE_DURATION = 5 * 60 * 1000;
