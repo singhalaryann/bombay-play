@@ -122,7 +122,7 @@ export default function Dashboard() {
   const CACHE_DURATION = 5 * 60 * 1000;
 
   // Define the data limit date
-  const DATA_LIMIT_DATE = new Date('2025-04-03'); // April 3, 2025
+  const DATA_LIMIT_DATE = new Date('2025-03-31'); // April 3, 2025
   
   // Polling interval for checking insight generation status (30 seconds)
   const POLLING_INTERVAL = 30 * 1000;
@@ -150,8 +150,8 @@ export default function Dashboard() {
       // If selected end date is after data limit, use Apr 2-3 range
       if (parsedEndDate > DATA_LIMIT_DATE) {
         console.log('Dashboard - Using fixed Apr 2-3 range due to data limit');
-        endDate = new Date('2025-04-03');
-        startDate = new Date('2025-04-02');
+        endDate = new Date('2025-03-31');
+        startDate = new Date('2025-03-30');
       } else {
         // Otherwise use the selected range, but ensure start date is end date - 1
         endDate = parsedEndDate;
@@ -167,8 +167,8 @@ export default function Dashboard() {
       // If since date is after data limit, use Apr 2-3 range
       if (sinceDate > DATA_LIMIT_DATE) {
         console.log('Dashboard - Using fixed Apr 2-3 range due to data limit');
-        endDate = new Date('2025-04-03');
-        startDate = new Date('2025-04-02');
+        endDate = new Date('2025-03-31');
+        startDate = new Date('2025-03-30');
       } else {
         // Otherwise use today as end date and ensure start date is end date - 1
         endDate = today < DATA_LIMIT_DATE ? today : DATA_LIMIT_DATE;

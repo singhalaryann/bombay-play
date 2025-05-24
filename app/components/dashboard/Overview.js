@@ -256,7 +256,7 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => { // UPD
         // For classic retention, we want Day 7 specifically
         if (metric.series && Array.isArray(metric.series)) {
           // Find the Day 7 series
-          const day7Series = metric.series.find(s => s.name === "Day 7 Classic Retention");
+          const day7Series = metric.series.find(s => s.name === "Day 7");
           
           if (day7Series && Array.isArray(day7Series.values) && day7Series.values.length > 0) {
             // Get the latest value (last in array)
