@@ -294,7 +294,7 @@ return {
       
       console.log('GetMetrics - Full API request payload:', requestBody);
       
-      const response = await fetch('https://get-metrics-nrosabqhla-uc.a.run.app', {
+      const response = await fetch('https://get-metrics-nt4chwvamq-uc.a.run.app', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody)

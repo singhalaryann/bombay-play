@@ -45,7 +45,7 @@ export default function ExperimentPage() {
       setLoading(true);
       
       try {
-        const response = await fetch('https://get-experiments-nrosabqhla-uc.a.run.app', {
+        const response = await fetch('https://get-experiments-nt4chwvamq-uc.a.run.app', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -91,7 +91,7 @@ export default function ExperimentPage() {
       
       console.log('Generating experiments for insight:', insightId);
       
-      const response = await fetch('https://generate-experiment-nrosabqhla-uc.a.run.app', {
+      const response = await fetch('https://generate-experiment-nt4chwvamq-uc.a.run.app', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -124,7 +124,7 @@ export default function ExperimentPage() {
     const pollingId = setInterval(async () => {
       try {
         // Check if any new experiments have completed
-        const response = await fetch('https://get-experiments-nrosabqhla-uc.a.run.app', {
+        const response = await fetch('https://get-experiments-nt4chwvamq-uc.a.run.app', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

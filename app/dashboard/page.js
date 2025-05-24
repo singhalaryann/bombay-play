@@ -398,7 +398,7 @@ export default function Dashboard() {
 
       // API call to get-insights endpoint with game_id and date filter
       const response = await fetch(
-        "https://get-insights-nrosabqhla-uc.a.run.app",
+        "https://get-insights-nt4chwvamq-uc.a.run.app",
         {
           method: "POST",
           headers: {
@@ -506,7 +506,7 @@ const generateInsights = async () => {
     const techniquePromises = TECHNIQUES_SEQUENCE.map(technique => {
       console.log(`Starting generation with technique: ${technique}`);
       return fetch(
-        "https://generate-insight-bulk-nrosabqhla-uc.a.run.app",
+        "https://generate-insight-bulk-nt4chwvamq-uc.a.run.app",
         {
           method: "POST",
           headers: {
@@ -556,7 +556,7 @@ const startPollingForAllTechniques = () => {
     try {
       // Check if any new pending insights have completed
       const response = await fetch(
-        "https://get-insights-nrosabqhla-uc.a.run.app",
+        "https://get-insights-nt4chwvamq-uc.a.run.app",
         {
           method: "POST",
           headers: {

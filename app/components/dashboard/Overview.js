@@ -137,7 +137,7 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => { // UPD
         
         console.log('Overview - Cards API request payload:', cardsRequestBody);
         
-        const cardsResponse = await fetch('https://get-metrics-nrosabqhla-uc.a.run.app', {
+        const cardsResponse = await fetch('https://get-metrics-nt4chwvamq-uc.a.run.app', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(cardsRequestBody)
@@ -185,7 +185,7 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => { // UPD
         
         console.log('Overview - Graphs API request payload:', graphsRequestBody);
         
-        const graphsResponse = await fetch('https://get-metrics-nrosabqhla-uc.a.run.app', {
+        const graphsResponse = await fetch('https://get-metrics-nt4chwvamq-uc.a.run.app', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(graphsRequestBody)

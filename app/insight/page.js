@@ -43,7 +43,7 @@ export default function InsightPage() {
       setLoading(true);
       try {
         const response = await fetch(
-          "https://get-insight-data-nrosabqhla-uc.a.run.app",
+          "https://get-insight-data-nt4chwvamq-uc.a.run.app",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

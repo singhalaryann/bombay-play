@@ -65,7 +65,7 @@
 //         const apiStart = performance.now();
 //         console.log('🔄 Starting API call to fetch ideas...');
         
-//         const response = await fetch('https://get-ideas-nrosabqhla-uc.a.run.app', {
+//         const response = await fetch('https://get-ideas-nt4chwvamq-uc.a.run.app', {
 //           method: 'POST',
 //           headers: {
 //             'Content-Type': 'application/json',
