@@ -515,7 +515,7 @@ const generateInsights = async () => {
           body: JSON.stringify({
             game_id: GAME_ID,
             date_filter: globalDateFilter,
-            metric_sets: ["engagement", "balance", "progression"],
+            metric_sets: ["test"],
             techniques: [technique]
           }),
         }
