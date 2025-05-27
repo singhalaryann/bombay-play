@@ -205,7 +205,7 @@ export async function POST(request) {
 
             // Handle the streaming events
             for await (const event of run) {
-              console.log(`📡 Stream event: ${event.event}`);
+              // console.log(`📡 Stream event: ${event.event}`);
               
               // Handle different types of streaming events
               switch (event.event) {
@@ -323,20 +323,23 @@ export async function POST(request) {
                         
                         // Call the BQ tool API with timeout
                         console.log("🔍 Attempting to call Python API...");
-                        console.log("🔍 URL:", "http://0.0.0.0:8696/run_bq_tool");
-                        // UPDATED: Handle both question and metric_type parameters
-                        console.log("🔍 Payload:", {question: args.question || `Get ${args.metric_type || 'user'} data ${args.time_period ? 'for ' + args.time_period : ''}`});
+                        console.log("🔍 URL:", "https://bqtool-service-350893954746.us-central1.run.app/run_planner");
+                        // UPDATED: Send user_query instead of question
+                        const userQuery = args.question || `Get ${args.metric_type || 'user'} data${args.time_period ? ' for ' + args.time_period : ''}`;
+                        console.log("🔍 Payload:", {user_query: userQuery});
 
-                        const bqResponse = await axios.post("http://0.0.0.0:8696/run_bq_tool", {
-                          question: args.question || `Get ${args.metric_type || 'user'} data ${args.time_period ? 'for ' + args.time_period : ''}`
+                        const bqResponse = await axios.post("https://bqtool-service-350893954746.us-central1.run.app/run_planner", {
+                          user_query: userQuery
                         }, {
                           headers: {
                             'Content-Type': 'application/json'
                           },
-                          timeout: 10000 // 10 seconds timeout
+                          timeout: 120000 // 2 minutes timeout
                         });
 
-                        console.log("📊 BQ API Response:", JSON.stringify(bqResponse.data));                      
+                        // Log the full axios response for debugging
+                        console.log("📦 Full BQ API Axios Response:", require('util').inspect(bqResponse, { depth: null }));
+                        console.log("📊 BQ API Response:", JSON.stringify(bqResponse.data, null, 2));                      
                         // Add the response to tool outputs
                         toolOutputs.push({
                           tool_call_id: toolCall.id,
@@ -368,7 +371,7 @@ export async function POST(request) {
                     
                     // ADDED: Continue processing the stream after tool submission
                     for await (const continuedEvent of continuedRun) {
-                      console.log(`📡 Continued stream event: ${continuedEvent.event}`);
+                      // console.log(`📡 Continued stream event: ${continuedEvent.event}`);
                       
                       // Process continued events same as before
                       if (continuedEvent.event === 'thread.message.delta') {
