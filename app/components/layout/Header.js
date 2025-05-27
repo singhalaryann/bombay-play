@@ -30,7 +30,7 @@ const Header = () => {
   return (
     <header className={styles.header}>
       <div className={styles.leftSection}>
-      <div className={styles.logo} onClick={() => router.push("/dashboard")} style={{ cursor: "pointer" }}>
+      <div className={styles.logo} onClick={() => router.push("/dashboard")} style={{ cursor: "pointer", position: "relative" }}>
     <Image
       src="/logo-XG.svg"
       alt="XG Gaming"
@@ -38,6 +38,7 @@ const Header = () => {
       height={36}
       className={styles.logoImage}
     />
+    <span className={styles.logoTooltip}>Route to dashboard</span>
   </div>
 </div>
 

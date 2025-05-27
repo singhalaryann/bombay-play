@@ -19,12 +19,67 @@
 .logo {
   display: flex;
   align-items: center;
+  position: relative;
 }
 
 .logoImage {
   width: auto;
   height: 36px;
   object-fit: contain;
+}
+
+.logoTooltip {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%) translateX(12px);
+  background: rgba(38, 38, 38, 0.95);
+  color: #E5E7EB;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  border: 1px solid rgba(130, 255, 131, 0.2);
+  backdrop-filter: blur(8px);
+  z-index: 20;
+  transition: all 0.2s ease;
+}
+
+.logoTooltip::before {
+  content: '';
+  position: absolute;
+  left: -7px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-right: 7px solid rgba(38, 38, 38, 0.95);
+}
+
+.logoTooltip::after {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-right: 8px solid rgba(130, 255, 131, 0.2);
+  z-index: -1;
+}
+
+.logo:hover .logoTooltip,
+.logo:focus .logoTooltip {
+  opacity: 1;
+  transform: translateY(-50%) translateX(16px);
+  pointer-events: auto;
 }
 
 .rightSection {
