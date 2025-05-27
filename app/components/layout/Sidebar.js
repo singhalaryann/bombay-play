@@ -13,6 +13,7 @@ const Sidebar = ({
   handleNewChat = () => {},
   isLoading = false
 }) => {
+  
   // Initialize routing and authentication hooks
   const router = useRouter();
   const pathname = usePathname();
