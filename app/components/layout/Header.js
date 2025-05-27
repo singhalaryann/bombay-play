@@ -4,12 +4,13 @@ import styles from "../../../styles/Header.module.css";
 import Image from "next/image";
 import { LogOut, User, MessageCircle } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 
 const Header = () => {
   const { userId, logout } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   // COMMENTED: Logout functionality
   // const handleLogout = () => {
@@ -30,17 +31,19 @@ const Header = () => {
   return (
     <header className={styles.header}>
       <div className={styles.leftSection}>
-      <div className={styles.logo} onClick={() => router.push("/dashboard")} style={{ cursor: "pointer", position: "relative" }}>
-    <Image
-      src="/logo-XG.svg"
-      alt="XG Gaming"
-      width={120}
-      height={36}
-      className={styles.logoImage}
-    />
-    <span className={styles.logoTooltip}>Route to dashboard</span>
-  </div>
-</div>
+        <div className={styles.logo} onClick={() => router.push("/dashboard")} style={{ cursor: "pointer", position: "relative" }}>
+          <Image
+            src="/logo-XG.svg"
+            alt="XG Gaming"
+            width={120}
+            height={36}
+            className={styles.logoImage}
+          />
+          {pathname !== "/dashboard" && (
+            <span className={styles.logoTooltip}>Route to dashboard</span>
+          )}
+        </div>
+      </div>
 
 
       <div className={styles.rightSection}>
