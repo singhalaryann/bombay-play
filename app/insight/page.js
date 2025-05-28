@@ -19,6 +19,7 @@ export default function InsightPage() {
   const [dateFilter, setDateFilter] = useState(null);
   const [gameId, setGameId] = useState("blockheads");
   const [userIds, setUserIds] = useState([]);
+  const [clusterHash, setClusterHash] = useState(null);
 
   // State to track which insights have their graphs visible
   const [visibleGraphs, setVisibleGraphs] = useState({});
@@ -65,17 +66,30 @@ export default function InsightPage() {
           if (selectedInsight.query) {
             console.log("Query data:", selectedInsight.query);
             setDateFilter(selectedInsight.query.date_filter || null);
-            setGameId(selectedInsight.query.game_id || "blockheads");
-            setUserIds(selectedInsight.query.user_ids || []);
+            setGameId(selectedInsight.query.game_id || "ludogoldrush");
+            if (selectedInsight.query.cluster_hash) {
+              setClusterHash(selectedInsight.query.cluster_hash);
+              setUserIds([]);
+            } else if (selectedInsight.query.user_ids && selectedInsight.query.user_ids.length > 0) {
+              setClusterHash(null);
+              setUserIds(selectedInsight.query.user_ids);
+            } else {
+              setClusterHash(null);
+              setUserIds([]);
+            }
           }
         } else {
           setInsight(null);
           setDateFilter(null);
+          setClusterHash(null);
+          setUserIds([]);
         }
       } catch (error) {
         console.error("❌ Error fetching insight data:", error);
         setInsight(null);
         setDateFilter(null);
+        setClusterHash(null);
+        setUserIds([]);
       } finally {
         setLoading(false);
       }
@@ -377,7 +391,11 @@ export default function InsightPage() {
                                     readOnly={true}
                                     initialDateFilter={dateFilter}
                                     hideSkeletons={false}
-                                    userIds={userIds}
+                                    {...(clusterHash
+                                      ? { clusterHash }
+                                      : userIds && userIds.length > 0
+                                      ? { userIds }
+                                      : {})}
                                   />
                                 </div>
                               </div>
