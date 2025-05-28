@@ -184,6 +184,15 @@
     opacity: 0;
     transition: opacity 0.2s ease;
   }
+  .threadItem.selectedThread {
+    border-left: 3px solid #82FF83;
+    padding-left: 9px;
+    background: rgba(30, 35, 25, 0.9);
+  }
+  .threadMenu {
+    right: -2px;
+    min-width: 100px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -209,6 +218,14 @@
   }
   .menuItem {
     padding: 3px;
+  }
+  .threadItem.selectedThread {
+    border-left: 3px solid #82FF83;
+    padding-left: 5px;
+  }
+  .threadMenu {
+    right: 0;
+    min-width: 90px;
   }
 }
 
@@ -377,13 +394,16 @@
   position: relative;
 }
 
-.threadItem:hover, .threadItem.selectedThread {
-  background: linear-gradient(90deg, #82FF83 0%, #60FF60 100%);
-  color: #191C17;
+.threadItem:hover {
+  background: rgba(35, 40, 30, 0.8);
+  border-color: rgba(130, 255, 131, 0.15);
+  color: rgba(255, 255, 255, 0.95);
 }
 
-.selectedThread {
-  font-weight: 600;
+.threadItem.selectedThread {
+  background: rgba(30, 35, 25, 0.9);
+  color: rgba(130, 255, 131, 0.95);
+  font-weight: 500;
   box-shadow: 0 2px 8px rgba(130, 255, 131, 0.10);
 }
 
@@ -392,37 +412,47 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  display: flex;
-  align-items: center;
+  display: block;
+  max-width: calc(100% - 30px);
+  line-height: 1.2;
 }
 
 .deleteThreadBtn {
   background: none;
   border: none;
-  color: #aaa;
+  color: rgba(255, 255, 255, 0.4);
   margin-left: 8px;
-  padding: 2px;
+  padding: 4px;
   border-radius: 4px;
   cursor: pointer;
-  opacity: 0.7;
-  transition: background 0.18s, color 0.18s, opacity 0.18s;
+  opacity: 0;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
+  transform: scale(0.9);
 }
 
-.threadItem:hover .deleteThreadBtn,
+.threadItem:hover .deleteThreadBtn {
+  opacity: 0.7;
+  transform: scale(1);
+}
+
+.deleteThreadBtn:hover,
 .deleteThreadBtn:focus {
   color: #ff6b6b;
-  background: rgba(255, 107, 107, 0.08);
+  background: rgba(255, 107, 107, 0.1);
   opacity: 1;
+  transform: scale(1.05);
 }
 
 .emptyThreads {
-  color: #888;
-  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 12px;
   text-align: center;
-  padding: 8px 0;
+  padding: 20px 0;
+  font-style: italic;
+  letter-spacing: 0.2px;
 }
 
 .moreMenuWrapper {
@@ -461,16 +491,33 @@
 
 .threadMenu {
   position: absolute;
-  top: 28px;
-  right: 0;
-  min-width: 110px;
-  background: #232823;
-  border-radius: 7px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.13);
-  z-index: 10;
+  top: 22px;
+  right: -8px;
+  min-width: 120px;
+  background: rgba(35, 40, 30, 0.98);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(130, 255, 131, 0.25);
+  border-radius: 8px;
+  box-shadow: 
+    0 6px 25px rgba(0, 0, 0, 0.4),
+    0 0 18px rgba(130, 255, 131, 0.12);
+  z-index: 1000;
   display: flex;
   flex-direction: column;
-  padding: 2px 0;
+  padding: 6px;
+  animation: menuSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes menuSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .menuItemBtn {
@@ -480,35 +527,50 @@
   background: none;
   border: none;
   color: #eaeaea;
-  font-size: 14px;
-  padding: 8px 16px;
+  font-size: 13px;
+  padding: 10px 14px;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 6px;
   transition: background 0.13s, color 0.13s;
+  margin-bottom: 2px;
 }
 
-.menuItemBtn:hover, .menuItemBtn:focus {
-  background: #232823;
+.menuItemBtn:hover, 
+.menuItemBtn:focus {
+  background: rgba(130, 255, 131, 0.1);
   color: #82FF83;
 }
 
 .deleteMenuBtn {
+  color: rgba(255, 107, 107, 0.8);
+}
+
+.deleteMenuBtn:hover,
+.deleteMenuBtn:focus {
+  background: rgba(255, 107, 107, 0.1);
   color: #ff6b6b;
 }
 
 .deleteMenuBtn .binIcon {
-  color: #ff6b6b;
+  color: inherit;
 }
 
 .renameInput {
   flex: 1;
-  border: none;
+  border: 1px solid rgba(130, 255, 131, 0.5);
   border-radius: 5px;
-  padding: 7px 10px;
-  font-size: 14px;
-  background: #232823;
+  padding: 6px 8px;
+  font-size: 13px;
+  background: rgba(35, 40, 30, 0.9);
   color: #fff;
-  outline: 2px solid #82FF83;
-  margin-right: 8px;
-  transition: outline 0.13s;
+  outline: none;
+  margin-right: 6px;
+  transition: border-color 0.13s;
+  max-width: calc(100% - 30px);
+  box-sizing: border-box;
+}
+
+.renameInput:focus {
+  border-color: #82FF83;
+  background: rgba(35, 40, 30, 1);
 }

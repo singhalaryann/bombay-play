@@ -511,7 +511,7 @@ export default function IdeationChat() {
                 {messages.length === 0 && (
                   <div className={styles.welcomeContent}>
                     <div className={styles.welcomeAnimation}>
-                      <div className={styles.welcomeCircle}></div>
+                      {/* <div className={styles.welcomeCircle}></div> */}
                       <h1 className={styles.welcomeHeading}>What can I help with?</h1>
                     </div>
                     
