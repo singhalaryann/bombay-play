@@ -14,7 +14,8 @@ const GetMetrics = ({
   hideSkeletons = false,  
   userIds = [],
   prefetchedData = null, // For the overview Graphs!!
-  isDataLoading = false
+  isDataLoading = false,
+  clusterHash = null
 }) => {
   const { userId } = useAuth();
   
@@ -284,13 +285,16 @@ return {
       console.log('GetMetrics - Fetching fresh metrics data with filter:', dateFilter);
       console.log('GetMetrics - Requesting metrics:', metricsToRequest);
       
-      const requestBody = {
+      let requestBody = {
         metrics: metricsToRequest,
         date_filter: dateFilter,
-        ...(userIds && userIds.length > 0 && { user_ids: userIds }),
-        ...(userId && (!userIds || userIds.length === 0) && { user_id: userId }),
         game_id: GAME_ID
       };
+      if (clusterHash) {
+        requestBody.cluster_hash = clusterHash;
+      } else if (userIds && userIds.length > 0) {
+        requestBody.user_ids = userIds;
+      }
       
       console.log('GetMetrics - Full API request payload:', requestBody);
       
