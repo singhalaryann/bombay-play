@@ -276,6 +276,10 @@ export default function IdeationChat() {
       role: "user" 
     }]);
 
+    // Clear uploaded files and close the file upload area immediately after sending
+    setUploadedFiles([]);
+    setIsFileUploadOpen(false);
+
     try {
       // Ensure we have a valid threadId
       let currentThreadId = threadId;
@@ -484,10 +488,8 @@ export default function IdeationChat() {
         images: []
       }]);
     } finally {
-      // Reset loading state and clear uploaded files
+      // Reset loading state
       setIsLoading(false);
-      setUploadedFiles([]);
-      setIsFileUploadOpen(false);
     }
   };
 
