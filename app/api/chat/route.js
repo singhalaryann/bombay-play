@@ -338,7 +338,7 @@ export async function POST(request) {
                         });
 
                         // Log the full axios response for debugging
-                        console.log("📦 Full BQ API Axios Response:", require('util').inspect(bqResponse, { depth: null }));
+                        // console.log("📦 Full BQ API Axios Response:", require('util').inspect(bqResponse, { depth: null }));
                         console.log("📊 BQ API Response:", JSON.stringify(bqResponse.data, null, 2));                      
                         // Add the response to tool outputs
                         toolOutputs.push({
@@ -371,29 +371,106 @@ export async function POST(request) {
                     
                     // ADDED: Continue processing the stream after tool submission
                     for await (const continuedEvent of continuedRun) {
-                      // console.log(`📡 Continued stream event: ${continuedEvent.event}`);
+                      console.log(`📡 Continued stream event: ${continuedEvent.event}`);
                       
-                      // Process continued events same as before
-                      if (continuedEvent.event === 'thread.message.delta') {
-                        if (continuedEvent.data.delta.content) {
-                          for (const contentDelta of continuedEvent.data.delta.content) {
-                            if (contentDelta.type === 'text' && contentDelta.text?.value) {
-                              const textChunk = contentDelta.text.value;
-                              responseText += textChunk;
-                              
-                              const chunk = JSON.stringify({
-                                type: 'text',
-                                content: textChunk,
-                                isComplete: false
-                              }) + '\n';
-                              
-                              controller.enqueue(new TextEncoder().encode(chunk));
+                      // Process continued events with FULL event handling
+                      switch (continuedEvent.event) {
+                        case 'thread.message.delta':
+                          if (continuedEvent.data.delta.content) {
+                            for (const contentDelta of continuedEvent.data.delta.content) {
+                              if (contentDelta.type === 'text' && contentDelta.text?.value) {
+                                const textChunk = contentDelta.text.value;
+                                responseText += textChunk;
+                                
+                                const chunk = JSON.stringify({
+                                  type: 'text',
+                                  content: textChunk,
+                                  isComplete: false
+                                }) + '\n';
+                                
+                                controller.enqueue(new TextEncoder().encode(chunk));
+                              }
+                              // ADD MISSING IMAGE HANDLING
+                              else if (contentDelta.type === 'image_file' && contentDelta.image_file?.file_id) {
+                                const fileId = contentDelta.image_file.file_id;
+                                if (!processedImageIds.has(fileId)) {
+                                  processedImageIds.add(fileId);
+                                  try {
+                                    console.log(`📸 Processing continued delta image: ${fileId}`);
+                                    const imageContent = await openai.files.content(fileId);
+                                    const buffer = Buffer.from(await imageContent.arrayBuffer());
+                                    const base64Image = buffer.toString('base64');
+                                    const imageUrl = `data:image/png;base64,${base64Image}`;
+                                    
+                                    images.push(imageUrl);
+                                    
+                                    const imageChunk = JSON.stringify({
+                                      type: 'image',
+                                      content: imageUrl,
+                                      isComplete: false
+                                    }) + '\n';
+                                    
+                                    controller.enqueue(new TextEncoder().encode(imageChunk));
+                                    console.log(`📤 Sent continued delta image: ${fileId}`);
+                                  } catch (err) {
+                                    console.error("❌ Error processing continued delta image:", err);
+                                  }
+                                }
+                              }
                             }
                           }
-                        }
+                          break;
+
+                        case 'thread.message.completed':
+                          // ADD MISSING COMPLETED MESSAGE IMAGE HANDLING
+                          console.log("📸 Continued message completed, checking for images...");
+                          if (continuedEvent.data.content) {
+                            for (const content of continuedEvent.data.content) {
+                              if (content.type === 'image_file' && content.image_file?.file_id) {
+                                const fileId = content.image_file.file_id;
+                                if (!processedImageIds.has(fileId)) {
+                                  processedImageIds.add(fileId);
+                                  try {
+                                    console.log(`📸 Processing continued completed image: ${fileId}`);
+                                    const imageContent = await openai.files.content(fileId);
+                                    const buffer = Buffer.from(await imageContent.arrayBuffer());
+                                    const base64Image = buffer.toString('base64');
+                                    const imageUrl = `data:image/png;base64,${base64Image}`;
+                                    
+                                    images.push(imageUrl);
+                                    
+                                    const imageChunk = JSON.stringify({
+                                      type: 'image',
+                                      content: imageUrl,
+                                      isComplete: false
+                                    }) + '\n';
+                                    
+                                    controller.enqueue(new TextEncoder().encode(imageChunk));
+                                    console.log(`📤 Sent continued completed image: ${fileId}`);
+                                  } catch (err) {
+                                    console.error("❌ Error processing continued completed image:", err);
+                                  }
+                                }
+                              }
+                            }
+                          }
+                          break;
+
+                        case 'thread.run.completed':
+                          // Signal that continued run is complete
+                          console.log("✅ Continued streaming run completed");
+                          break;
+
+                        case 'thread.run.failed':
+                          console.error("❌ Continued streaming run failed:", continuedEvent.data);
+                          break;
+
+                        case 'error':
+                          console.error("❌ Continued streaming error:", continuedEvent.data);
+                          break;
                       }
-                      // Handle other continued events...
                     }
+
                   }
                   // REMOVED: break statement so main loop can continue
                   break;

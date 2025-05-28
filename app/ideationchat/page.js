@@ -355,128 +355,136 @@ export default function IdeationChat() {
       });
 
       // FIXED: Enhanced streaming loop with better chunk processing
+      let buffer = ""; // Buffer to accumulate incoming data
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        const chunk = decoder.decode(value);
-        const lines = chunk.split('\n').filter(line => line.trim());
+        buffer += decoder.decode(value, { stream: true }); // Append new data to buffer
 
-        for (const line of lines) {
-          try {
-            const data = JSON.parse(line);
+        // Process complete JSON lines from the buffer
+        let newlineIndex;
+        while ((newlineIndex = buffer.indexOf('\n')) !== -1) {
+          const line = buffer.substring(0, newlineIndex).trim();
+          buffer = buffer.substring(newlineIndex + 1); // Remove processed line from buffer
+
+          if (line) { // Process only if line is not empty
+            try {
+              const data = JSON.parse(line);
             
-            // Handle different types of streaming events
-            if (data.type === 'text') {
-              // FIXED: Append text content for real-time typing effect
-              fullContent += data.content;
+              // Handle different types of streaming events
+              if (data.type === 'text') {
+                // FIXED: Append text content for real-time typing effect
+                fullContent += data.content;
 
-              // Extract image URLs from markdown and add to images array
-              const imageUrls = [];
-              const regex = /!\[.*?\]\((.*?)\)/g;
-              let match;
-              while ((match = regex.exec(data.content))) {
-                if (!images.includes(match[1])) {
-                  images.push(match[1]);
+                // Extract image URLs from markdown and add to images array
+                const imageUrls = [];
+                const regex = /!\[.*?\]\((.*?)\)/g;
+                let match;
+                while ((match = regex.exec(data.content))) {
+                  if (!images.includes(match[1])) {
+                    images.push(match[1]);
+                  }
                 }
-              }
-              
-              // Update the specific message at the tracked index
-              setMessages(prev => {
-                const newMessages = [...prev];
-                if (newMessages[messageIndex]) {
-                  newMessages[messageIndex] = {
-                    ...newMessages[messageIndex],
-                    content: fullContent,
-                    images: [...images]
-                  };
-                }
-                return newMessages;
-              });
-            } 
-            else if (data.type === 'image') {
-              // FIXED: Handle image chunks with immediate display
-              if (data.content && !images.includes(data.content)) {
-                images.push(data.content);
                 
-                // Update the specific message with new images
+                // Update the specific message at the tracked index
                 setMessages(prev => {
                   const newMessages = [...prev];
                   if (newMessages[messageIndex]) {
                     newMessages[messageIndex] = {
                       ...newMessages[messageIndex],
+                      content: fullContent,
                       images: [...images]
                     };
                   }
                   return newMessages;
                 });
-                
-                console.log('📸 Image received and displayed');
-              }
-            } 
-            else if (data.type === 'function_call') {
-              // Handle function call notifications (like "Fetching DAU data...")
-              fullContent += `\n${data.content}\n`;
-              
-              // Update the message with function call info
-              setMessages(prev => {
-                const newMessages = [...prev];
-                if (newMessages[messageIndex]) {
-                  newMessages[messageIndex] = {
-                    ...newMessages[messageIndex],
-                    content: fullContent
-                  };
+              } 
+              else if (data.type === 'image') {
+                // FIXED: Handle image chunks with immediate display
+                if (data.content && !images.includes(data.content)) {
+                  images.push(data.content);
+                  
+                  // Update the specific message with new images
+                  setMessages(prev => {
+                    const newMessages = [...prev];
+                    if (newMessages[messageIndex]) {
+                      newMessages[messageIndex] = {
+                        ...newMessages[messageIndex],
+                        images: [...images]
+                      };
+                    }
+                    return newMessages;
+                  });
+                  
+                  console.log('📸 Image received and displayed');
                 }
-                return newMessages;
-              });
-            } 
-            else if (data.type === 'complete') {
-              // FIXED: Handle completion with final image check
-              console.log('✅ Streaming completed');
-              
-              // Final update with any remaining images from completion data
-              if (data.images && data.images.length > 0) {
-                // Merge any additional images from completion
-                const allImages = [...new Set([...images, ...data.images])];
+              } 
+              else if (data.type === 'function_call') {
+                // Handle function call notifications (like "Fetching DAU data...")
+                fullContent += `\n${data.content}\n`;
+                
+                // Update the message with function call info
+                setMessages(prev => {
+                  const newMessages = [...prev];
+                  if (newMessages[messageIndex]) {
+                    newMessages[messageIndex] = {
+                      ...newMessages[messageIndex],
+                      content: fullContent
+                    };
+                  }
+                  return newMessages;
+                });
+              } 
+              else if (data.type === 'complete') {
+                // FIXED: Handle completion with final image check
+                console.log('✅ Streaming completed');
+                
+                // Final update with any remaining images from completion data
+                if (data.images && data.images.length > 0) {
+                  // Merge any additional images from completion
+                  const allImages = [...new Set([...images, ...data.images])];
+                  
+                  setMessages(prev => {
+                    const newMessages = [...prev];
+                    if (newMessages[messageIndex]) {
+                      newMessages[messageIndex] = {
+                        ...newMessages[messageIndex],
+                        content: data.content || fullContent,
+                        images: allImages
+                      };
+                    }
+                    return newMessages;
+                  });
+                }
+              } 
+              else if (data.type === 'error') {
+                // Handle error signals from backend
+                console.error('❌ Streaming error:', data.content);
+                fullContent += `\nError: ${data.content}`;
                 
                 setMessages(prev => {
                   const newMessages = [...prev];
                   if (newMessages[messageIndex]) {
                     newMessages[messageIndex] = {
                       ...newMessages[messageIndex],
-                      content: data.content || fullContent,
-                      images: allImages
+                      content: fullContent
                     };
                   }
                   return newMessages;
                 });
               }
-              break;
-            } 
-            else if (data.type === 'error') {
-              // Handle error signals from backend
-              console.error('❌ Streaming error:', data.content);
-              fullContent += `\nError: ${data.content}`;
-              
-              setMessages(prev => {
-                const newMessages = [...prev];
-                if (newMessages[messageIndex]) {
-                  newMessages[messageIndex] = {
-                    ...newMessages[messageIndex],
-                    content: fullContent
-                  };
-                }
-                return newMessages;
-              });
-              break;
+            } catch (parseError) {
+              // Better error handling for malformed JSON chunks
+              console.warn('Failed to parse chunk:', line, parseError);
+              // Continue processing other chunks even if one fails
             }
-          } catch (parseError) {
-            // Better error handling for malformed JSON chunks
-            console.warn('Failed to parse chunk:', line, parseError);
-            // Continue processing other chunks even if one fails
           }
         }
       }
+      // After the loop, if there's any remaining data in the buffer, it might be an incomplete message part.
+      // Depending on the protocol, you might want to handle it or log it.
+      // For now, we assume messages are always newline-terminated.
 
     } catch (error) {
       console.error("Error in chat process:", error);
@@ -544,7 +552,9 @@ export default function IdeationChat() {
                       {/* FIXED: Better image rendering with error handling */}
                       {msg.images && msg.images.length > 0 && (
                         <div className={styles.messageImages}>
-                          {msg.images.map((imgSrc, imgIdx) => (
+                          {msg.images.map((imgSrc, imgIdx) => {
+                            console.log(`Rendering image for message ${idx}, image ${imgIdx + 1}:`, imgSrc ? imgSrc.substring(0, 70) + "..." : "null/undefined imgSrc");
+                            return (
                             <img
                               key={`${idx}-${imgIdx}`}
                               src={imgSrc}
@@ -556,7 +566,8 @@ export default function IdeationChat() {
                                 e.target.style.display = 'none';
                               }}
                             />
-                          ))}
+                          );
+                        })}
                         </div>
                       )}
                     </div>
