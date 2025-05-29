@@ -20,6 +20,12 @@
   display: flex;
   align-items: center;
   position: relative;
+  transition: box-shadow 0.3s ease; /* FIXED: Changed back to box-shadow */
+}
+
+/* UPDATED: Green glow directly on logo image */
+.logoGlow .logoImage {
+  filter: drop-shadow(0 0 4px rgba(130, 255, 131, 0.6));
 }
 
 .logoImage {
@@ -46,6 +52,16 @@
   backdrop-filter: blur(8px);
   z-index: 20;
   transition: all 0.2s ease;
+}
+
+@media (max-width: 768px) {
+  .logoTooltip {
+    font-size: 0.75rem;
+    padding: 6px 8px;
+    max-width: 120px;
+    white-space: normal;
+    text-align: center;
+  }
 }
 
 .logoTooltip::before {
@@ -75,6 +91,7 @@
   z-index: -1;
 }
 
+/* UPDATED: Tooltip hover works for both normal and glow states */
 .logo:hover .logoTooltip,
 .logo:focus .logoTooltip {
   opacity: 1;
@@ -101,6 +118,14 @@
   cursor: pointer;
   color: #E5E7EB;
   transition: all 0.2s ease;
+}
+
+.aiChatButton.active {
+  color: #82FF83;
+}
+
+.aiChatButton.active .chatIcon {
+  filter: brightness(0) saturate(100%) invert(86%) sepia(18%) saturate(1075%) hue-rotate(67deg) brightness(103%) contrast(98%);
 }
 
 .aiIcon,
@@ -266,5 +291,70 @@
   .knowledgebaseButton,
   .logoutButton {
     padding: 0.375rem;
+  }
+}
+
+.hamburgerHeaderBtn {
+  display: none;
+  background: rgba(130, 255, 131, 0.12);
+  border: none;
+  border-radius: 8px;
+  padding: 8px;
+  margin-right: 16px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  width: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hamburgerHeaderBtn:hover, 
+.hamburgerHeaderBtn:focus {
+  background: rgba(130, 255, 131, 0.25);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(130, 255, 131, 0.3);
+}
+
+.iconWrapper {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+
+.hamburgerIcon,
+.arrowIcon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #82FF83;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.arrowIcon {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.8);
+}
+
+.hamburgerHeaderBtn:hover .hamburgerIcon {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.8);
+}
+
+.hamburgerHeaderBtn:hover .arrowIcon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+/* UPDATED: Added leftArrow style for when sidebar is open - rotates arrow to point left */
+.hamburgerHeaderBtn:hover .arrowIcon.leftArrow {
+  transform: rotate(180deg) scale(1);
+}
+
+@media (max-width: 768px) {
+  .hamburgerHeaderBtn {
+    display: flex;
   }
 }
