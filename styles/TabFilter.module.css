@@ -470,39 +470,39 @@
   
   .datePickerContainer {
     width: 95%;
-    max-width: 320px;
+    max-width: 300px;
   }
   
   .dateInput,
   .lastValueInput,
   .lastUnitFixed {
-    padding: 12px;
-    font-size: 13px;
-  }
-  
-  .calendarDateBtn {
-    width: 28px;
-    height: 28px;
+    padding: 10px;
     font-size: 12px;
   }
   
-  .datePickerTab {
-    padding: 12px 6px;
-    font-size: 13px;
-  }
-  
-  .calendarDays span {
+  .calendarDateBtn {
+    width: 24px;
+    height: 24px;
     font-size: 11px;
   }
   
+  .datePickerTab {
+    padding: 10px 6px;
+    font-size: 12px;
+  }
+  
+  .calendarDays span {
+    font-size: 10px;
+  }
+  
   .calendarMonthHeader {
-    font-size: 13px;
+    font-size: 12px;
   }
   
   .applyButton, 
   .cancelButton {
-    padding: 8px 16px;
-    font-size: 13px;
+    padding: 6px 12px;
+    font-size: 12px;
   }
 }
 

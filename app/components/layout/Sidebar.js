@@ -73,6 +73,15 @@ React.useEffect(() => {
 
   return (
     <>
+      {/* Mobile overlay when expanded - moved outside sidebar */}
+      {isExpanded && (
+        <div 
+          key="mobile-overlay"
+          className={styles.mobileOverlay} 
+          onClick={() => setIsExpanded(false)}
+          onTouchStart={() => setIsExpanded(false)}
+        />
+      )}
       {/* UPDATED: Sidebar hidden by default on mobile for ideationchat, expanded when toggled */}
       <aside className={`${styles.sidebar} ${isExpanded ? styles.expanded : ''} ${pathname === "/ideationchat" ? styles.chatSidebar : ''}`}>
         <div className={styles.glassEffect}>
@@ -146,10 +155,16 @@ React.useEffect(() => {
                     {/* UPDATED: 3-dot menu visibility based on expansion state */}
                     <div
                       className={`${styles.moreMenuWrapper} ${isExpanded ? styles.expanded : ''}`}
-                      onClick={e => { e.stopPropagation(); setMenuOpen(menuOpen === thread.threadId ? null : thread.threadId); }}
+                      onClick={e => { 
+                        if (!isLoading) {
+                          e.stopPropagation(); 
+                          setMenuOpen(menuOpen === thread.threadId ? null : thread.threadId);
+                        }
+                      }}
+                      style={{ cursor: isLoading ? 'not-allowed' : 'pointer' }}
                     >
-                      <MoreVertical className={styles.moreMenuIcon} />
-                      {menuOpen === thread.threadId && (
+                      <MoreVertical className={styles.moreMenuIcon} style={{ opacity: isLoading ? 0.5 : 1 }} />
+                      {menuOpen === thread.threadId && !isLoading && (
                         <div className={styles.threadMenu} onClick={e => e.stopPropagation()}>
                           <button
                             className={styles.menuItemBtn}
@@ -238,15 +253,6 @@ React.useEffect(() => {
             </>
           )}
         </div>
-
-{/* Mobile overlay when expanded */}
-{isExpanded && (
-  <div 
-    className={styles.mobileOverlay} 
-    onClick={() => setIsExpanded(false)}
-    onTouchStart={() => setIsExpanded(false)}
-  />
-)}
       </aside>
     </>
   );

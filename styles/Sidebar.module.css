@@ -65,16 +65,31 @@
 
 /* Mobile Overlay with proper z-index */
 .mobileOverlay {
-  display: none;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
   z-index: 10000;
+  display: none;
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.3s ease;
+}
+
+/* Show overlay when sidebar is expanded */
+.chatSidebar.expanded + .mobileOverlay,
+.expanded .mobileOverlay {
+  display: block;
+  opacity: 1;
+}
+
+/* Make glassEffect fully opaque when sidebar is expanded on mobile */
+.chatSidebar.expanded .glassEffect {
+  background: #161c15 !important;
+  z-index: 10002;
 }
 
 .menuItem {
