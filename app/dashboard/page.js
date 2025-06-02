@@ -66,12 +66,8 @@ export default function Dashboard() {
         return { type: "last", days: 7 };
       } else if (savedTimeFilter === "30D") {
         return { type: "last", days: 30 };
-      } else if (savedTimeFilter === "3M") {
-        return { type: "last", days: 90 };
-      } else if (savedTimeFilter === "6M") {
-        return { type: "last", days: 180 };
-      } else if (savedTimeFilter === "12M") {
-        return { type: "last", days: 365 };
+      } else if (savedTimeFilter === "3D") {
+        return { type: "last", days: 3 };
       } else if (savedTimeFilter.includes(" - ")) {
         // Parse date range like "Apr 1, 2025 - Apr 15, 2025"
         const [start, end] = savedTimeFilter.split(" - ");
@@ -211,9 +207,7 @@ export default function Dashboard() {
           break;
         case "7D":
         case "30D":
-        case "3M":
-        case "6M":
-        case "12M":
+        case "3D":
           // All these presets should use the same logic - end date is today/max date
           // and start date is end date - 1
           endDate = maxEndDate;
@@ -692,12 +686,8 @@ const startPollingForAllTechniques = () => {
       newGlobalDateFilter = { type: "last", days: 7 };
     } else if (newTime === "30D") {
       newGlobalDateFilter = { type: "last", days: 30 };
-    } else if (newTime === "3M") {
-      newGlobalDateFilter = { type: "last", days: 90 };
-    } else if (newTime === "6M") {
-      newGlobalDateFilter = { type: "last", days: 180 };
-    } else if (newTime === "12M") {
-      newGlobalDateFilter = { type: "last", days: 365 };
+    } else if (newTime === "3D") {
+      newGlobalDateFilter = { type: "last", days: 3 };
     } else if (newTime.includes(" - ")) {
       // Parse date range like "Apr 1, 2025 - Apr 15, 2025"
       const [start, end] = newTime.split(" - ");

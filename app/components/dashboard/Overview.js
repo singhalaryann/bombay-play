@@ -268,7 +268,7 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => { // UPD
             const delta = calculateDeltaPercentage(newValue, oldValue);
             
             processedMetrics[metricId] = {
-              title: day7Series.name,
+              title: metric.name || "Classic Retention",
               value: formatValue(metricId, newValue),
               change: `${delta.isPositive ? '+' : '-'}${delta.value}%`,
               isPositive: delta.isPositive,
@@ -416,6 +416,10 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => { // UPD
   // Render the overview stats
   return (
     <div className={styles.overviewContainer}>
+      {/* Static line above the cards */}
+      <div className={styles.latestDateObserved}>
+        Latest Date observed as 31 March 2025
+      </div>
       <div className={styles.statsGrid}>
         {getOverviewStats().map((stat, index) => (
           <div key={index} className={`${styles.statCard} ${isLoading ? styles.loading : ''}`}>

@@ -20,8 +20,7 @@ const TabFilter = ({ selected, onChange, disabled, readOnly }) => {
   }  const [isOpen, setIsOpen] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const dropdownRef = useRef(null);
-  const filters = ["Today", "Yesterday", "7D", "30D", "3M", "6M", "12M", "Custom"];
-  
+  const filters = ["Today", "Yesterday", "7D", "30D", "3D", "Custom"];  
   // Current date for default selection
   const today = new Date();
   const currentDay = today.getDate();
