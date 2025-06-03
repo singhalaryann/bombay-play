@@ -479,7 +479,7 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => {
           isDataLoading={graphsLoading}
         />
         
-        {/* <GetMetrics 
+        <GetMetrics 
           selectedTime={selectedTime}
           specificMetric="classic_retention"
           specificMetricType="multiline"
@@ -488,7 +488,7 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => {
           hideSkeletons={true}
           prefetchedData={getMetricData("classic_retention")}
           isDataLoading={graphsLoading}
-        /> */}
+        />
         
         <GetMetrics 
           selectedTime={selectedTime}
