@@ -24,11 +24,11 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => {
   const CACHE_DURATION = 5 * 60 * 1000;
   
   // UPDATED: Separated metrics by aggregate type for cards
-  const averageMetrics = ["dau", "classic_retention", "avg_session_length"];
+  const averageMetrics = ["dau", "avg_session_length"];
   const sumMetrics = ["new_players"];
   
   // Graph metrics to request
-  const graphMetricsToRequest = ["dau", "classic_retention", "new_players", "avg_session_length"];
+  const graphMetricsToRequest = ["dau", "new_players", "avg_session_length"];
 
   // UPDATED: New delta calculation formula as per mentor's requirement
   const calculateDeltaPercentage = (newValue, oldValue) => {
@@ -322,11 +322,8 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => {
           return;
         }
 
-        // Handle other average metrics (dau, avg_session_length)
-        if (currentMetric.values?.value !== undefined && prevMetric?.values?.value !== undefined) {
-          const currentValue = currentMetric.values.value;
-          const previousValue = prevMetric.values.value;
-          const delta = calculateDeltaPercentage(currentValue, previousValue);
+        if (currentMetric.value !== undefined && prevMetric?.value !== undefined) {
+          // Handle other average metrics (dau, avg_session_length)
           let icon;
           switch (metricId) {
             case "dau":
@@ -340,7 +337,7 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => {
           }
           processedMetrics[metricId] = {
             title: metricId === "dau" ? "Average Daily Active Users" : currentMetric.name,
-            value: formatValue(metricId, currentValue),
+            value: formatValue(metricId, currentMetric.value),
             change: `${delta.isPositive ? '+' : '-'}${delta.value}%`,
             isPositive: delta.isPositive,
             icon
@@ -383,7 +380,7 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => {
   }, [apiDateFilter, globalDateFilter]);
 
   // Define order of metrics for display
-  const metricOrder = ["dau", "classic_retention", "new_players", "avg_session_length"];
+  const metricOrder = ["dau", "new_players", "avg_session_length"];
 
   // Map of metrics for the overview cards
   const getOverviewStats = () => {
@@ -407,9 +404,6 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => {
         switch (metricId) {
           case "dau":
             fallbackIcon = Users;
-            break;
-          case "classic_retention":
-            fallbackIcon = Target;
             break;
           case "new_players":
             fallbackIcon = TrendingUp;
@@ -476,17 +470,6 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => {
           initialDateFilter={globalDateFilter}
           hideSkeletons={graphsLoading ? false : true}
           prefetchedData={getMetricData("dau")}
-          isDataLoading={graphsLoading}
-        />
-        
-        <GetMetrics 
-          selectedTime={selectedTime}
-          specificMetric="classic_retention"
-          specificMetricType="multiline"
-          readOnly={true}
-          initialDateFilter={globalDateFilter}
-          hideSkeletons={true}
-          prefetchedData={getMetricData("classic_retention")}
           isDataLoading={graphsLoading}
         />
         
