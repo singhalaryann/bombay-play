@@ -3,10 +3,9 @@ import React, { useState, useEffect } from "react";
 import { Users, Target, TrendingUp, Clock } from "lucide-react";
 import styles from "../../../styles/Overview.module.css";
 import { useAuth } from "../../context/AuthContext";
-// ADDED: Import GetMetrics component
 import GetMetrics from "./GetMetrics";
 
-const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => { // UPDATED: Added globalDateFilter prop
+const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => {
   const { userId } = useAuth();
   
   // State for storing the metrics data
@@ -14,9 +13,8 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => { // UPD
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // ADDED: New state for storing graph metrics data to pass to GetMetrics components
+  // State for storing graph metrics data to pass to GetMetrics components
   const [graphsMetricsData, setGraphsMetricsData] = useState(null);
-  // ADDED: State for tracking if graphs data is loading
   const [graphsLoading, setGraphsLoading] = useState(true);
   
   // Game ID constant
@@ -25,24 +23,24 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => { // UPD
   // Cache duration: 5 minutes in milliseconds
   const CACHE_DURATION = 5 * 60 * 1000;
   
-  // Metrics to request for the overview cards
-  const metricsToRequest = ["dau", "avg_session_length", "classic_retention", "new_players"];
-
-  // ADDED: Graph metrics to request - same as card metrics for consolidated API call
+  // UPDATED: Separated metrics by aggregate type for cards
+  const averageMetrics = ["dau", "new_players", "avg_session_length"];
+  const sumMetrics = ["classic_retention"];
+  
+  // Graph metrics to request
   const graphMetricsToRequest = ["dau", "classic_retention", "new_players", "avg_session_length"];
 
-  // Calculate delta percentage between new and old values using mentor's formula
+  // UPDATED: New delta calculation formula as per mentor's requirement
   const calculateDeltaPercentage = (newValue, oldValue) => {
     if (!oldValue || oldValue === 0) {
       return { value: 0, isPositive: true };
     }
     
-    // Using formula: (1 - (new value/old value)) * 100%
-    const delta = (1 - (newValue / oldValue)) * 100;
+    // NEW FORMULA: ((old - new) / old) * 100
+    const delta = ((oldValue - newValue) / oldValue) * 100;
     return {
       value: Math.abs(delta).toFixed(1),
-      // Negative delta means value increased (which is positive for business)
-      isPositive: delta <= 0
+      isPositive: delta <= 0 // Negative delta means value increased (good for business)
     };
   };
   
@@ -56,7 +54,6 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => { // UPD
       case "new_players":
         return `${Math.round(value).toLocaleString()}`;
       case "avg_session_length":
-        // Display raw seconds value
         return `${Math.round(value)}`;
       case "classic_retention":
         return `${value.toFixed(1)}%`;
@@ -65,307 +62,353 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => { // UPD
     }
   };
 
-  // UPDATED: Fetch metrics data from API - consolidated to fetch both card and graph metrics
+  // UPDATED: Calculate previous period dates based on current period
+  const calculatePreviousPeriod = (currentStartDate, currentEndDate) => {
+    try {
+      // Parse dates from DD-MM-YYYY format
+      const [startDay, startMonth, startYear] = currentStartDate.split('-').map(Number);
+      const [endDay, endMonth, endYear] = currentEndDate.split('-').map(Number);
+      
+      const startDate = new Date(startYear, startMonth - 1, startDay);
+      const endDate = new Date(endYear, endMonth - 1, endDay);
+      
+      // Calculate period length in days
+      const periodLength = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+      
+      // Calculate previous period dates
+      const prevEndDate = new Date(startDate);
+      prevEndDate.setDate(prevEndDate.getDate() - 1);
+      
+      const prevStartDate = new Date(prevEndDate);
+      prevStartDate.setDate(prevStartDate.getDate() - periodLength + 1);
+      
+      // Format back to DD-MM-YYYY
+      const formatDate = (date) => {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+      };
+      
+      return {
+        start_date: formatDate(prevStartDate),
+        end_date: formatDate(prevEndDate)
+      };
+    } catch (err) {
+      console.error('❌ Error calculating previous period:', err);
+      return null;
+    }
+  };
+
+  // COMPLETELY REWRITTEN: Fetch metrics data with multiple API calls for cards
   const fetchMetricsData = async () => {
     try {
-      // UPDATED: Set loading state to true immediately when fetch starts
       setIsLoading(true);
-      setGraphsLoading(true); // ADDED: Set graphs loading state
-      setMetricsData(null); // Clear current data to show loading state
-      setGraphsMetricsData(null); // ADDED: Clear graphs data
+      setGraphsLoading(true);
+      setMetricsData(null);
+      setGraphsMetricsData(null);
       
       if (!apiDateFilter || !apiDateFilter.start_date || !apiDateFilter.end_date) {
-        console.log("Overview - Invalid date filter:", apiDateFilter);
+        console.log('❌ Invalid date filter');
         return;
       }
       
-      // Create a cache key based on date filter
-      const dateFilterStr = JSON.stringify(apiDateFilter);
-      const cacheKey = `overview_metrics_cache_${dateFilterStr}`;
-      const graphsCacheKey = `overview_graphs_metrics_cache_${JSON.stringify(globalDateFilter)}`; // ADDED: Separate cache key for graphs
+      console.log('📅 Selected Time:', selectedTime);
+      console.log('📊 Current Period:', `${apiDateFilter.start_date} to ${apiDateFilter.end_date}`);
       
-      // Check cache first
-      const cachedMetrics = localStorage.getItem(cacheKey);
-      const cachedGraphsMetrics = localStorage.getItem(graphsCacheKey); // ADDED: Check graphs cache
-      
-      let shouldFetchCardsData = true;
-      let shouldFetchGraphsData = true;
-      
-      // Check cards cache
-      if (cachedMetrics) {
-        const { data: cachedMetricsData, timestamp } = JSON.parse(cachedMetrics);
-        if (Date.now() - timestamp < CACHE_DURATION) {
-          console.log('Overview - Loading metrics from cache for filter:', apiDateFilter);
-          processMetricsData(cachedMetricsData);
-          setIsLoading(false);
-          shouldFetchCardsData = false;
-        } else {
-          console.log('Overview - Cache expired, fetching fresh data');
-        }
-      } else {
-        console.log('Overview - No cache found, fetching fresh data');
+      // Calculate previous period for delta
+      const previousPeriod = calculatePreviousPeriod(apiDateFilter.start_date, apiDateFilter.end_date);
+      if (!previousPeriod) {
+        throw new Error('Failed to calculate previous period');
       }
       
-      // ADDED: Check graphs cache
-      if (cachedGraphsMetrics) {
-        const { data: cachedGraphsData, timestamp } = JSON.parse(cachedGraphsMetrics);
+      console.log('📊 Previous Period:', `${previousPeriod.start_date} to ${previousPeriod.end_date}`);
+      
+      // Check cache for cards data
+      const cardsCacheKey = `overview_cards_cache_${JSON.stringify(apiDateFilter)}`;
+      const cachedCardsData = localStorage.getItem(cardsCacheKey);
+      
+      let cardsData = null;
+      
+      if (cachedCardsData) {
+        const { data, timestamp } = JSON.parse(cachedCardsData);
         if (Date.now() - timestamp < CACHE_DURATION) {
-          console.log('Overview - Loading graphs metrics from cache for filter:', globalDateFilter);
-          setGraphsMetricsData(cachedGraphsData);
+          console.log('✅ Loading cards from cache');
+          cardsData = data;
+        }
+      }
+      
+      // Fetch cards data if not cached
+      if (!cardsData) {
+        console.log('🔄 Fetching fresh cards data...');
+        
+        // UPDATED: Make 4 API calls for cards (2 current + 2 previous)
+        const apiCalls = [
+          // Current period - average metrics
+          {
+            metrics: averageMetrics,
+            date_filter: apiDateFilter,
+            aggregate: "average",
+            game_id: GAME_ID,
+            ...(userId && { user_id: userId })
+          },
+          // Current period - sum metrics
+          {
+            metrics: sumMetrics,
+            date_filter: apiDateFilter,
+            aggregate: "sum",
+            game_id: GAME_ID,
+            ...(userId && { user_id: userId })
+          },
+          // Previous period - average metrics
+          {
+            metrics: averageMetrics,
+            date_filter: { type: "between", ...previousPeriod },
+            aggregate: "average",
+            game_id: GAME_ID,
+            ...(userId && { user_id: userId })
+          },
+          // Previous period - sum metrics
+          {
+            metrics: sumMetrics,
+            date_filter: { type: "between", ...previousPeriod },
+            aggregate: "sum",
+            game_id: GAME_ID,
+            ...(userId && { user_id: userId })
+          }
+        ];
+        
+        console.log('🚀 Making 4 API calls for cards...');
+        
+        // Execute all API calls in parallel
+        const responses = await Promise.all(
+          apiCalls.map(payload => 
+            fetch('https://get-metrics-nt4chwvamq-uc.a.run.app', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            })
+          )
+        );
+        
+        // Check all responses are OK
+        for (const response of responses) {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+        }
+        
+        // Parse all responses
+        const [currentAvgData, currentSumData, prevAvgData, prevSumData] = await Promise.all(
+          responses.map(r => r.json())
+        );
+        
+        console.log('✅ All cards API calls completed');
+        
+        // Combine the data
+        cardsData = {
+          current: { average: currentAvgData, sum: currentSumData },
+          previous: { average: prevAvgData, sum: prevSumData }
+        };
+        
+        // Cache the combined data
+        localStorage.setItem(cardsCacheKey, JSON.stringify({
+          data: cardsData,
+          timestamp: Date.now()
+        }));
+      }
+      
+      // Process the cards data
+      processCardsData(cardsData);
+      
+      // Fetch graphs data (unchanged logic)
+      const graphsCacheKey = `overview_graphs_cache_${JSON.stringify(globalDateFilter)}`;
+      const cachedGraphsData = localStorage.getItem(graphsCacheKey);
+      
+      if (cachedGraphsData) {
+        const { data, timestamp } = JSON.parse(cachedGraphsData);
+        if (Date.now() - timestamp < CACHE_DURATION) {
+          console.log('✅ Loading graphs from cache');
+          setGraphsMetricsData(data);
           setGraphsLoading(false);
-          shouldFetchGraphsData = false;
         } else {
-          console.log('Overview - Graphs cache expired, fetching fresh data');
+          await fetchGraphsData(graphsCacheKey);
         }
       } else {
-        console.log('Overview - No graphs cache found, fetching fresh data');
+        await fetchGraphsData(graphsCacheKey);
       }
       
-      // UPDATED: Fetch cards data if needed
-      if (shouldFetchCardsData) {
-        const startTime = performance.now();
-        console.log('Overview - Fetching fresh metrics data with filter:', apiDateFilter);
-        console.log('Overview - Requesting metrics for cards:', metricsToRequest);
-        
-        // API request with date_filter and game_id for cards
-        const cardsRequestBody = {
-          metrics: metricsToRequest,
-          date_filter: apiDateFilter,
-          ...(userId && { user_id: userId }),
-          game_id: GAME_ID
-        };
-        
-        console.log('Overview - Cards API request payload:', cardsRequestBody);
-        
-        const cardsResponse = await fetch('https://get-metrics-nt4chwvamq-uc.a.run.app', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(cardsRequestBody)
-        });
-        
-        const endTime = performance.now();
-        console.log(`Overview - Cards API response time: ${((endTime - startTime) / 1000).toFixed(2)} seconds`);
-        
-        if (!cardsResponse.ok) {
-          throw new Error(`HTTP error! status: ${cardsResponse.status}`);
-        }
-
-        // Parse the response JSON
-        const cardsData = await cardsResponse.json();
-        console.log('Overview - Cards API Response:', cardsData);
-        
-        // Process metrics data for cards
-        processMetricsData(cardsData);
-        
-        // Store cards data in cache
-        try {
-          localStorage.setItem(cacheKey, JSON.stringify({
-            data: cardsData,
-            timestamp: Date.now()
-          }));
-          console.log('Overview - Cards metrics data cached successfully with key:', cacheKey);
-        } catch (error) {
-          console.error('Overview - Error caching cards metrics:', error);
-        }
-      }
-      
-      // ADDED: Fetch graphs data if needed
-      if (shouldFetchGraphsData) {
-        const graphsStartTime = performance.now();
-        console.log('Overview - Fetching fresh graphs metrics data with filter:', globalDateFilter);
-        console.log('Overview - Requesting metrics for graphs:', graphMetricsToRequest);
-        
-        // API request with date_filter and game_id for graphs
-        const graphsRequestBody = {
-          metrics: graphMetricsToRequest,
-          date_filter: globalDateFilter,
-          ...(userId && { user_id: userId }),
-          game_id: GAME_ID
-        };
-        
-        console.log('Overview - Graphs API request payload:', graphsRequestBody);
-        
-        const graphsResponse = await fetch('https://get-metrics-nt4chwvamq-uc.a.run.app', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(graphsRequestBody)
-        });
-        
-        const graphsEndTime = performance.now();
-        console.log(`Overview - Graphs API response time: ${((graphsEndTime - graphsStartTime) / 1000).toFixed(2)} seconds`);
-        
-        if (!graphsResponse.ok) {
-          throw new Error(`HTTP error for graphs! status: ${graphsResponse.status}`);
-        }
-
-        // Parse the response JSON
-        const graphsData = await graphsResponse.json();
-        console.log('Overview - Graphs API Response:', graphsData);
-        
-        // Store the graphs data for passing to GetMetrics components
-        setGraphsMetricsData(graphsData);
-        
-        // Store graphs data in cache
-        try {
-          localStorage.setItem(graphsCacheKey, JSON.stringify({
-            data: graphsData,
-            timestamp: Date.now()
-          }));
-          console.log('Overview - Graphs metrics data cached successfully with key:', graphsCacheKey);
-        } catch (error) {
-          console.error('Overview - Error caching graphs metrics:', error);
-        }
-      }
-      
-      // UPDATED: Set loading states to false when fetches are complete
       setIsLoading(false);
-      setGraphsLoading(false);
       
     } catch (err) {
-      console.error('Overview - Error fetching metrics:', err);
-      setError(`Failed to load metrics data: ${err.message}`);
+      console.error('❌ Error in fetchMetricsData:', err);
+      setError(`Failed to load metrics: ${err.message}`);
       setIsLoading(false);
       setGraphsLoading(false);
     }
   };
   
-  // Process the metrics data for display
-  const processMetricsData = (data) => {
-    if (!data || !data.metrics || !Array.isArray(data.metrics)) {
-      console.log("Overview - No valid metrics data to process");
+  // UPDATED: New function to fetch graphs data
+  const fetchGraphsData = async (cacheKey) => {
+    try {
+      console.log('🔄 Fetching graphs data...');
+      
+      const graphsResponse = await fetch('https://get-metrics-nt4chwvamq-uc.a.run.app', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          metrics: graphMetricsToRequest,
+          date_filter: globalDateFilter,
+          ...(userId && { user_id: userId }),
+          game_id: GAME_ID
+        })
+      });
+      
+      if (!graphsResponse.ok) {
+        throw new Error(`HTTP error! status: ${graphsResponse.status}`);
+      }
+      
+      const graphsData = await graphsResponse.json();
+      console.log('✅ Graphs data fetched');
+      
+      setGraphsMetricsData(graphsData);
+      setGraphsLoading(false);
+      
+      // Cache graphs data
+      localStorage.setItem(cacheKey, JSON.stringify({
+        data: graphsData,
+        timestamp: Date.now()
+      }));
+    } catch (err) {
+      console.error('❌ Error fetching graphs:', err);
+      setGraphsLoading(false);
+    }
+  };
+  
+  // COMPLETELY REWRITTEN: Process cards data with new API response structure
+  const processCardsData = (data) => {
+    if (!data || !data.current || !data.previous) {
+      console.log('❌ Invalid cards data structure');
       setMetricsData(null);
       return;
     }
     
-    console.log("Overview - Processing metrics data:", data);
-    
-    // Create an object to hold the processed metrics
     const processedMetrics = {};
     
-    // Process each metric
-    data.metrics.forEach(metric => {
-      const metricId = metric.metric_id;
-      
-      // Skip if not the metric we're looking for
-      if (!metricsToRequest.includes(metricId)) {
-        return;
-      }
-      
-      // Handle different metric types
-      if (metricId === "classic_retention") {
-        // For classic retention, we want Day 7 specifically
-        if (metric.series && Array.isArray(metric.series)) {
-          // Find the Day 7 series
-          const day7Series = metric.series.find(s => s.name === "Day 7");
+    // Process average metrics
+    if (data.current.average?.metrics && data.previous.average?.metrics) {
+      data.current.average.metrics.forEach(currentMetric => {
+        const metricId = currentMetric.metric_id;
+        
+        // Find corresponding previous metric
+        const prevMetric = data.previous.average.metrics.find(m => m.metric_id === metricId);
+        
+        // FIXED: Access the aggregated value from the new API response structure
+        if (currentMetric.values?.value !== undefined && prevMetric?.values?.value !== undefined) {
+          const currentValue = currentMetric.values.value;
+          const previousValue = prevMetric.values.value;
           
-          if (day7Series && Array.isArray(day7Series.values) && day7Series.values.length > 0) {
-            // Get the latest value (last in array)
-            const newValue = day7Series.values[day7Series.values.length - 1] || 0;
-            // Get the previous value (second to last)
-            const oldValue = day7Series.values.length > 1 ? day7Series.values[day7Series.values.length - 2] : 0;
-            
-            // Calculate delta
-            const delta = calculateDeltaPercentage(newValue, oldValue);
-            
-            processedMetrics[metricId] = {
-              title: metric.name || "Classic Retention",
-              value: formatValue(metricId, newValue),
-              change: `${delta.isPositive ? '+' : '-'}${delta.value}%`,
-              isPositive: delta.isPositive,
-              icon: Target
-            };
+          console.log(`📊 ${metricId}: Current=${currentValue}, Previous=${previousValue}`);
+          
+          const delta = calculateDeltaPercentage(currentValue, previousValue);
+          
+          // Set icon based on metric type
+          let icon;
+          switch (metricId) {
+            case "dau":
+              icon = Users;
+              break;
+            case "new_players":
+              icon = TrendingUp;
+              break;
+            case "avg_session_length":
+              icon = Clock;
+              break;
+            default:
+              icon = Target;
           }
+          
+          processedMetrics[metricId] = {
+            title: currentMetric.name,
+            value: formatValue(metricId, currentValue),
+            change: `${delta.isPositive ? '+' : '-'}${delta.value}%`,
+            isPositive: delta.isPositive,
+            icon
+          };
         }
-      } else if (Array.isArray(metric.values) && metric.values.length > 0) {
-        // For time series data, get the latest values
-        // Sort values by date if not already sorted
-        const sortedValues = [...metric.values].sort((a, b) => new Date(a[0]) - new Date(b[0]));
-        
-        // Get the latest value (last in array)
-        const newValue = sortedValues[sortedValues.length - 1][1] || 0;
-        // Get the previous value (second to last)
-        const oldValue = sortedValues.length > 1 ? sortedValues[sortedValues.length - 2][1] : 0;
-        
-        // Calculate delta
-        const delta = calculateDeltaPercentage(newValue, oldValue);
-        
-        // Set icon based on metric type
-        let icon;
-        switch (metricId) {
-          case "dau":
-            icon = Users;
-            break;
-          case "new_players":
-            icon = TrendingUp;
-            break;
-          case "avg_session_length":
-            icon = Clock;
-            break;
-          default:
-            icon = Target;
-        }
-        
-        processedMetrics[metricId] = {
-          title: metric.name, // Use the name from the API
-          value: formatValue(metricId, newValue),
-          change: `${delta.isPositive ? '+' : '-'}${delta.value}%`,
-          isPositive: delta.isPositive,
-          icon
-        };
-      }
-    });
+      });
+    }
     
-    console.log("Overview - Processed metrics:", processedMetrics);
+    // Process sum metrics (classic_retention)
+// Process sum metrics (classic_retention)
+if (data.current.sum?.metrics && data.previous.sum?.metrics) {
+  data.current.sum.metrics.forEach(currentMetric => {
+    const metricId = currentMetric.metric_id;
+    
+    if (metricId === "classic_retention") {
+      const prevMetric = data.previous.sum.metrics.find(m => m.metric_id === metricId);
+      
+      // Debug log to see the structure
+      console.log('📊 Classic Retention Current Data:', currentMetric);
+      console.log('📊 Classic Retention Previous Data:', prevMetric);
+      
+      // For classic retention with aggregate, find Day 7 series
+      if (currentMetric.series && prevMetric?.series) {
+        const currentDay7 = currentMetric.series.find(s => s.name === "Day 7");
+        const prevDay7 = prevMetric.series.find(s => s.name === "Day 7");
+        
+        console.log('📊 Current Day 7:', currentDay7);
+        console.log('📊 Previous Day 7:', prevDay7);
+        
+        // Access the aggregated value directly
+        if (currentDay7?.value !== undefined && prevDay7?.value !== undefined) {
+          const currentValue = currentDay7.value;
+          const previousValue = prevDay7.value;
+          
+          console.log(`📊 ${metricId} Day 7 Values: Current=${currentValue}, Previous=${previousValue}`);
+          
+          const delta = calculateDeltaPercentage(currentValue, previousValue);
+          
+          processedMetrics[metricId] = {
+            title: currentMetric.name || "Classic Retention",
+            value: formatValue(metricId, currentValue), // This should format as "10.4%"
+            change: `${delta.isPositive ? '+' : '-'}${delta.value}%`,
+            isPositive: delta.isPositive,
+            icon: Target
+          };
+          
+          console.log('📊 Processed Classic Retention:', processedMetrics[metricId]);
+        }
+      }
+    }
+  });
+}    
+    console.log('✅ Cards processed successfully');
     setMetricsData(processedMetrics);
   };
 
-  // UPDATED: Fetch metrics when date filters change
+  // Fetch metrics when date filters change
   useEffect(() => {
     if (apiDateFilter && apiDateFilter.start_date && apiDateFilter.end_date) {
-      console.log("Overview - Date filter is valid, fetching metrics");
+      console.log('🔄 Date filter changed, fetching metrics...');
       fetchMetricsData();
-    } else {
-      console.log("Overview - Waiting for valid date filter");
     }
-  }, [apiDateFilter, globalDateFilter]); // UPDATED: Added globalDateFilter as dependency
+  }, [apiDateFilter, globalDateFilter]);
 
   // Define order of metrics for display
   const metricOrder = ["dau", "classic_retention", "new_players", "avg_session_length"];
 
-  // Map of metrics for the overview cards - using loading state when API data is not available
+  // Map of metrics for the overview cards
   const getOverviewStats = () => {
     if (!metricsData) {
-      // Return loading placeholders if no metrics data is available
-      return [
-        {
-          title: "Loading...",
-          value: "...",
-          change: "0%",
-          isPositive: true,
-          icon: Users,
-        },
-        {
-          title: "Loading...",
-          value: "...",
-          change: "0%",
-          isPositive: true,
-          icon: Target,
-        },
-        {
-          title: "Loading...",
-          value: "...",
-          change: "0%",
-          isPositive: true,
-          icon: TrendingUp,
-        },
-        {
-          title: "Loading...",
-          value: "...",
-          change: "0%",
-          isPositive: true,
-          icon: Clock,
-        }
-      ];
+      // Return loading placeholders
+      return metricOrder.map(() => ({
+        title: "Loading...",
+        value: "...",
+        change: "0%",
+        isPositive: true,
+        icon: Users,
+      }));
     }
     
     // Return metrics in the specified order
@@ -404,7 +447,7 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => { // UPD
     });
   };
 
-  // ADDED: Helper function to extract metrics data for specific metric
+  // Helper function to extract metrics data for specific metric
   const getMetricData = (metricId) => {
     if (!graphsMetricsData || !graphsMetricsData.metrics || !Array.isArray(graphsMetricsData.metrics)) {
       return null;
@@ -436,9 +479,8 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => { // UPD
       </div>
       {error && <div className={styles.errorMessage}>{error}</div>}
       
-      {/* UPDATED: Section to display graphs for each metric using GetMetrics with pre-fetched data */}
+      {/* Section to display graphs for each metric using GetMetrics with pre-fetched data */}
       <div className={styles.overviewGraphsContainer}>
-        {/* UPDATED: Display DAU Graph - first graph shows skeletons, pass pre-fetched data */}
         <GetMetrics 
           selectedTime={selectedTime}
           specificMetric="dau"
@@ -446,11 +488,10 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => { // UPD
           readOnly={true}
           initialDateFilter={globalDateFilter}
           hideSkeletons={graphsLoading ? false : true}
-          prefetchedData={getMetricData("dau")} // ADDED: Pass pre-fetched data
-          isDataLoading={graphsLoading} // ADDED: Pass loading state
+          prefetchedData={getMetricData("dau")}
+          isDataLoading={graphsLoading}
         />
         
-        {/* UPDATED: Hide skeletons for the other graphs and pass pre-fetched data */}
         <GetMetrics 
           selectedTime={selectedTime}
           specificMetric="classic_retention"
@@ -458,11 +499,10 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => { // UPD
           readOnly={true}
           initialDateFilter={globalDateFilter}
           hideSkeletons={true}
-          prefetchedData={getMetricData("classic_retention")} // ADDED: Pass pre-fetched data
-          isDataLoading={graphsLoading} // ADDED: Pass loading state
+          prefetchedData={getMetricData("classic_retention")}
+          isDataLoading={graphsLoading}
         />
         
-        {/* UPDATED: Hide skeletons for this graph and pass pre-fetched data */}
         <GetMetrics 
           selectedTime={selectedTime}
           specificMetric="new_players"
@@ -470,11 +510,10 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => { // UPD
           readOnly={true}
           initialDateFilter={globalDateFilter}
           hideSkeletons={true}
-          prefetchedData={getMetricData("new_players")} // ADDED: Pass pre-fetched data
-          isDataLoading={graphsLoading} // ADDED: Pass loading state
+          prefetchedData={getMetricData("new_players")}
+          isDataLoading={graphsLoading}
         />
         
-        {/* UPDATED: Hide skeletons for this graph and pass pre-fetched data */}
         <GetMetrics 
           selectedTime={selectedTime}
           specificMetric="avg_session_length"
@@ -482,8 +521,8 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => { // UPD
           readOnly={true}
           initialDateFilter={globalDateFilter}
           hideSkeletons={true}
-          prefetchedData={getMetricData("avg_session_length")} // ADDED: Pass pre-fetched data
-          isDataLoading={graphsLoading} // ADDED: Pass loading state
+          prefetchedData={getMetricData("avg_session_length")}
+          isDataLoading={graphsLoading}
         />
       </div>
     </div>

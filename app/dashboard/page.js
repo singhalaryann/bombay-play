@@ -127,116 +127,130 @@ export default function Dashboard() {
   const TECHNIQUES_SEQUENCE = ["behaviour", "bartle", "rfe"];
 
   // Convert selectedTime to API date filter format (between format for Overview)
-  useEffect(() => {
-    console.log('Dashboard - Time filter changed to:', selectedTime);
-    
-    if (!selectedTime) {
-      console.log('Dashboard - No selectedTime provided');
-      return;
-    }
-    
-    let endDate, startDate;
-    const today = new Date();
+// UPDATED: Convert selectedTime to API date filter format with proper day calculations
+useEffect(() => {
+  console.log('Dashboard - Time filter changed to:', selectedTime);
+  
+  if (!selectedTime) {
+    console.log('Dashboard - No selectedTime provided');
+    return;
+  }
+  
+  let endDate, startDate;
+  const today = new Date();
 
-    // Check if the selectedTime includes a date range (from TabFilter's custom date)
-    if (selectedTime.includes(" - ")) {
-      const [startStr, endStr] = selectedTime.split(" - ");
-      const parsedEndDate = new Date(endStr.trim());
-      
-      // If selected end date is after data limit, use Apr 2-3 range
-      if (parsedEndDate > DATA_LIMIT_DATE) {
-        console.log('Dashboard - Using fixed Apr 2-3 range due to data limit');
-        endDate = new Date('2025-03-31');
-        startDate = new Date('2025-03-30');
-      } else {
-        // Otherwise use the selected range, but ensure start date is end date - 1
-        endDate = parsedEndDate;
-        startDate = new Date(endDate);
-        startDate.setDate(endDate.getDate() - 1);
-      }
-    } 
-    // Handle "Since" date format
-    else if (selectedTime.startsWith("Since ")) {
-      const sinceStr = selectedTime.replace("Since ", "");
-      const sinceDate = new Date(sinceStr);
-      
-      // If since date is after data limit, use Apr 2-3 range
-      if (sinceDate > DATA_LIMIT_DATE) {
-        console.log('Dashboard - Using fixed Apr 2-3 range due to data limit');
-        endDate = new Date('2025-03-31');
-        startDate = new Date('2025-03-30');
-      } else {
-        // Otherwise use today as end date and ensure start date is end date - 1
-        endDate = today < DATA_LIMIT_DATE ? today : DATA_LIMIT_DATE;
-        startDate = new Date(endDate);
-        startDate.setDate(endDate.getDate() - 1);
-      }
+  // Check if the selectedTime includes a date range (from TabFilter's custom date)
+  if (selectedTime.includes(" - ")) {
+    const [startStr, endStr] = selectedTime.split(" - ");
+    const parsedStartDate = new Date(startStr.trim()); // UPDATED: Parse start date
+    const parsedEndDate = new Date(endStr.trim());
+    
+    // If selected end date is after data limit, use data limit as end date
+    if (parsedEndDate > DATA_LIMIT_DATE) {
+      console.log('Dashboard - Adjusting end date to data limit');
+      endDate = DATA_LIMIT_DATE;
+      // UPDATED: Calculate actual period length and apply to start date
+      const periodLength = Math.ceil((parsedEndDate - parsedStartDate) / (1000 * 60 * 60 * 24)) + 1;
+      startDate = new Date(endDate);
+      startDate.setDate(endDate.getDate() - periodLength + 1);
+    } else {
+      // UPDATED: Use the actual selected range
+      endDate = parsedEndDate;
+      startDate = parsedStartDate;
     }
-    // Handle "Last X days" format
-    else if (selectedTime.startsWith("Last ")) {
-      const daysText = selectedTime.replace("Last ", "").replace(" days", "");
-      const days = parseInt(daysText);
-      
-      if (!isNaN(days)) {
-        endDate = today < DATA_LIMIT_DATE ? today : DATA_LIMIT_DATE;
-        startDate = new Date(endDate);
-        startDate.setDate(endDate.getDate() - 1);
-      } else {
-        console.log('Dashboard - Invalid days value, using default');
-        endDate = today < DATA_LIMIT_DATE ? today : DATA_LIMIT_DATE;
-        startDate = new Date(endDate);
-        startDate.setDate(endDate.getDate() - 1);
-      }
+  } 
+  // Handle "Since" date format
+  else if (selectedTime.startsWith("Since ")) {
+    const sinceStr = selectedTime.replace("Since ", "");
+    const sinceDate = new Date(sinceStr);
+    
+    // UPDATED: Calculate proper date range for "Since"
+    endDate = today < DATA_LIMIT_DATE ? today : DATA_LIMIT_DATE;
+    startDate = sinceDate;
+    
+    // If since date is after data limit, adjust accordingly
+    if (sinceDate > DATA_LIMIT_DATE) {
+      console.log('Dashboard - Since date is beyond data limit');
+      startDate = DATA_LIMIT_DATE;
     }
-    // Handle preset values (Today, Yesterday, 7D, 30D, etc.)
-    else {
-      // For all preset values, ensure we don't exceed data limit
-      const maxEndDate = today < DATA_LIMIT_DATE ? today : DATA_LIMIT_DATE;
-      
-      switch(selectedTime) {
-        case "Today":
-          endDate = maxEndDate;
-          startDate = new Date(endDate);
-          startDate.setDate(endDate.getDate() - 1);
-          break;
-        case "Yesterday":
-          endDate = new Date(maxEndDate);
-          endDate.setDate(maxEndDate.getDate() - 1);
-          startDate = new Date(endDate);
-          startDate.setDate(endDate.getDate() - 1);
-          break;
-        case "7D":
-        case "30D":
-        case "3D":
-          // All these presets should use the same logic - end date is today/max date
-          // and start date is end date - 1
-          endDate = maxEndDate;
-          startDate = new Date(endDate);
-          startDate.setDate(endDate.getDate() - 1);
-          break;
-        default:
-          console.log('Dashboard - Unknown time filter, using default');
-          endDate = maxEndDate;
-          startDate = new Date(endDate);
-          startDate.setDate(endDate.getDate() - 1);
-      }
+  }
+  // Handle "Last X days" format
+  else if (selectedTime.startsWith("Last ")) {
+    const daysText = selectedTime.replace("Last ", "").replace(" days", "");
+    const days = parseInt(daysText);
+    
+    if (!isNaN(days)) {
+      endDate = today < DATA_LIMIT_DATE ? today : DATA_LIMIT_DATE;
+      startDate = new Date(endDate);
+      // UPDATED: Calculate actual X days back
+      startDate.setDate(endDate.getDate() - days + 1);
+    } else {
+      console.log('Dashboard - Invalid days value, using default');
+      endDate = today < DATA_LIMIT_DATE ? today : DATA_LIMIT_DATE;
+      startDate = new Date(endDate);
+      startDate.setDate(endDate.getDate() - 29); // Default to 30 days
     }
+  }
+  // Handle preset values (Today, Yesterday, 7D, 30D, etc.)
+  else {
+    // For all preset values, ensure we don't exceed data limit
+    const maxEndDate = today < DATA_LIMIT_DATE ? today : DATA_LIMIT_DATE;
     
-    // Format dates for API
-    const formattedStartDate = formatApiDate(startDate);
-    const formattedEndDate = formatApiDate(endDate);
-    
-    // Create the between format for API
-    const newApiDateFilter = {
-      type: "between",
-      start_date: formattedStartDate,
-      end_date: formattedEndDate
-    };
-    
-    console.log('Dashboard - Converted to API date filter:', newApiDateFilter);
-    setApiDateFilter(newApiDateFilter);
-    
-  }, [selectedTime]);
+    switch(selectedTime) {
+      case "Today":
+        endDate = maxEndDate;
+        startDate = new Date(endDate); // UPDATED: Today = same day
+        break;
+      case "Yesterday":
+        endDate = new Date(maxEndDate);
+        endDate.setDate(maxEndDate.getDate() - 1);
+        startDate = new Date(endDate); // UPDATED: Yesterday = single day
+        break;
+      case "7D":
+        // UPDATED: Actual 7 days
+        endDate = maxEndDate;
+        startDate = new Date(endDate);
+        startDate.setDate(endDate.getDate() - 6); // -6 to include end date = 7 days
+        break;
+      case "30D":
+        // UPDATED: Actual 30 days
+        endDate = maxEndDate;
+        startDate = new Date(endDate);
+        startDate.setDate(endDate.getDate() - 29); // -29 to include end date = 30 days
+        break;
+      case "3D":
+        // UPDATED: Actual 3 days
+        endDate = maxEndDate;
+        startDate = new Date(endDate);
+        startDate.setDate(endDate.getDate() - 2); // -2 to include end date = 3 days
+        break;
+      default:
+        console.log('Dashboard - Unknown time filter, using 30D default');
+        endDate = maxEndDate;
+        startDate = new Date(endDate);
+        startDate.setDate(endDate.getDate() - 29); // Default to 30 days
+    }
+  }
+  
+  // Format dates for API
+  const formattedStartDate = formatApiDate(startDate);
+  const formattedEndDate = formatApiDate(endDate);
+  
+  // Create the between format for API
+  const newApiDateFilter = {
+    type: "between",
+    start_date: formattedStartDate,
+    end_date: formattedEndDate
+  };
+  
+  // UPDATED: Cleaner logging
+  console.log('📅 Dashboard - Date Filter Update:');
+  console.log(`   Selected: ${selectedTime}`);
+  console.log(`   API Filter: ${formattedStartDate} to ${formattedEndDate}`);
+  
+  setApiDateFilter(newApiDateFilter);
+  
+}, [selectedTime]);
 
   // UPDATED: Helper function to detect page reload
   const isPageReload = () => {
