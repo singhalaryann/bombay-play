@@ -301,26 +301,26 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => {
         const metricId = currentMetric.metric_id;
         const prevMetric = data.previous.average.metrics.find(m => m.metric_id === metricId);
 
-        // Handle classic_retention in average section
-        if (metricId === "classic_retention") {
-          if (currentMetric.series && prevMetric?.series) {
-            const currentDay7 = currentMetric.series.find(s => s.name === "Day 7");
-            const prevDay7 = prevMetric.series.find(s => s.name === "Day 7");
-            if (currentDay7?.value !== undefined && prevDay7?.value !== undefined) {
-              const currentValue = currentDay7.value;
-              const previousValue = prevDay7.value;
-              const delta = calculateDeltaPercentage(currentValue, previousValue);
-              processedMetrics[metricId] = {
-                title: "Classic Retention (7D)",
-                value: formatValue(metricId, currentValue),
-                change: `${delta.isPositive ? '+' : '-'}${delta.value}%`,
-                isPositive: delta.isPositive,
-                icon: Target
-              };
-            }
-          }
-          return;
-        }
+        // // Handle classic_retention in average section
+        // if (metricId === "classic_retention") {
+        //   if (currentMetric.series && prevMetric?.series) {
+        //     const currentDay7 = currentMetric.series.find(s => s.name === "Day 7");
+        //     const prevDay7 = prevMetric.series.find(s => s.name === "Day 7");
+        //     if (currentDay7?.value !== undefined && prevDay7?.value !== undefined) {
+        //       const currentValue = currentDay7.value;
+        //       const previousValue = prevDay7.value;
+        //       const delta = calculateDeltaPercentage(currentValue, previousValue);
+        //       processedMetrics[metricId] = {
+        //         title: "Classic Retention (7D)",
+        //         value: formatValue(metricId, currentValue),
+        //         change: `${delta.isPositive ? '+' : '-'}${delta.value}%`,
+        //         isPositive: delta.isPositive,
+        //         icon: Target
+        //       };
+        //     }
+        //   }
+        //   return;
+        // }
 
         // Handle other average metrics (dau, avg_session_length)
         if (currentMetric.values?.value !== undefined && prevMetric?.values?.value !== undefined) {
@@ -383,7 +383,7 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => {
   }, [apiDateFilter, globalDateFilter]);
 
   // Define order of metrics for display
-  const metricOrder = ["dau", "classic_retention", "new_players", "avg_session_length"];
+  const metricOrder = ["dau", /*"classic_retention",*/ "new_players", "avg_session_length"];
 
   // Map of metrics for the overview cards
   const getOverviewStats = () => {
@@ -479,7 +479,7 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => {
           isDataLoading={graphsLoading}
         />
         
-        <GetMetrics 
+        {/* <GetMetrics 
           selectedTime={selectedTime}
           specificMetric="classic_retention"
           specificMetricType="multiline"
@@ -488,7 +488,7 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => {
           hideSkeletons={true}
           prefetchedData={getMetricData("classic_retention")}
           isDataLoading={graphsLoading}
-        />
+        /> */}
         
         <GetMetrics 
           selectedTime={selectedTime}
