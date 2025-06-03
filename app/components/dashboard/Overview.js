@@ -24,8 +24,8 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => {
   const CACHE_DURATION = 5 * 60 * 1000;
   
   // UPDATED: Separated metrics by aggregate type for cards
-  const averageMetrics = ["dau", "new_players", "avg_session_length"];
-  const sumMetrics = ["classic_retention"];
+  const averageMetrics = ["dau", "classic_retention", "avg_session_length"];
+  const sumMetrics = ["new_players"];
   
   // Graph metrics to request
   const graphMetricsToRequest = ["dau", "classic_retention", "new_players", "avg_session_length"];
@@ -299,27 +299,38 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => {
     if (data.current.average?.metrics && data.previous.average?.metrics) {
       data.current.average.metrics.forEach(currentMetric => {
         const metricId = currentMetric.metric_id;
-        
-        // Find corresponding previous metric
         const prevMetric = data.previous.average.metrics.find(m => m.metric_id === metricId);
-        
-        // FIXED: Access the aggregated value from the new API response structure
+
+        // Handle classic_retention in average section
+        if (metricId === "classic_retention") {
+          if (currentMetric.series && prevMetric?.series) {
+            const currentDay7 = currentMetric.series.find(s => s.name === "Day 7");
+            const prevDay7 = prevMetric.series.find(s => s.name === "Day 7");
+            if (currentDay7?.value !== undefined && prevDay7?.value !== undefined) {
+              const currentValue = currentDay7.value;
+              const previousValue = prevDay7.value;
+              const delta = calculateDeltaPercentage(currentValue, previousValue);
+              processedMetrics[metricId] = {
+                title: "Classic Retention (7D)",
+                value: formatValue(metricId, currentValue),
+                change: `${delta.isPositive ? '+' : '-'}${delta.value}%`,
+                isPositive: delta.isPositive,
+                icon: Target
+              };
+            }
+          }
+          return;
+        }
+
+        // Handle other average metrics (dau, avg_session_length)
         if (currentMetric.values?.value !== undefined && prevMetric?.values?.value !== undefined) {
           const currentValue = currentMetric.values.value;
           const previousValue = prevMetric.values.value;
-          
-          console.log(`📊 ${metricId}: Current=${currentValue}, Previous=${previousValue}`);
-          
           const delta = calculateDeltaPercentage(currentValue, previousValue);
-          
-          // Set icon based on metric type
           let icon;
           switch (metricId) {
             case "dau":
               icon = Users;
-              break;
-            case "new_players":
-              icon = TrendingUp;
               break;
             case "avg_session_length":
               icon = Clock;
@@ -327,9 +338,8 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => {
             default:
               icon = Target;
           }
-          
           processedMetrics[metricId] = {
-            title: currentMetric.name,
+            title: metricId === "dau" ? "Average Daily Active Users" : currentMetric.name,
             value: formatValue(metricId, currentValue),
             change: `${delta.isPositive ? '+' : '-'}${delta.value}%`,
             isPositive: delta.isPositive,
@@ -338,51 +348,28 @@ const Overview = ({ selectedTime, apiDateFilter, globalDateFilter }) => {
         }
       });
     }
-    
-    // Process sum metrics (classic_retention)
-// Process sum metrics (classic_retention)
-if (data.current.sum?.metrics && data.previous.sum?.metrics) {
-  data.current.sum.metrics.forEach(currentMetric => {
-    const metricId = currentMetric.metric_id;
-    
-    if (metricId === "classic_retention") {
-      const prevMetric = data.previous.sum.metrics.find(m => m.metric_id === metricId);
-      
-      // Debug log to see the structure
-      console.log('📊 Classic Retention Current Data:', currentMetric);
-      console.log('📊 Classic Retention Previous Data:', prevMetric);
-      
-      // For classic retention with aggregate, find Day 7 series
-      if (currentMetric.series && prevMetric?.series) {
-        const currentDay7 = currentMetric.series.find(s => s.name === "Day 7");
-        const prevDay7 = prevMetric.series.find(s => s.name === "Day 7");
-        
-        console.log('📊 Current Day 7:', currentDay7);
-        console.log('📊 Previous Day 7:', prevDay7);
-        
-        // Access the aggregated value directly
-        if (currentDay7?.value !== undefined && prevDay7?.value !== undefined) {
-          const currentValue = currentDay7.value;
-          const previousValue = prevDay7.value;
-          
-          console.log(`📊 ${metricId} Day 7 Values: Current=${currentValue}, Previous=${previousValue}`);
-          
-          const delta = calculateDeltaPercentage(currentValue, previousValue);
-          
-          processedMetrics[metricId] = {
-            title: currentMetric.name || "Classic Retention",
-            value: formatValue(metricId, currentValue), // This should format as "10.4%"
-            change: `${delta.isPositive ? '+' : '-'}${delta.value}%`,
-            isPositive: delta.isPositive,
-            icon: Target
-          };
-          
-          console.log('📊 Processed Classic Retention:', processedMetrics[metricId]);
+    // Process sum metrics (now for new_players)
+    if (data.current.sum?.metrics && data.previous.sum?.metrics) {
+      data.current.sum.metrics.forEach(currentMetric => {
+        const metricId = currentMetric.metric_id;
+        // Handle new_players in sum section
+        if (metricId === "new_players") {
+          const prevMetric = data.previous.sum.metrics.find(m => m.metric_id === metricId);
+          if (currentMetric.values?.value !== undefined && prevMetric?.values?.value !== undefined) {
+            const currentValue = currentMetric.values.value;
+            const previousValue = prevMetric.values.value;
+            const delta = calculateDeltaPercentage(currentValue, previousValue);
+            processedMetrics[metricId] = {
+              title: currentMetric.name,
+              value: formatValue(metricId, currentValue),
+              change: `${delta.isPositive ? '+' : '-'}${delta.value}%`,
+              isPositive: delta.isPositive,
+              icon: TrendingUp
+            };
+          }
         }
-      }
+      });
     }
-  });
-}    
     console.log('✅ Cards processed successfully');
     setMetricsData(processedMetrics);
   };
