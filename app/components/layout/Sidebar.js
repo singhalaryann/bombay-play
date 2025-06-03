@@ -229,6 +229,7 @@ React.useEffect(() => {
               </div>
               
               {/* User Analytics Menu Item */}
+              {/*
               <div className={styles.menuItem}>
                 <div
                   className={`${styles.menuLink} ${isAnalyticsActive ? styles.active : ""}`}
@@ -250,6 +251,7 @@ React.useEffect(() => {
                   <span className={styles.menuText}>User Analytics</span>
                 </div>
               </div>
+              */}
             </>
           )}
         </div>

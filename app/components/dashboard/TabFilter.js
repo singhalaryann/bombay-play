@@ -20,8 +20,7 @@ const TabFilter = ({ selected, onChange, disabled, readOnly }) => {
   }  const [isOpen, setIsOpen] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const dropdownRef = useRef(null);
-  const filters = ["Today", "Yesterday", "7D", "30D", "3D", "Custom"];  
-  // Current date for default selection
+  const filters = ["Today", "Yesterday", "3D", "7D", "30D", "Custom"]; // Changed: Moved "3D" before "7D" for logical chronological order  // Current date for default selection
   const today = new Date();
   const currentDay = today.getDate();
   const currentMonth = today.getMonth();
